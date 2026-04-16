@@ -729,12 +729,11 @@ body::before {
     const comment = document.getElementById('commentField').value;
 
     try {
-      await fetch('https://frizz-2.bubbleapps.io/version-test/api/1.1/obj/reponse', {
+      await fetch('https://frizz-2.bubbleapps.io/version-test/api/1.1/obj/reponse?api_token=1441d6c6954a281862a4c333fa3b8e62', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer 1441d6c6954a281862a4c333fa3b8e62'
-        },
+  'Content-Type': 'application/json',
+},
         body: JSON.stringify({
           commerce: commerceId,
           note: starRating,
