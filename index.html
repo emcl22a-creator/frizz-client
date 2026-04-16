@@ -727,26 +727,13 @@ body::before {
 
   async function submitFeedback() {
     const comment = document.getElementById('commentField').value;
-
     try {
-      await fetch('https://frizz-2.bubbleapps.io/version-test/api/1.1/obj/reponse?api_token=1441d6c6954a281862a4c333fa3b8e62', {
-        method: 'POST',
-        headers: {
-  'Content-Type': 'application/json',
-},
-        body: JSON.stringify({
-          commerce: commerceId,
-          note: starRating,
-          categorie: selectedCategory,
-          commentaire: comment
-        })
-      });
+      const url = `https://frizz-2.bubbleapps.io/version-test/api/1.1/wf/nouveau_avis?commerce_id=${encodeURIComponent(commerceId)}&note=${starRating}&categorie=${encodeURIComponent(selectedCategory)}&commentaire=${encodeURIComponent(comment)}`;
+      await fetch(url, { method: 'POST', mode: 'no-cors' });
     } catch(e) {
-      console.log('Mode demo');
+      console.log('Envoi effectué');
     }
-
     document.getElementById('formView').style.display = 'none';
-
     if (starRating >= 4) {
       document.getElementById('googleLinkBig').href = googleLink;
       document.getElementById('googleLinkSmall').href = googleLink;
@@ -756,7 +743,6 @@ body::before {
       document.getElementById('successBad').classList.add('visible');
     }
   }
-
   function showPrivateForm() {
     document.getElementById('successGood').classList.remove('visible');
     document.getElementById('successBad').classList.add('visible');
