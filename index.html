@@ -45,7 +45,7 @@ body::before {
 }
 .container {
   width: 100%;
-  max-width: 390px;
+  max-width: 500px;
   position: relative;
   z-index: 1;
 }
@@ -121,7 +121,7 @@ body::before {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 24px;
+  padding: 24px 20px;
   margin-bottom: 16px;
   animation: fadeUp 0.5s 0.15s ease both;
 }
@@ -224,7 +224,7 @@ body::before {
   color: var(--text);
   resize: none;
   outline: none;
-  min-height: 100px;
+  min-height: 160px;
   transition: border-color 0.2s;
   line-height: 1.5;
 }
@@ -508,19 +508,19 @@ body::before {
       <div class="question">Qu'est-ce qui vous a le plus marqué ?</div>
       <div class="question-sub">Choisissez ce qui correspond le mieux</div>
       <div class="emoji-row">
-        <div class="emoji-btn" onclick="selectEmoji(this,'food')">
+        <div class="emoji-btn" onclick="selectEmoji(this,'food')" data-cat="food">
           <span class="em">🍽️</span>
           <span class="label">La cuisine</span>
         </div>
-        <div class="emoji-btn" onclick="selectEmoji(this,'service')">
+        <div class="emoji-btn" onclick="selectEmoji(this,'service')" data-cat="service">
           <span class="em">🤝</span>
           <span class="label">Le service</span>
         </div>
-        <div class="emoji-btn" onclick="selectEmoji(this,'ambiance')">
+        <div class="emoji-btn" onclick="selectEmoji(this,'ambiance')" data-cat="ambiance">
           <span class="em">✨</span>
           <span class="label">L'ambiance</span>
         </div>
-        <div class="emoji-btn" onclick="selectEmoji(this,'price')">
+        <div class="emoji-btn" onclick="selectEmoji(this,'price')" data-cat="price">
           <span class="em">💰</span>
           <span class="label">Le prix</span>
         </div>
@@ -702,9 +702,9 @@ body::before {
   }
 
   function selectEmoji(el, cat) {
-    document.querySelectorAll('.emoji-btn').forEach(b => b.classList.remove('active'));
-    el.classList.add('active');
-    selectedCategory = cat;
+    el.classList.toggle('active');
+    const active = [...document.querySelectorAll('.emoji-btn.active')].map(b => b.getAttribute('data-cat'));
+    selectedCategory = active.join(',');
   }
 
   function nextStep() {
@@ -727,13 +727,16 @@ body::before {
 
   async function submitFeedback() {
     const comment = document.getElementById('commentField').value;
+
     try {
       const url = `https://frizz-2.bubbleapps.io/version-test/api/1.1/wf/nouveau_avis?commerce_id=${encodeURIComponent(commerceId)}&note=${starRating}&categorie=${encodeURIComponent(selectedCategory)}&commentaire=${encodeURIComponent(comment)}`;
       await fetch(url, { method: 'POST', mode: 'no-cors' });
     } catch(e) {
       console.log('Envoi effectué');
     }
+
     document.getElementById('formView').style.display = 'none';
+
     if (starRating >= 4) {
       document.getElementById('googleLinkBig').href = googleLink;
       document.getElementById('googleLinkSmall').href = googleLink;
@@ -743,6 +746,7 @@ body::before {
       document.getElementById('successBad').classList.add('visible');
     }
   }
+
   function showPrivateForm() {
     document.getElementById('successGood').classList.remove('visible');
     document.getElementById('successBad').classList.add('visible');
