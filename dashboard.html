@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Frizz — Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --bg: #0A0A0A;
+  --surface: #161616;
+  --surface2: #1E1E1E;
+  --border: rgba(255,255,255,0.07);
+  --text: #FFFFFF;
+  --text-muted: rgba(255,255,255,0.45);
+  --text-dim: rgba(255,255,255,0.25);
+  --accent: #58CC02;
+  --accent-dim: rgba(88,204,2,0.12);
+  --danger: #FF4B4B;
+  --danger-dim: rgba(255,75,75,0.1);
+  --warning: #FFC800;
+  --warning-dim: rgba(255,200,0,0.1);
+  --radius: 20px;
+}
+html, body {
+  min-height: 100vh;
+  background: var(--bg);
+  font-family: 'Figtree', sans-serif;
+  color: var(--text);
+}
+
+/* HEADER */
+.header {
+  background: #111;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.logo { font-size: 20px; font-weight: 900; color: var(--accent); letter-spacing: -0.5px; }
+.header-right { display: flex; align-items: center; gap: 12px; }
+.commerce-name-header { font-size: 13px; color: var(--text-muted); font-weight: 600; }
+.avatar {
+  width: 38px; height: 38px;
+  border-radius: 12px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px;
+  cursor: pointer;
+}
+.avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+/* BODY */
+.body { padding: 20px 16px 40px; display: flex; flex-direction: column; gap: 20px; max-width: 480px; margin: 0 auto; }
+
+/* WELCOME */
+.welcome { padding: 4px 0; }
+.welcome-title { font-size: 22px; font-weight: 900; letter-spacing: -0.4px; margin-bottom: 4px; }
+.welcome-sub { font-size: 13px; color: var(--text-muted); font-weight: 500; }
+
+/* STATS GRID */
+.stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 16px;
+}
+.stat-label { font-size: 11px; color: var(--text-muted); font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 8px; }
+.stat-value { font-size: 30px; font-weight: 900; letter-spacing: -0.5px; color: var(--text); }
+.stat-value.green { color: var(--accent); }
+.stat-sub { font-size: 11px; color: var(--text-dim); margin-top: 4px; font-weight: 500; }
+
+/* ALERT */
+.alert-card {
+  background: var(--danger-dim);
+  border: 1px solid rgba(255,75,75,0.2);
+  border-radius: 16px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.alert-card:hover { background: rgba(255,75,75,0.15); }
+.alert-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--danger); flex-shrink: 0; animation: blink 1.5s infinite; }
+@keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+.alert-text { flex: 1; font-size: 13px; color: rgba(255,255,255,0.8); font-weight: 600; line-height: 1.4; }
+.alert-link { font-size: 12px; color: var(--danger); font-weight: 700; white-space: nowrap; }
+.no-alert {
+  background: var(--accent-dim);
+  border: 1px solid rgba(88,204,2,0.2);
+  border-radius: 16px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.no-alert-text { font-size: 13px; color: rgba(255,255,255,0.7); font-weight: 600; }
+
+/* SECTION TITLE */
+.section-title { font-size: 12px; font-weight: 800; color: var(--text-muted); letter-spacing: 0.8px; text-transform: uppercase; margin-bottom: 12px; }
+
+/* TREND CHART */
+.trend-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 18px;
+}
+.trend-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.trend-title { font-size: 15px; font-weight: 800; }
+.trend-badge {
+  background: var(--accent-dim);
+  border: 1px solid rgba(88,204,2,0.2);
+  border-radius: 99px;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent);
+}
+.bars-wrap { display: flex; align-items: flex-end; gap: 6px; height: 70px; }
+.bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 5px; height: 100%; justify-content: flex-end; }
+.bar-fill { width: 100%; border-radius: 5px 5px 0 0; background: var(--accent); opacity: 0.8; transition: height 0.5s ease; }
+.bar-fill.bad { background: var(--danger); opacity: 0.7; }
+.bar-day { font-size: 10px; color: var(--text-dim); font-weight: 600; }
+
+/* AVIS LIST */
+.avis-list { display: flex; flex-direction: column; gap: 10px; }
+.avis-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+  transition: all 0.2s ease;
+}
+.avis-item.bad { border-color: rgba(255,75,75,0.15); background: rgba(255,75,75,0.04); }
+.avis-item:hover { border-color: rgba(255,255,255,0.12); }
+.avis-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.avis-stars { font-size: 13px; letter-spacing: 1px; }
+.avis-time { font-size: 11px; color: var(--text-dim); font-weight: 500; }
+.avis-cat {
+  display: inline-block;
+  border-radius: 99px;
+  padding: 3px 10px;
+  font-size: 10px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.avis-cat.green { background: var(--accent-dim); border: 1px solid rgba(88,204,2,0.2); color: var(--accent); }
+.avis-cat.orange { background: var(--warning-dim); border: 1px solid rgba(255,200,0,0.2); color: var(--warning); }
+.avis-cat.red { background: var(--danger-dim); border: 1px solid rgba(255,75,75,0.2); color: var(--danger); }
+.avis-comment { font-size: 13px; color: rgba(255,255,255,0.65); line-height: 1.5; font-weight: 500; }
+
+/* QR SECTION */
+.qr-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 18px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.qr-box {
+  width: 64px; height: 64px;
+  background: white;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  font-size: 10px;
+  color: #000;
+  text-align: center;
+  padding: 4px;
+}
+.qr-info { flex: 1; }
+.qr-title { font-size: 14px; font-weight: 800; margin-bottom: 3px; }
+.qr-sub { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+.qr-url { font-size: 11px; color: var(--accent); margin-top: 5px; word-break: break-all; }
+.btn-download {
+  background: var(--accent);
+  border: none;
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-family: 'Figtree', sans-serif;
+  font-size: 12px;
+  font-weight: 800;
+  color: #000;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+.btn-download:hover { background: #65e002; transform: translateY(-1px); }
+
+/* SETTINGS SECTION */
+.settings-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  overflow: hidden;
+}
+.settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.settings-row:last-child { border-bottom: none; }
+.settings-row:hover { background: rgba(255,255,255,0.03); }
+.settings-left { display: flex; align-items: center; gap: 12px; }
+.settings-icon {
+  width: 34px; height: 34px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+}
+.settings-icon.green { background: var(--accent-dim); }
+.settings-icon.blue { background: rgba(56,139,255,0.1); }
+.settings-icon.orange { background: var(--warning-dim); }
+.settings-icon.red { background: var(--danger-dim); }
+.settings-text { font-size: 14px; font-weight: 700; }
+.settings-sub { font-size: 11px; color: var(--text-muted); font-weight: 500; margin-top: 1px; }
+.settings-arrow { color: var(--text-dim); font-size: 16px; }
+
+/* PHOTO UPLOAD */
+.photo-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 18px;
+}
+.photo-title { font-size: 15px; font-weight: 800; margin-bottom: 4px; }
+.photo-sub { font-size: 12px; color: var(--text-muted); margin-bottom: 16px; font-weight: 500; }
+.photo-preview {
+  width: 80px; height: 80px;
+  border-radius: 18px;
+  background: var(--surface2);
+  border: 2px dashed rgba(255,255,255,0.15);
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 14px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.photo-preview:hover { border-color: var(--accent); }
+.photo-preview img { width: 100%; height: 100%; object-fit: cover; }
+.photo-placeholder { font-size: 28px; }
+.btn-upload {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 11px 16px;
+  font-family: 'Figtree', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+.btn-upload:hover { border-color: var(--accent); color: var(--accent); }
+
+/* POWERED */
+.powered {
+  text-align: center;
+  font-size: 11px;
+  color: rgba(255,255,255,0.15);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  padding-top: 10px;
+}
+.powered span { color: var(--accent); opacity: 0.5; }
+
+/* EMPTY STATE */
+.empty { text-align: center; padding: 30px 20px; color: var(--text-muted); font-size: 13px; font-weight: 500; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <span class="logo">Frizz</span>
+  <div class="header-right">
+    <span class="commerce-name-header" id="headerNom">Mon Commerce</span>
+    <div class="avatar" id="headerAvatar" onclick="goToSettings()">🏪</div>
+  </div>
+</div>
+
+<!-- BODY -->
+<div class="body">
+
+  <!-- WELCOME -->
+  <div class="welcome">
+    <p class="welcome-title" id="welcomeTitle">Bonjour 👋</p>
+    <p class="welcome-sub" id="welcomeSub">Voici vos résultats de cette semaine</p>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <p class="stat-label">Note moyenne</p>
+      <p class="stat-value green" id="statNote">—</p>
+      <p class="stat-sub" id="statNoteSub">cette semaine</p>
+    </div>
+    <div class="stat-card">
+      <p class="stat-label">Avis reçus</p>
+      <p class="stat-value" id="statTotal">—</p>
+      <p class="stat-sub">ce mois-ci</p>
+    </div>
+    <div class="stat-card">
+      <p class="stat-label">Avis Google</p>
+      <p class="stat-value green" id="statGoogle">—</p>
+      <p class="stat-sub">générés via Frizz</p>
+    </div>
+    <div class="stat-card">
+      <p class="stat-label">Taux scan</p>
+      <p class="stat-value" id="statScan">—</p>
+      <p class="stat-sub">des clients</p>
+    </div>
+  </div>
+
+  <!-- ALERTE -->
+  <div id="alertSection"></div>
+
+  <!-- TENDANCE -->
+  <div>
+    <p class="section-title">Tendance cette semaine</p>
+    <div class="trend-card">
+      <div class="trend-header">
+        <span class="trend-title">Notes par jour</span>
+        <span class="trend-badge" id="trendBadge">+0.0 ce mois</span>
+      </div>
+      <div class="bars-wrap" id="barsWrap">
+        <div class="bar-col"><div class="bar-fill" style="height:0%"></div><span class="bar-day">Lun</span></div>
+        <div class="bar-col"><div class="bar-fill" style="height:0%"></div><span class="bar-day">Mar</span></div>
+        <div class="bar-col"><div class="bar-fill" style="height:0%"></div><span class="bar-day">Mer</span></div>
+        <div class="bar-col"><div class="bar-fill" style="height:0%"></div><span class="bar-day">Jeu</span></div>
+        <div class="bar-col"><div class="bar-fill" style="height:0%"></div><span class="bar-day">Ven</span></div>
+        <div class="bar-col"><div class="bar-fill" style="height:0%"></div><span class="bar-day">Sam</span></div>
+        <div class="bar-col"><div class="bar-fill" style="height:0%"></div><span class="bar-day">Dim</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DERNIERS AVIS -->
+  <div>
+    <p class="section-title">Derniers avis reçus</p>
+    <div class="avis-list" id="avisList">
+      <div class="empty">Aucun avis pour le moment.<br>Posez votre QR code sur les tables !</div>
+    </div>
+  </div>
+
+  <!-- QR CODE -->
+  <div>
+    <p class="section-title">Votre QR Code</p>
+    <div class="qr-card">
+      <div class="qr-box" id="qrBox">
+        <svg width="52" height="52" viewBox="0 0 52 52" fill="black">
+          <rect x="2" y="2" width="20" height="20" rx="2" fill="none" stroke="black" stroke-width="3"/>
+          <rect x="7" y="7" width="10" height="10" rx="1"/>
+          <rect x="30" y="2" width="20" height="20" rx="2" fill="none" stroke="black" stroke-width="3"/>
+          <rect x="35" y="7" width="10" height="10" rx="1"/>
+          <rect x="2" y="30" width="20" height="20" rx="2" fill="none" stroke="black" stroke-width="3"/>
+          <rect x="7" y="35" width="10" height="10" rx="1"/>
+          <rect x="30" y="30" width="4" height="4"/>
+          <rect x="36" y="30" width="4" height="4"/>
+          <rect x="42" y="30" width="4" height="4"/>
+          <rect x="30" y="36" width="4" height="4"/>
+          <rect x="42" y="36" width="4" height="4"/>
+          <rect x="36" y="42" width="4" height="4"/>
+          <rect x="42" y="42" width="4" height="4"/>
+        </svg>
+      </div>
+      <div class="qr-info">
+        <p class="qr-title">QR Code de votre commerce</p>
+        <p class="qr-sub">À imprimer et poser sur vos tables</p>
+        <p class="qr-url" id="qrUrl">Chargement...</p>
+      </div>
+      <button class="btn-download" onclick="downloadQR()">Télécharger</button>
+    </div>
+  </div>
+
+  <!-- PHOTO ET PARAMÈTRES -->
+  <div>
+    <p class="section-title">Personnalisation</p>
+    <div class="photo-section">
+      <p class="photo-title">Photo de votre commerce</p>
+      <p class="photo-sub">Elle apparaît sur la page que voient vos clients</p>
+      <div class="photo-preview" id="photoPreview" onclick="document.getElementById('photoInput').click()">
+        <span class="photo-placeholder" id="photoPlaceholder">🏪</span>
+      </div>
+      <input type="file" id="photoInput" accept="image/*" style="display:none" onchange="previewPhoto(event)">
+      <button class="btn-upload" onclick="document.getElementById('photoInput').click()">
+        + Changer la photo
+      </button>
+    </div>
+  </div>
+
+  <!-- PARAMÈTRES -->
+  <div>
+    <p class="section-title">Paramètres</p>
+    <div class="settings-card">
+      <div class="settings-row" onclick="goToGoogleLink()">
+        <div class="settings-left">
+          <div class="settings-icon green">🔗</div>
+          <div>
+            <p class="settings-text">Lien Google</p>
+            <p class="settings-sub">Votre page d'avis Google</p>
+          </div>
+        </div>
+        <span class="settings-arrow">›</span>
+      </div>
+      <div class="settings-row" onclick="goToNotifications()">
+        <div class="settings-left">
+          <div class="settings-icon orange">🔔</div>
+          <div>
+            <p class="settings-text">Alertes</p>
+            <p class="settings-sub">Email et SMS pour mauvaises notes</p>
+          </div>
+        </div>
+        <span class="settings-arrow">›</span>
+      </div>
+      <div class="settings-row" onclick="goToQuestions()">
+        <div class="settings-left">
+          <div class="settings-icon blue">✏️</div>
+          <div>
+            <p class="settings-text">Questions</p>
+            <p class="settings-sub">Personnaliser le formulaire</p>
+          </div>
+        </div>
+        <span class="settings-arrow">›</span>
+      </div>
+      <div class="settings-row" onclick="goToFacturation()">
+        <div class="settings-left">
+          <div class="settings-icon red">💳</div>
+          <div>
+            <p class="settings-text">Abonnement</p>
+            <p class="settings-sub">Gérer votre plan Frizz</p>
+          </div>
+        </div>
+        <span class="settings-arrow">›</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="powered">Propulsé par <span>Frizz</span></div>
+
+</div>
+
+<script>
+  const API_BASE = 'https://frizz-2.bubbleapps.io/version-test/api/1.1';
+  const API_TOKEN = 'VOTRE_API_TOKEN';
+  let commerceId = '';
+  let commerceData = null;
+
+  function getUrlParam(param) {
+    return new URLSearchParams(window.location.search).get(param);
+  }
+
+  async function loadDashboard() {
+    commerceId = getUrlParam('id') || 'demo';
+
+    if (commerceId === 'demo') {
+      loadDemoData();
+      return;
+    }
+
+    try {
+      const res = await fetch(`${API_BASE}/obj/commerce/${commerceId}`, {
+        headers: { 'Authorization': `Bearer ${API_TOKEN}` }
+      });
+      const data = await res.json();
+      commerceData = data.response;
+      renderCommerce(commerceData);
+      loadAvis();
+    } catch(e) {
+      loadDemoData();
+    }
+  }
+
+  function renderCommerce(c) {
+    document.getElementById('headerNom').textContent = c.nom || 'Mon Commerce';
+    document.getElementById('welcomeTitle').textContent = `Bonjour, ${c.nom} 👋`;
+
+    if (c.photo) {
+      document.getElementById('headerAvatar').innerHTML = `<img src="${c.photo}" alt="${c.nom}">`;
+      document.getElementById('photoPreview').innerHTML = `<img src="${c.photo}" alt="${c.nom}">`;
+    }
+
+    document.getElementById('statNote').textContent = c.note_moyenne ? c.note_moyenne.toFixed(1) : '—';
+    document.getElementById('statTotal').textContent = c.total_reponses || '0';
+    document.getElementById('statGoogle').textContent = '—';
+    document.getElementById('statScan').textContent = '—';
+
+    const feedbackUrl = `https://emcl22a-creator.github.io/frizz-client/?id=${commerceId}`;
+    document.getElementById('qrUrl').textContent = feedbackUrl;
+  }
+
+  async function loadAvis() {
+    try {
+      const res = await fetch(`${API_BASE}/obj/reponse?constraints=${encodeURIComponent(JSON.stringify([{key:'commerce',constraint_type:'equals',value:commerceId}]))}&sort_field=Created Date&descending=true&limit=10`, {
+        headers: { 'Authorization': `Bearer ${API_TOKEN}` }
+      });
+      const data = await res.json();
+      const avis = data.response?.results || [];
+      renderAvis(avis);
+      renderAlerte(avis);
+      renderBars(avis);
+    } catch(e) {
+      console.log('Erreur chargement avis');
+    }
+  }
+
+  function renderAvis(avis) {
+    const list = document.getElementById('avisList');
+    if (avis.length === 0) {
+      list.innerHTML = '<div class="empty">Aucun avis pour le moment.<br>Posez votre QR code sur les tables !</div>';
+      return;
+    }
+
+    const catLabels = { food: 'La cuisine', service: 'Le service', ambiance: "L'ambiance", price: 'Le prix' };
+    const catColors = { food: 'green', service: 'orange', ambiance: 'green', price: 'orange' };
+
+    list.innerHTML = avis.map(a => {
+      const stars = '⭐'.repeat(a.note || 0);
+      const isBad = a.note <= 2;
+      const cat = a.categorie ? `<span class="avis-cat ${isBad ? 'red' : (catColors[a.categorie] || 'green')}">${catLabels[a.categorie] || a.categorie}</span>` : '';
+      const comment = a.commentaire ? `<p class="avis-comment">${a.commentaire}</p>` : '';
+      const time = timeAgo(a['Created Date']);
+      return `
+        <div class="avis-item ${isBad ? 'bad' : ''}">
+          <div class="avis-top">
+            <span class="avis-stars">${stars}</span>
+            <span class="avis-time">${time}</span>
+          </div>
+          ${cat}
+          ${comment}
+        </div>`;
+    }).join('');
+  }
+
+  function renderAlerte(avis) {
+    const section = document.getElementById('alertSection');
+    const mauvais = avis.filter(a => a.note <= 2);
+    if (mauvais.length > 0) {
+      const dernier = mauvais[0];
+      section.innerHTML = `
+        <div class="alert-card">
+          <div class="alert-dot"></div>
+          <p class="alert-text">Mauvaise note reçue — ${dernier.note}/5 · ${dernier.categorie || 'Commentaire'}</p>
+          <span class="alert-link">Voir →</span>
+        </div>`;
+    } else {
+      section.innerHTML = `
+        <div class="no-alert">
+          <span style="font-size:16px;">✅</span>
+          <p class="no-alert-text">Aucune alerte — tout va bien cette semaine !</p>
+        </div>`;
+    }
+  }
+
+  function renderBars(avis) {
+    const days = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
+    const today = new Date().getDay();
+    const dayNotes = [[], [], [], [], [], [], []];
+
+    avis.forEach(a => {
+      if (a['Created Date'] && a.note) {
+        const d = new Date(a['Created Date']).getDay();
+        const idx = d === 0 ? 6 : d - 1;
+        dayNotes[idx].push(a.note);
+      }
+    });
+
+    const wrap = document.getElementById('barsWrap');
+    wrap.innerHTML = days.map((day, i) => {
+      const notes = dayNotes[i];
+      const avg = notes.length ? notes.reduce((a,b) => a+b, 0) / notes.length : 0;
+      const height = avg ? (avg / 5 * 100) : 0;
+      const isBad = avg > 0 && avg < 3;
+      return `
+        <div class="bar-col">
+          <div class="bar-fill ${isBad ? 'bad' : ''}" style="height:${height}%"></div>
+          <span class="bar-day">${day}</span>
+        </div>`;
+    }).join('');
+  }
+
+  function loadDemoData() {
+    document.getElementById('headerNom').textContent = 'Chez Marco';
+    document.getElementById('welcomeTitle').textContent = 'Bonjour, Chez Marco 👋';
+    document.getElementById('statNote').textContent = '4.3';
+    document.getElementById('statTotal').textContent = '47';
+    document.getElementById('statGoogle').textContent = '23';
+    document.getElementById('statScan').textContent = '68%';
+    document.getElementById('qrUrl').textContent = 'frizz.app/feedback?id=demo';
+    document.getElementById('trendBadge').textContent = '+0.2 ce mois';
+
+    const demoAvis = [
+      { note: 5, categorie: 'food', commentaire: 'Excellent repas, la pasta était parfaite !', time: 'il y a 5 min' },
+      { note: 2, categorie: 'service', commentaire: 'Longue attente, serveur peu aimable ce soir.', time: 'il y a 12 min' },
+      { note: 4, categorie: 'ambiance', commentaire: 'Belle terrasse, musique agréable. Pizza bonne.', time: 'il y a 1h' },
+      { note: 5, categorie: 'food', commentaire: 'On reviendra ! Meilleure pizza du quartier.', time: 'il y a 2h' },
+    ];
+
+    const catLabels = { food: 'La cuisine', service: 'Le service', ambiance: "L'ambiance", price: 'Le prix' };
+    document.getElementById('avisList').innerHTML = demoAvis.map(a => {
+      const stars = '⭐'.repeat(a.note);
+      const isBad = a.note <= 2;
+      const catClass = isBad ? 'red' : (a.note >= 4 ? 'green' : 'orange');
+      return `
+        <div class="avis-item ${isBad ? 'bad' : ''}">
+          <div class="avis-top">
+            <span class="avis-stars">${stars}</span>
+            <span class="avis-time">${a.time}</span>
+          </div>
+          <span class="avis-cat ${catClass}">${catLabels[a.categorie]}</span>
+          <p class="avis-comment">${a.commentaire}</p>
+        </div>`;
+    }).join('');
+
+    document.getElementById('alertSection').innerHTML = `
+      <div class="alert-card">
+        <div class="alert-dot"></div>
+        <p class="alert-text">Mauvaise note reçue il y a 12 min — note 2/5 · Service</p>
+        <span class="alert-link">Voir →</span>
+      </div>`;
+
+    const demoHeights = [70, 85, 40, 90, 100, 80, 60];
+    const days = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
+    document.getElementById('barsWrap').innerHTML = demoHeights.map((h, i) => `
+      <div class="bar-col">
+        <div class="bar-fill ${h < 50 ? 'bad' : ''}" style="height:${h}%"></div>
+        <span class="bar-day">${days[i]}</span>
+      </div>`).join('');
+  }
+
+  function previewPhoto(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      document.getElementById('photoPreview').innerHTML = `<img src="${e.target.result}" alt="Photo">`;
+      document.getElementById('headerAvatar').innerHTML = `<img src="${e.target.result}" alt="Photo">`;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function downloadQR() {
+    alert('Fonctionnalité disponible après connexion à Bubble');
+  }
+
+  function timeAgo(dateStr) {
+    if (!dateStr) return '';
+    const diff = Date.now() - new Date(dateStr).getTime();
+    const mins = Math.floor(diff / 60000);
+    if (mins < 60) return `il y a ${mins} min`;
+    const hrs = Math.floor(mins / 60);
+    if (hrs < 24) return `il y a ${hrs}h`;
+    return `il y a ${Math.floor(hrs/24)}j`;
+  }
+
+  function goToSettings() {}
+  function goToGoogleLink() {}
+  function goToNotifications() {}
+  function goToQuestions() {}
+  function goToFacturation() {}
+
+  loadDashboard();
+</script>
+</body>
+</html>
