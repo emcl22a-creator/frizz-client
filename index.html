@@ -675,7 +675,7 @@ body::before {
 
     try {
       const response = await fetch(`https://frizz-2.bubbleapps.io/version-test/api/1.1/obj/commerce/${commerceId}`, {
-        headers: { 'Authorization': 'Bearer VOTRE_API_TOKEN' }
+        headers: { 'Authorization': 'Bearer 1441d6c6954a281862a4c333fa3b8e62' }
       });
       const data = await response.json();
       const commerce = data.response;
@@ -772,7 +772,7 @@ body::before {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer VOTRE_API_TOKEN'
+          'Authorization': 'Bearer 1441d6c6954a281862a4c333fa3b8e62'
         },
         body: JSON.stringify({
           commerce_id: commerceId,
