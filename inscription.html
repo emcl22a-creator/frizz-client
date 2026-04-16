@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Frizz — Inscription</title>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --bg: #0A0A0A;
+  --surface: #161616;
+  --surface2: #1E1E1E;
+  --border: rgba(255,255,255,0.07);
+  --text: #FFFFFF;
+  --text-muted: rgba(255,255,255,0.45);
+  --accent: #58CC02;
+  --accent-dim: rgba(88,204,2,0.12);
+  --accent-glow: rgba(88,204,2,0.25);
+  --danger: #FF4B4B;
+  --radius: 20px;
+}
+html, body {
+  min-height: 100vh;
+  background: var(--bg);
+  font-family: 'Figtree', sans-serif;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+}
+body::before {
+  content: '';
+  position: fixed;
+  top: -200px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(88,204,2,0.06) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+.container {
+  width: 100%;
+  max-width: 390px;
+  position: relative;
+  z-index: 1;
+  animation: fadeUp 0.5s ease both;
+}
+/* LOGO */
+.logo-wrap {
+  text-align: center;
+  margin-bottom: 36px;
+}
+.logo {
+  font-size: 32px;
+  font-weight: 900;
+  color: var(--accent);
+  letter-spacing: -1px;
+}
+.logo-sub {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin-top: 6px;
+  font-weight: 500;
+}
+/* STEPS */
+.steps {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 28px;
+}
+.step {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+.step.active { color: var(--accent); }
+.step.done { color: var(--text-muted); }
+.step-dot {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--surface2);
+  border: 1.5px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 800;
+}
+.step.active .step-dot {
+  background: var(--accent-dim);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.step.done .step-dot {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #000;
+}
+.step-line {
+  width: 24px;
+  height: 1.5px;
+  background: var(--border);
+}
+/* CARD */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin-bottom: 16px;
+}
+.card-title {
+  font-size: 20px;
+  font-weight: 900;
+  letter-spacing: -0.3px;
+  margin-bottom: 6px;
+}
+.card-sub {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 24px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+/* FORM */
+.form-group { margin-bottom: 14px; }
+.form-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  display: block;
+}
+.form-input {
+  width: 100%;
+  background: var(--surface2);
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  padding: 14px 16px;
+  font-family: 'Figtree', sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.2s;
+}
+.form-input::placeholder { color: var(--text-muted); }
+.form-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-dim);
+}
+.form-input.error { border-color: var(--danger); }
+.form-hint {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 6px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+.form-error {
+  font-size: 11px;
+  color: var(--danger);
+  margin-top: 6px;
+  font-weight: 600;
+  display: none;
+}
+/* PHOTO UPLOAD */
+.photo-upload {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+.photo-preview {
+  width: 72px;
+  height: 72px;
+  border-radius: 18px;
+  background: var(--surface2);
+  border: 2px dashed rgba(255,255,255,0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.photo-preview:hover { border-color: var(--accent); }
+.photo-preview img { width: 100%; height: 100%; object-fit: cover; }
+.photo-placeholder { font-size: 28px; }
+.photo-info { flex: 1; }
+.photo-title { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+.photo-sub { font-size: 11px; color: var(--text-muted); font-weight: 500; line-height: 1.4; }
+.btn-photo {
+  margin-top: 8px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 7px 12px;
+  font-family: 'Figtree', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.btn-photo:hover { border-color: var(--accent); color: var(--accent); }
+/* GOOGLE LINK HELP */
+.google-help {
+  background: rgba(66,133,244,0.08);
+  border: 1px solid rgba(66,133,244,0.2);
+  border-radius: 14px;
+  padding: 14px;
+  margin-bottom: 14px;
+}
+.google-help-title {
+  font-size: 13px;
+  font-weight: 800;
+  color: #6BA3FF;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.google-help ol {
+  padding-left: 16px;
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 500;
+  line-height: 1.8;
+}
+/* BUTTON */
+.btn-primary {
+  width: 100%;
+  padding: 18px;
+  background: var(--accent);
+  border: none;
+  border-radius: 16px;
+  font-family: 'Figtree', sans-serif;
+  font-size: 16px;
+  font-weight: 800;
+  color: #000;
+  cursor: pointer;
+  letter-spacing: -0.2px;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 4px 24px var(--accent-glow);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.btn-primary:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 8px 32px var(--accent-glow);
+  background: #65e002;
+}
+.btn-primary:active { transform: scale(0.98); }
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+.btn-secondary {
+  width: 100%;
+  padding: 16px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  font-family: 'Figtree', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 10px;
+}
+.btn-secondary:hover { border-color: rgba(255,255,255,0.2); color: var(--text); }
+/* LOGIN LINK */
+.login-link {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 13px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+.login-link a {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 700;
+}
+/* SUCCESS */
+.success-screen {
+  display: none;
+  text-align: center;
+  padding: 40px 24px;
+  background: var(--surface);
+  border: 1px solid rgba(88,204,2,0.2);
+  border-radius: var(--radius);
+  animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+.success-icon {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: var(--accent-dim);
+  border: 2px solid rgba(88,204,2,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+  font-size: 36px;
+}
+.success-title {
+  font-size: 24px;
+  font-weight: 900;
+  letter-spacing: -0.5px;
+  margin-bottom: 8px;
+}
+.success-sub {
+  font-size: 14px;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin-bottom: 28px;
+  font-weight: 500;
+}
+/* ERROR BANNER */
+.error-banner {
+  background: rgba(255,75,75,0.1);
+  border: 1px solid rgba(255,75,75,0.2);
+  border-radius: 14px;
+  padding: 12px 16px;
+  font-size: 13px;
+  color: #FF6B6B;
+  font-weight: 600;
+  margin-bottom: 16px;
+  display: none;
+}
+/* POWERED */
+.powered {
+  text-align: center;
+  margin-top: 24px;
+  font-size: 11px;
+  color: rgba(255,255,255,0.15);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+.powered span { color: var(--accent); opacity: 0.5; }
+/* ANIMATIONS */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes popIn {
+  from { opacity: 0; transform: scale(0.85); }
+  to { opacity: 1; transform: scale(1); }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- LOGO -->
+  <div class="logo-wrap">
+    <div class="logo">Frizz</div>
+    <div class="logo-sub">Créez votre compte gérant</div>
+  </div>
+
+  <!-- STEPS -->
+  <div class="steps" id="stepsBar">
+    <div class="step active" id="step1Indicator">
+      <div class="step-dot">1</div>
+      <span>Compte</span>
+    </div>
+    <div class="step-line"></div>
+    <div class="step" id="step2Indicator">
+      <div class="step-dot">2</div>
+      <span>Commerce</span>
+    </div>
+    <div class="step-line"></div>
+    <div class="step" id="step3Indicator">
+      <div class="step-dot">3</div>
+      <span>Terminé</span>
+    </div>
+  </div>
+
+  <!-- ERROR BANNER -->
+  <div class="error-banner" id="errorBanner"></div>
+
+  <!-- ÉTAPE 1 — COMPTE -->
+  <div id="screen1">
+    <div class="card">
+      <p class="card-title">Créez votre compte</p>
+      <p class="card-sub">Entrez votre email et choisissez un mot de passe pour accéder à votre dashboard Frizz.</p>
+
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input type="email" class="form-input" id="email" placeholder="vous@moncommerce.fr">
+        <p class="form-error" id="emailError">Email invalide</p>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Mot de passe</label>
+        <input type="password" class="form-input" id="password" placeholder="Minimum 8 caractères">
+        <p class="form-hint">Minimum 8 caractères</p>
+        <p class="form-error" id="passwordError">Mot de passe trop court</p>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Confirmer le mot de passe</label>
+        <input type="password" class="form-input" id="passwordConfirm" placeholder="Répétez votre mot de passe">
+        <p class="form-error" id="confirmError">Les mots de passe ne correspondent pas</p>
+      </div>
+    </div>
+
+    <button class="btn-primary" id="btn1" onclick="goToStep2()">
+      Continuer <span>→</span>
+    </button>
+
+    <div class="login-link">
+      Déjà un compte ? <a href="connexion.html">Se connecter</a>
+    </div>
+  </div>
+
+  <!-- ÉTAPE 2 — COMMERCE -->
+  <div id="screen2" style="display:none">
+    <div class="card">
+      <p class="card-title">Votre commerce</p>
+      <p class="card-sub">Ces informations apparaîtront sur la page que voient vos clients quand ils scannent le QR code.</p>
+
+      <!-- Photo -->
+      <div class="photo-upload">
+        <div class="photo-preview" id="photoPreview" onclick="document.getElementById('photoInput').click()">
+          <span class="photo-placeholder" id="photoPlaceholder">🏪</span>
+        </div>
+        <div class="photo-info">
+          <p class="photo-title">Photo de votre commerce</p>
+          <p class="photo-sub">Logo ou façade du commerce. Apparaît sur la page client.</p>
+          <button class="btn-photo" onclick="document.getElementById('photoInput').click()">+ Ajouter une photo</button>
+        </div>
+      </div>
+      <input type="file" id="photoInput" accept="image/*" style="display:none" onchange="previewPhoto(event)">
+
+      <div class="form-group">
+        <label class="form-label">Nom du commerce</label>
+        <input type="text" class="form-input" id="nomCommerce" placeholder="Ex: Chez Marco, Boulangerie Dupont...">
+        <p class="form-error" id="nomError">Ce champ est requis</p>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Ville</label>
+        <input type="text" class="form-input" id="villeCommerce" placeholder="Ex: Paris 11e, Lyon 2e...">
+      </div>
+
+      <!-- Google Link Help -->
+      <div class="google-help">
+        <p class="google-help-title">🔗 Comment trouver votre lien Google ?</p>
+        <ol>
+          <li>Ouvrez Google Maps sur votre téléphone</li>
+          <li>Cherchez le nom de votre commerce</li>
+          <li>Cliquez sur "Écrire un avis"</li>
+          <li>Copiez l'URL et collez-la ci-dessous</li>
+        </ol>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Lien Google Avis</label>
+        <input type="url" class="form-input" id="lienGoogle" placeholder="https://g.page/r/...">
+        <p class="form-hint">Facultatif — vous pourrez l'ajouter plus tard depuis votre dashboard.</p>
+      </div>
+    </div>
+
+    <button class="btn-primary" id="btn2" onclick="createAccount()">
+      Créer mon compte <span>→</span>
+    </button>
+
+    <button class="btn-secondary" onclick="goBackToStep1()">← Retour</button>
+  </div>
+
+  <!-- SUCCÈS -->
+  <div class="success-screen" id="screenSuccess">
+    <div class="success-icon">🎉</div>
+    <p class="success-title">Compte créé !</p>
+    <p class="success-sub">Votre commerce est configuré. Votre QR code est prêt à être posé sur vos tables.</p>
+    <button class="btn-primary" onclick="goToDashboard()">
+      Accéder à mon dashboard →
+    </button>
+  </div>
+
+  <div class="powered">Propulsé par <span>Frizz</span></div>
+
+</div>
+
+<script>
+  const API_BASE = 'https://frizz-2.bubbleapps.io/version-test/api/1.1';
+  const API_TOKEN = '1441d6c6954a281862a4c333fa3b8e62';
+
+  let photoFile = null;
+  let photoBase64 = null;
+  let newUserId = null;
+  let newCommerceId = null;
+
+  function showError(msg) {
+    const banner = document.getElementById('errorBanner');
+    banner.textContent = msg;
+    banner.style.display = 'block';
+    setTimeout(() => { banner.style.display = 'none'; }, 4000);
+  }
+
+  function goToStep2() {
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    const confirm = document.getElementById('passwordConfirm').value;
+
+    let valid = true;
+
+    if (!email || !email.includes('@')) {
+      document.getElementById('emailError').style.display = 'block';
+      document.getElementById('email').classList.add('error');
+      valid = false;
+    } else {
+      document.getElementById('emailError').style.display = 'none';
+      document.getElementById('email').classList.remove('error');
+    }
+
+    if (password.length < 8) {
+      document.getElementById('passwordError').style.display = 'block';
+      document.getElementById('password').classList.add('error');
+      valid = false;
+    } else {
+      document.getElementById('passwordError').style.display = 'none';
+      document.getElementById('password').classList.remove('error');
+    }
+
+    if (password !== confirm) {
+      document.getElementById('confirmError').style.display = 'block';
+      document.getElementById('passwordConfirm').classList.add('error');
+      valid = false;
+    } else {
+      document.getElementById('confirmError').style.display = 'none';
+      document.getElementById('passwordConfirm').classList.remove('error');
+    }
+
+    if (!valid) return;
+
+    document.getElementById('screen1').style.display = 'none';
+    document.getElementById('screen2').style.display = 'block';
+
+    document.getElementById('step1Indicator').classList.remove('active');
+    document.getElementById('step1Indicator').classList.add('done');
+    document.getElementById('step1Indicator').querySelector('.step-dot').textContent = '✓';
+    document.getElementById('step2Indicator').classList.add('active');
+  }
+
+  function goBackToStep1() {
+    document.getElementById('screen2').style.display = 'none';
+    document.getElementById('screen1').style.display = 'block';
+    document.getElementById('step2Indicator').classList.remove('active');
+    document.getElementById('step1Indicator').classList.remove('done');
+    document.getElementById('step1Indicator').classList.add('active');
+    document.getElementById('step1Indicator').querySelector('.step-dot').textContent = '1';
+  }
+
+  function previewPhoto(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    photoFile = file;
+    const reader = new FileReader();
+    reader.onload = e => {
+      photoBase64 = e.target.result;
+      document.getElementById('photoPreview').innerHTML = `<img src="${e.target.result}" alt="Photo">`;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  async function createAccount() {
+    const nom = document.getElementById('nomCommerce').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    const ville = document.getElementById('villeCommerce').value.trim();
+    const lienGoogle = document.getElementById('lienGoogle').value.trim();
+
+    if (!nom) {
+      document.getElementById('nomError').style.display = 'block';
+      document.getElementById('nomCommerce').classList.add('error');
+      return;
+    }
+
+    const btn = document.getElementById('btn2');
+    btn.disabled = true;
+    btn.textContent = 'Création en cours...';
+
+    try {
+      // 1. Créer l'utilisateur Bubble
+      const userRes = await fetch(`${API_BASE}/wf/inscription`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${API_TOKEN}`
+        },
+        body: JSON.stringify({ email, password })
+      });
+
+      const userData = await userRes.json();
+
+      // 2. Créer le commerce
+      const commerceRes = await fetch(`${API_BASE}/obj/commerce`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${API_TOKEN}`
+        },
+        body: JSON.stringify({
+          nom,
+          ville,
+          lien_google: lienGoogle || '#',
+          email_gerant: email,
+          note_moyenne: 0,
+          total_reponses: 0
+        })
+      });
+
+      const commerceData = await commerceRes.json();
+      newCommerceId = commerceData.id;
+
+      // Succès
+      document.getElementById('screen2').style.display = 'none';
+      document.getElementById('screenSuccess').style.display = 'block';
+      document.getElementById('stepsBar').style.display = 'none';
+
+      document.getElementById('step2Indicator').classList.remove('active');
+      document.getElementById('step2Indicator').classList.add('done');
+      document.getElementById('step3Indicator').classList.add('active');
+
+      // Sauvegarde l'ID du commerce en local
+      localStorage.setItem('frizz_commerce_id', newCommerceId);
+      localStorage.setItem('frizz_email', email);
+
+    } catch(e) {
+      showError('Une erreur est survenue. Vérifiez votre connexion et réessayez.');
+      btn.disabled = false;
+      btn.textContent = 'Créer mon compte →';
+    }
+  }
+
+  function goToDashboard() {
+    window.location.href = `dashboard.html?id=${newCommerceId || localStorage.getItem('frizz_commerce_id')}`;
+  }
+</script>
+</body>
+</html>
