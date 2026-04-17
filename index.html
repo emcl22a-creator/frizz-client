@@ -18,75 +18,91 @@
   --accent-dim: rgba(88,204,2,0.12);
   --accent-glow: rgba(88,204,2,0.25);
   --danger: #FF4B4B;
+  --warning: #FFC800;
   --radius: 20px;
 }
-html, body {
-  background: #0A0A0A;
-  margin: 0; padding: 0;
-  font-family: 'Figtree', sans-serif;
-  color: #FFFFFF;
-  min-height: 100vh;
-}
-#wrap { padding: 24px 16px; min-height: 100vh; }
+html, body { background: #0A0A0A; margin: 0; padding: 0; font-family: 'Figtree', sans-serif; color: #FFFFFF; min-height: 100vh; }
+#wrap { padding: 24px 16px 40px; min-height: 100vh; }
 .container { width: 100%; max-width: 420px; margin: 0 auto; }
+
 .header { text-align: center; margin-bottom: 28px; }
-.avatar {
-  width: 72px; height: 72px;
-  background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
-  border: 1.5px solid var(--border);
-  border-radius: 20px;
-  display: flex; align-items: center; justify-content: center;
-  margin: 0 auto 14px; font-size: 32px;
-}
+.avatar { width: 72px; height: 72px; background: linear-gradient(135deg, #1a1a1a, #2a2a2a); border: 1.5px solid var(--border); border-radius: 20px; display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; font-size: 32px; overflow: hidden; }
+.avatar img { width: 100%; height: 100%; object-fit: cover; }
 .name { font-size: 22px; font-weight: 800; }
+
 .progress-wrap { margin-bottom: 24px; }
 .progress-label { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 12px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; }
 .progress-bar { height: 6px; background: var(--surface2); border-radius: 99px; overflow: hidden; }
-.progress-fill { height: 100%; width: 33%; background: var(--accent); border-radius: 99px; transition: width 0.5s cubic-bezier(0.34,1.56,0.64,1); box-shadow: 0 0 12px var(--accent-glow); }
+.progress-fill { height: 100%; width: 50%; background: var(--accent); border-radius: 99px; transition: width 0.5s cubic-bezier(0.34,1.56,0.64,1); box-shadow: 0 0 12px var(--accent-glow); }
+
 .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px 20px; margin-bottom: 16px; }
 .q { font-size: 18px; font-weight: 800; margin-bottom: 6px; line-height: 1.3; }
 .q-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 24px; font-weight: 500; }
-/* STARS */
-.stars { display: flex; gap: 8px; justify-content: center; margin-bottom: 16px; }
-.star { width: 52px; height: 52px; background: var(--surface2); border: 1.5px solid var(--border); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 22px; cursor: pointer; transition: all 0.2s; user-select: none; }
-.star.active { background: var(--accent-dim); border-color: var(--accent); transform: scale(1.12); box-shadow: 0 4px 20px var(--accent-glow); }
-.rating-labels { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); font-weight: 600; }
-/* CHOICE */
-.choice-row { display: flex; gap: 10px; }
-.choice-btn { flex: 1; padding: 16px 8px 12px; background: var(--surface2); border: 1.5px solid var(--border); border-radius: 16px; cursor: pointer; text-align: center; transition: all 0.15s; user-select: none; }
-.choice-btn .em { font-size: 26px; display: block; margin-bottom: 6px; }
-.choice-btn .lbl { font-size: 11px; font-weight: 700; color: var(--text-muted); }
-.choice-btn:active, .choice-btn.selected { border-color: var(--accent); background: var(--accent-dim); transform: scale(0.97); }
+
+/* PAGE 1 STARS */
+.stars-big { display: flex; gap: 8px; justify-content: center; margin-bottom: 12px; }
+.star-big { width: 52px; height: 52px; background: var(--surface2); border: 1.5px solid var(--border); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 22px; cursor: pointer; transition: all 0.2s; user-select: none; }
+.star-big.active { background: var(--accent-dim); border-color: var(--accent); transform: scale(1.12); box-shadow: 0 4px 20px var(--accent-glow); }
+.rating-labels { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); font-weight: 600; margin-bottom: 4px; }
+
+/* PAGE 2 CATEGORY STARS */
+.cat-row { display: flex; align-items: center; justify-content: space-between; padding: 14px 0; border-bottom: 1px solid var(--border); }
+.cat-row:last-child { border-bottom: none; }
+.cat-label { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 700; }
+.cat-label .em { font-size: 20px; }
+.cat-stars { display: flex; gap: 4px; }
+.cat-star { font-size: 20px; cursor: pointer; transition: transform 0.15s; user-select: none; filter: grayscale(1) opacity(0.4); }
+.cat-star.active { filter: none; transform: scale(1.1); }
+
 /* TEXTAREA */
-.textarea { width: 100%; background: var(--surface2); border: 1.5px solid var(--border); border-radius: 14px; padding: 14px 16px; font-family: inherit; font-size: 15px; font-weight: 500; color: var(--text); resize: none; outline: none; min-height: 130px; line-height: 1.5; }
-.textarea::placeholder { color: var(--text-muted); }
+.textarea { width: 100%; background: var(--surface2); border: 1.5px solid var(--border); border-radius: 14px; padding: 14px 16px; font-family: inherit; font-size: 14px; font-weight: 500; color: var(--text); resize: none; outline: none; min-height: 100px; line-height: 1.6; transition: border-color 0.2s; margin-top: 16px; }
 .textarea:focus { border-color: var(--accent); }
+.textarea::placeholder { color: var(--text-muted); }
+.optional-label { font-size: 12px; color: var(--text-muted); font-weight: 600; margin-top: 20px; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+
 /* BUTTONS */
 .btn-primary { width: 100%; padding: 18px; background: var(--accent); border: none; border-radius: 16px; font-family: inherit; font-size: 16px; font-weight: 800; color: #000; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 24px var(--accent-glow); margin-bottom: 12px; }
 .btn-primary:hover { transform: translateY(-2px); background: #65e002; }
-.skip-btn { width: 100%; padding: 14px; background: transparent; border: 1px solid var(--border); border-radius: 14px; font-family: inherit; font-size: 14px; font-weight: 600; color: var(--text-muted); cursor: pointer; margin-bottom: 16px; }
+
 /* DOTS */
 .dots { display: flex; justify-content: center; gap: 6px; margin-top: 8px; }
 .dot { width: 6px; height: 6px; border-radius: 99px; background: var(--surface2); transition: all 0.3s; }
 .dot.active { width: 20px; background: var(--accent); }
+
 /* SUCCESS */
-.success-card { background: var(--surface); border-radius: var(--radius); padding: 28px 20px; text-align: center; display: none; flex-direction: column; gap: 14px; }
+.success-card { background: var(--surface); border-radius: var(--radius); padding: 28px 20px; text-align: center; display: none; flex-direction: column; gap: 16px; }
 .success-card.visible { display: flex; }
-.badge { display: inline-flex; align-items: center; gap: 5px; border-radius: 99px; padding: 5px 14px; font-size: 11px; font-weight: 700; margin: 0 auto; }
+.badge { display: inline-flex; align-items: center; gap: 5px; border-radius: 99px; padding: 6px 16px; font-size: 12px; font-weight: 700; margin: 0 auto; }
 .badge.green { background: rgba(88,204,2,0.1); border: 1px solid rgba(88,204,2,0.2); color: var(--accent); }
-.badge.red { background: rgba(255,75,75,0.1); border: 1px solid rgba(255,75,75,0.2); color: var(--danger); }
+.badge.orange { background: rgba(255,200,0,0.1); border: 1px solid rgba(255,200,0,0.2); color: var(--warning); }
 .success-icon { width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto; }
 .success-icon.green { background: rgba(88,204,2,0.12); border: 1.5px solid rgba(88,204,2,0.25); }
 .success-icon.orange { background: rgba(255,200,0,0.1); border: 1.5px solid rgba(255,200,0,0.2); }
 .success-title { font-size: 20px; font-weight: 900; margin: 0; }
 .success-sub { font-size: 13px; color: var(--text-muted); line-height: 1.6; margin: 0; font-weight: 500; }
-.google-btn { background: #4285F4; border-radius: 16px; padding: 14px 16px; display: flex; align-items: center; gap: 12px; border: none; width: 100%; cursor: pointer; transition: all 0.2s; }
-.google-btn:hover { transform: translateY(-2px); opacity: 0.95; }
-.google-logo { width: 32px; height: 32px; min-width: 32px; background: white; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
-.google-text { flex: 1; text-align: left; }
-.google-text .t1 { font-size: 13px; font-weight: 800; color: white; margin: 0; }
-.google-text .t2 { font-size: 11px; color: rgba(255,255,255,0.7); margin: 2px 0 0; }
+
+/* ACTION BUTTONS */
+.action-btn { width: 100%; border-radius: 16px; padding: 16px; display: flex; align-items: center; gap: 12px; border: none; cursor: pointer; transition: all 0.2s; text-decoration: none; }
+.action-btn:hover { transform: translateY(-2px); opacity: 0.95; }
+.action-btn.google { background: #4285F4; }
+.action-btn.private { background: var(--surface2); border: 1.5px solid var(--border); }
+.action-logo { width: 36px; height: 36px; min-width: 36px; background: white; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+.action-logo.dark { background: var(--surface); border: 1px solid var(--border); font-size: 18px; }
+.action-text { flex: 1; text-align: left; }
+.action-text .t1 { font-size: 14px; font-weight: 800; color: white; margin: 0; }
+.action-text .t2 { font-size: 11px; color: rgba(255,255,255,0.65); margin: 2px 0 0; }
+.action-text.dark .t1 { color: var(--text); }
+.action-text.dark .t2 { color: var(--text-muted); }
+
+/* DIVIDER */
+.divider { display: flex; align-items: center; gap: 10px; }
+.divider-line { flex: 1; height: 1px; background: var(--border); }
+.divider-text { font-size: 11px; color: var(--text-muted); font-weight: 600; }
+
+/* TOAST */
 .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--accent); color: #000; font-size: 13px; font-weight: 700; padding: 10px 20px; border-radius: 99px; opacity: 0; transition: all 0.3s; pointer-events: none; z-index: 999; white-space: nowrap; }
+
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 .powered { text-align: center; margin-top: 20px; font-size: 11px; color: rgba(255,255,255,0.15); font-weight: 600; }
 .powered span { color: var(--accent); opacity: 0.5; }
 </style>
@@ -96,7 +112,7 @@ html, body {
 <div class="container">
 
   <div class="header">
-    <div class="avatar">🏪</div>
+    <div class="avatar" id="avatarEl">🏪</div>
     <div class="name" id="commerceName">Mon Commerce</div>
   </div>
 
@@ -104,100 +120,125 @@ html, body {
     <div class="progress-wrap">
       <div class="progress-label">
         <span>Votre avis</span>
-        <span id="stepLabel">1 / 3</span>
+        <span id="stepLabel">1 / 2</span>
       </div>
       <div class="progress-bar">
         <div class="progress-fill" id="progressFill"></div>
       </div>
     </div>
 
-    <!-- ÉTAPE 1 — Note -->
+    <!-- PAGE 1 — Note globale -->
     <div id="step1">
       <div class="card">
-        <div class="q">Comment était votre expérience ?</div>
-        <div class="q-sub">Soyez honnête, ça nous aide vraiment 🙏</div>
-        <div class="stars">
-          <div class="star" onclick="selectStar(1)">⭐</div>
-          <div class="star" onclick="selectStar(2)">⭐</div>
-          <div class="star" onclick="selectStar(3)">⭐</div>
-          <div class="star" onclick="selectStar(4)">⭐</div>
-          <div class="star" onclick="selectStar(5)">⭐</div>
+        <div class="q" style="text-align:center; margin-bottom: 20px;">Comment était votre expérience ?</div>
+        <div class="stars-big" id="starsGlobal">
+          <div class="star-big" onclick="selectGlobal(1)">⭐</div>
+          <div class="star-big" onclick="selectGlobal(2)">⭐</div>
+          <div class="star-big" onclick="selectGlobal(3)">⭐</div>
+          <div class="star-big" onclick="selectGlobal(4)">⭐</div>
+          <div class="star-big" onclick="selectGlobal(5)">⭐</div>
         </div>
         <div class="rating-labels"><span>Décevant</span><span>Excellent !</span></div>
       </div>
       <button class="btn-primary" onclick="goToStep(2)">Continuer →</button>
+      <div class="dots">
+        <div class="dot active" id="dot1"></div>
+        <div class="dot" id="dot2"></div>
+      </div>
     </div>
 
-    <!-- ÉTAPE 2 — Point fort (auto-avance) -->
+    <!-- PAGE 2 — Détail + commentaire -->
     <div id="step2" style="display:none">
       <div class="card">
-        <div class="q">Le point fort de votre visite ?</div>
-        <div class="q-sub">Un clic et on passe à la suite ✨</div>
-        <div class="choice-row">
-          <div class="choice-btn" onclick="selectCategory('cuisine', this)">
-            <span class="em">🍽️</span><span class="lbl">Cuisine</span>
-          </div>
-          <div class="choice-btn" onclick="selectCategory('service', this)">
-            <span class="em">🤝</span><span class="lbl">Service</span>
-          </div>
-          <div class="choice-btn" onclick="selectCategory('ambiance', this)">
-            <span class="em">🎶</span><span class="lbl">Ambiance</span>
-          </div>
-          <div class="choice-btn" onclick="selectCategory('prix', this)">
-            <span class="em">💰</span><span class="lbl">Prix</span>
+        <div class="q">Comment évaluez-vous ces points ?</div>
+        <div class="q-sub" style="margin-bottom: 8px;">Optionnel — 1 clic par critère</div>
+
+        <div class="cat-row">
+          <div class="cat-label"><span class="em">🍽️</span> Cuisine</div>
+          <div class="cat-stars" id="starsCuisine">
+            <span class="cat-star" onclick="selectCat('cuisine',1,this)">⭐</span>
+            <span class="cat-star" onclick="selectCat('cuisine',2,this)">⭐</span>
+            <span class="cat-star" onclick="selectCat('cuisine',3,this)">⭐</span>
+            <span class="cat-star" onclick="selectCat('cuisine',4,this)">⭐</span>
+            <span class="cat-star" onclick="selectCat('cuisine',5,this)">⭐</span>
           </div>
         </div>
-      </div>
-      <button class="skip-btn" onclick="goToStep(3)">Passer →</button>
-    </div>
+        <div class="cat-row">
+          <div class="cat-label"><span class="em">😊</span> Service</div>
+          <div class="cat-stars" id="starsService">
+            <span class="cat-star" onclick="selectCat('service',1,this)">⭐</span>
+            <span class="cat-star" onclick="selectCat('service',2,this)">⭐</span>
+            <span class="cat-star" onclick="selectCat('service',3,this)">⭐</span>
+            <span class="cat-star" onclick="selectCat('service',4,this)">⭐</span>
+            <span class="cat-star" onclick="selectCat('service',5,this)">⭐</span>
+          </div>
+        </div>
+        <div class="cat-row">
+          <div class="cat-label"><span class="em">💰</span> Qualité/Prix</div>
+          <div class="cat-stars" id="starsPrix">
+            <span class="cat-star" onclick="selectCat('prix',1,this)">⭐</span>
+            <span class="cat-star" onclick="selectCat('prix',2,this)">⭐</span>
+            <span class="cat-star" onclick="selectCat('prix',3,this)">⭐</span>
+            <span class="cat-star" onclick="selectCat('prix',4,this)">⭐</span>
+            <span class="cat-star" onclick="selectCat('prix',5,this)">⭐</span>
+          </div>
+        </div>
 
-    <!-- ÉTAPE 3 — Commentaire -->
-    <div id="step3" style="display:none">
-      <div class="card">
-        <div class="q">Un commentaire ?</div>
-        <div class="q-sub">20 secondes max ⏱️</div>
-        <textarea class="textarea" id="commentField" placeholder="Dites-nous ce que vous avez aimé..."></textarea>
+        <div class="optional-label">Un mot sur votre expérience ? (optionnel)</div>
+        <textarea class="textarea" id="commentField" placeholder="Partagez votre ressenti..."></textarea>
       </div>
-      <button class="btn-primary" onclick="submitFeedback()">Envoyer ✓</button>
-      <button class="skip-btn" onclick="submitFeedback()">Passer sans commentaire</button>
-    </div>
-
-    <div class="dots">
-      <div class="dot active" id="dot1"></div>
-      <div class="dot" id="dot2"></div>
-      <div class="dot" id="dot3"></div>
+      <button class="btn-primary" id="submitBtn" onclick="submitFeedback()">Envoyer mon avis ✓</button>
+      <div class="dots">
+        <div class="dot" id="dot1b"></div>
+        <div class="dot active" id="dot2b"></div>
+      </div>
     </div>
   </div>
 
-  <!-- SUCCÈS BONNE NOTE -->
+  <!-- SUCCÈS BONNE NOTE (≥4) -->
   <div class="success-card" id="successGood">
-    <div class="badge green">🔥 +10 XP · Super note !</div>
+    <div class="badge green">🙏 Merci beaucoup !</div>
     <div class="success-icon green">
       <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
         <path d="M5 13l4 4L19 7" stroke="#58CC02" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
     </div>
-    <p class="success-title">Merci beaucoup !</p>
-    <p class="success-sub">Votre avis aide ce commerce à s'améliorer chaque jour ✨</p>
-    <button class="google-btn" onclick="copyAndOpenGoogle()">
-      <div class="google-logo">
-        <svg width="16" height="16" viewBox="0 0 24 24">
+    <p class="success-title">Merci beaucoup 🙏</p>
+    <p class="success-sub">Ça nous aide énormément ! Si vous avez 30 secondes, partagez votre avis sur Google.</p>
+
+    <button class="action-btn google" onclick="copyAndOpenGoogle()">
+      <div class="action-logo">
+        <svg width="18" height="18" viewBox="0 0 24 24">
           <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
           <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
           <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
           <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
         </svg>
       </div>
-      <div class="google-text">
+      <div class="action-text">
         <p class="t1">Laisser un avis Google</p>
-        <p class="t2">Votre commentaire sera déjà copié ✓</p>
+        <p class="t2">Votre résumé est déjà copié ✓</p>
+      </div>
+    </button>
+
+    <div class="divider">
+      <div class="divider-line"></div>
+      <span class="divider-text">ou</span>
+      <div class="divider-line"></div>
+    </div>
+
+    <button class="action-btn private" onclick="showPrivateForm()">
+      <div class="action-logo dark">💬</div>
+      <div class="action-text dark">
+        <p class="t1" style="color:var(--text)">Avis en privé au gérant</p>
+        
       </div>
     </button>
   </div>
 
-  <!-- SUCCÈS MAUVAISE NOTE -->
+  <!-- SUCCÈS MAUVAISE NOTE (≤3) -->
   <div class="success-card" id="successBad">
-    <div class="badge red">📣 Gérant notifié</div>
+    <div class="badge orange">🙏 Merci pour votre retour</div>
     <div class="success-icon orange">
       <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
         <path d="M12 8v4m0 4h.01" stroke="#FFC800" stroke-width="2.5" stroke-linecap="round"/>
@@ -205,82 +246,149 @@ html, body {
       </svg>
     </div>
     <p class="success-title">Merci pour votre retour</p>
-    <p class="success-sub">On va tout faire pour améliorer votre prochaine visite.</p>
-    <button class="google-btn" onclick="copyAndOpenGoogle()">
-      <div class="google-logo">
-        <svg width="16" height="16" viewBox="0 0 24 24">
+    <p class="success-sub">Ça nous aide à nous améliorer 🙏 Vous pouvez aussi nous écrire directement.</p>
+
+    <button class="action-btn google" onclick="copyAndOpenGoogle()">
+      <div class="action-logo">
+        <svg width="18" height="18" viewBox="0 0 24 24">
           <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
           <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
           <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
           <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
         </svg>
       </div>
-      <div class="google-text">
+      <div class="action-text">
         <p class="t1">Laisser un avis Google</p>
-        <p class="t2">Votre commentaire sera déjà copié ✓</p>
+        <p class="t2">Votre résumé est déjà copié ✓</p>
       </div>
     </button>
+
+    <div class="divider">
+      <div class="divider-line"></div>
+      <span class="divider-text">ou</span>
+      <div class="divider-line"></div>
+    </div>
+
+    <button class="action-btn private" onclick="showPrivateForm()">
+      <div class="action-logo dark">💬</div>
+      <div class="action-text dark">
+        <p class="t1" style="color:var(--text)">Écrire au gérant en privé</p>
+        
+      </div>
+    </button>
+  </div>
+
+    <!-- MESSAGE ENVOYÉ -->
+  <div class="success-card" id="privateSent">
+    <div class="success-icon green">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+        <path d="M5 13l4 4L19 7" stroke="#58CC02" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <p class="success-title">Message envoyé !</p>
+    
   </div>
 
   <div class="powered">Propulsé par <span>Frizz</span></div>
 </div>
 </div>
 
-<div class="toast" id="toast">📋 Commentaire copié — collez-le sur Google !</div>
+<div class="toast" id="toast">📋 Résumé copié — collez-le sur Google !</div>
 
 <script>
   const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxpZRqqiq9zpIhBAtYvKDoxOelXAoKwHJ2T3pS0bttdgyZ7Ls7Kc1MS-LFg-DqrhItu/exec';
 
-  let starRating = 0;
-  let category = '';
+  const params = new URLSearchParams(window.location.search);
+  const commerceId = params.get('id') || 'demo';
+  const googleUrl = params.get('google') || '#';
+  const commerceName = params.get('name') || 'Mon Commerce';
+  document.getElementById('commerceName').textContent = commerceName;
+
+  let globalRating = 0;
+  let catRatings = { cuisine: 0, service: 0, prix: 0 };
   let userComment = '';
-  let currentStep = 1;
-  const commerceId = new URLSearchParams(window.location.search).get('id') || 'demo';
-  const googleUrl = new URLSearchParams(window.location.search).get('google') || '#';
+  let generatedText = '';
 
-  const progressMap = { 1: '33%', 2: '66%', 3: '100%' };
-
-  function selectStar(val) {
-    starRating = val;
-    document.querySelectorAll('.star').forEach((s, i) => s.classList.toggle('active', i < val));
+  function selectGlobal(val) {
+    globalRating = val;
+    document.querySelectorAll('#starsGlobal .star-big').forEach((s, i) => {
+      s.classList.toggle('active', i < val);
+    });
   }
 
-  function selectCategory(cat, el) {
-    category = cat;
-    el.classList.add('selected');
-    setTimeout(() => goToStep(3), 300);
+  function selectCat(cat, val, el) {
+    catRatings[cat] = val;
+    const container = document.getElementById('stars' + cat.charAt(0).toUpperCase() + cat.slice(1));
+    container.querySelectorAll('.cat-star').forEach((s, i) => {
+      s.classList.toggle('active', i < val);
+    });
   }
 
   function goToStep(step) {
-    if (step === 2 && !starRating) return;
-    document.getElementById('step' + currentStep).style.display = 'none';
-    currentStep = step;
-    document.getElementById('step' + step).style.display = 'block';
-    document.getElementById('progressFill').style.width = progressMap[step];
-    document.getElementById('stepLabel').textContent = step + ' / 3';
-    for (let i = 1; i <= 3; i++) {
-      document.getElementById('dot' + i).classList.toggle('active', i === step);
+    if (step === 2 && !globalRating) return;
+    document.getElementById('step1').style.display = 'none';
+    document.getElementById('step2').style.display = 'block';
+    document.getElementById('progressFill').style.width = '100%';
+    document.getElementById('stepLabel').textContent = '2 / 2';
+  }
+
+  function generateSummary() {
+    const isGood = globalRating >= 4;
+    let parts = [];
+
+    if (isGood) {
+      parts.push(globalRating === 5 ? "Excellent restaurant !" : "Très bonne expérience !");
+    } else {
+      parts.push("Expérience mitigée.");
     }
+
+    const catLabels = { cuisine: "cuisine", service: "service", prix: "rapport qualité/prix" };
+    const goodCats = Object.entries(catRatings).filter(([,v]) => v >= 4).map(([k]) => catLabels[k]);
+    const badCats = Object.entries(catRatings).filter(([,v]) => v > 0 && v <= 3).map(([k]) => catLabels[k]);
+
+    if (goodCats.length > 0) {
+      const list = goodCats.length === 1 ? goodCats[0] : goodCats.slice(0,-1).join(', ') + ' et ' + goodCats[goodCats.length-1];
+      parts.push("J'ai apprécié " + list + ".");
+    }
+    if (badCats.length > 0) {
+      const list = badCats.length === 1 ? badCats[0] : badCats.slice(0,-1).join(', ') + ' et ' + badCats[badCats.length-1];
+      parts.push("Le " + list + " pourrait être amélioré.");
+    }
+
+    const comment = document.getElementById('commentField').value.trim();
+    if (comment) parts.push(comment);
+
+    if (isGood) parts.push("Je recommande !");
+
+    return parts.join(' ');
   }
 
   async function submitFeedback() {
+    const btn = document.getElementById('submitBtn');
+    btn.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" style="animation:spin 0.8s linear infinite"><circle cx="12" cy="12" r="10" stroke="rgba(0,0,0,0.25)" stroke-width="3"/><path d="M12 2a10 10 0 0 1 10 10" stroke="#000" stroke-width="3" stroke-linecap="round"/></svg>';
+    btn.disabled = true;
     userComment = document.getElementById('commentField').value;
+    generatedText = generateSummary();
+
     try {
       await fetch(SCRIPT_URL, {
         method: 'POST',
         mode: 'no-cors',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          note: starRating,
-          categorie: category,
+          note_globale: globalRating,
+          note_cuisine: catRatings.cuisine,
+          note_service: catRatings.service,
+          note_prix: catRatings.prix,
           commentaire: userComment,
+          resume: generatedText,
           commerce_id: commerceId
         })
       });
     } catch(e) {}
 
     document.getElementById('formView').style.display = 'none';
-    if (starRating >= 4) {
+    if (globalRating >= 4) {
       document.getElementById('successGood').classList.add('visible');
     } else {
       document.getElementById('successBad').classList.add('visible');
@@ -288,11 +396,34 @@ html, body {
   }
 
   function copyAndOpenGoogle() {
-    if (userComment && userComment.trim()) {
-      navigator.clipboard.writeText(userComment).then(() => showToast()).catch(() => {});
+    // Enregistrer que le client a cliqué sur Google
+    try {
+      fetch(SCRIPT_URL, {
+        method: 'POST', mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'google_click', commerce_id: commerceId, note: globalRating, resume: generatedText })
+      });
+    } catch(e) {}
+    if (generatedText) {
+      navigator.clipboard.writeText(generatedText).then(() => showToast()).catch(() => {});
     }
-    if (googleUrl !== '#') setTimeout(() => window.open(googleUrl, '_blank'), 300);
+    if (googleUrl !== '#') setTimeout(() => window.open(googleUrl, '_blank'), 400);
   }
+
+  function showPrivateForm() {
+    document.getElementById('successGood').classList.remove('visible');
+    document.getElementById('successBad').classList.remove('visible');
+    document.getElementById('privateSent').classList.add('visible');
+    try {
+      fetch(SCRIPT_URL, {
+        method: 'POST', mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'avis_prive', note: globalRating, resume: generatedText, commentaire: userComment, commerce_id: commerceId })
+      });
+    } catch(e) {}
+  }
+
+
 
   function showToast() {
     const t = document.getElementById('toast');
