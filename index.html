@@ -17,133 +17,87 @@
   --accent: #58CC02;
   --accent-dim: rgba(88,204,2,0.12);
   --accent-glow: rgba(88,204,2,0.25);
-  --warning: #FFC800;
   --danger: #FF4B4B;
   --radius: 20px;
 }
 html, body {
-  min-height: 100vh;
-  background: var(--bg);
+  background: #0A0A0A;
+  margin: 0; padding: 0;
   font-family: 'Figtree', sans-serif;
-  color: var(--text);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px 16px;
+  color: #FFFFFF;
+  min-height: 100vh;
 }
-body::before {
-  content: '';
-  position: fixed;
-  top: -200px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 600px;
-  height: 600px;
-  background: radial-gradient(circle, rgba(88,204,2,0.06) 0%, transparent 70%);
-  pointer-events: none;
-  z-index: 0;
-}
-.container {
-  width: 100%;
-  max-width: 500px;
-  position: relative;
-  z-index: 1;
-}
-.header {
-  text-align: center;
-  margin-bottom: 32px;
-  animation: fadeUp 0.5s ease both;
-}
-.restaurant-avatar {
-  width: 72px;
-  height: 72px;
+#wrap { padding: 24px 16px; min-height: 100vh; }
+.container { width: 100%; max-width: 420px; margin: 0 auto; }
+.header { text-align: center; margin-bottom: 28px; }
+.avatar {
+  width: 72px; height: 72px;
   background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
   border: 1.5px solid var(--border);
   border-radius: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 16px;
-  overflow: hidden;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 14px; font-size: 32px;
 }
-.restaurant-avatar img { width: 100%; height: 100%; object-fit: cover; }
-.restaurant-avatar .fallback { font-size: 32px; }
-.restaurant-name { font-size: 22px; font-weight: 800; letter-spacing: -0.4px; margin-bottom: 4px; }
-.restaurant-sub { font-size: 13px; color: var(--text-muted); font-weight: 500; }
-.progress-wrap { margin-bottom: 28px; animation: fadeUp 0.5s 0.1s ease both; }
-.progress-label { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 12px; color: var(--text-muted); font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; }
+.name { font-size: 22px; font-weight: 800; }
+.progress-wrap { margin-bottom: 24px; }
+.progress-label { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 12px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; }
 .progress-bar { height: 6px; background: var(--surface2); border-radius: 99px; overflow: hidden; }
-.progress-fill { height: 100%; width: 33%; background: var(--accent); border-radius: 99px; transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); box-shadow: 0 0 12px var(--accent-glow); }
-.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px 20px; margin-bottom: 16px; animation: fadeUp 0.5s 0.15s ease both; }
-.question { font-size: 18px; font-weight: 800; letter-spacing: -0.3px; margin-bottom: 6px; line-height: 1.3; }
-.question-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 24px; font-weight: 500; }
+.progress-fill { height: 100%; width: 33%; background: var(--accent); border-radius: 99px; transition: width 0.5s cubic-bezier(0.34,1.56,0.64,1); box-shadow: 0 0 12px var(--accent-glow); }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px 20px; margin-bottom: 16px; }
+.q { font-size: 18px; font-weight: 800; margin-bottom: 6px; line-height: 1.3; }
+.q-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 24px; font-weight: 500; }
+/* STARS */
 .stars { display: flex; gap: 8px; justify-content: center; margin-bottom: 16px; }
-.star { width: 52px; height: 52px; background: var(--surface2); border: 1.5px solid var(--border); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 22px; cursor: pointer; transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); user-select: none; }
-.star:hover, .star.active { background: var(--accent-dim); border-color: var(--accent); transform: scale(1.12); box-shadow: 0 4px 20px var(--accent-glow); }
-.star:active { transform: scale(0.95); }
-.rating-labels { display: flex; justify-content: space-between; margin-top: 10px; font-size: 11px; color: var(--text-muted); font-weight: 600; padding: 0 2px; }
-.emoji-row { display: flex; gap: 10px; justify-content: center; }
-.emoji-btn { flex: 1; padding: 16px 8px 12px; background: var(--surface2); border: 1.5px solid var(--border); border-radius: 16px; cursor: pointer; transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); text-align: center; user-select: none; }
-.emoji-btn .em { font-size: 26px; display: block; margin-bottom: 6px; transition: transform 0.2s; }
-.emoji-btn .label { font-size: 11px; font-weight: 700; color: var(--text-muted); letter-spacing: 0.3px; }
-.emoji-btn:hover, .emoji-btn.active { border-color: var(--accent); background: var(--accent-dim); transform: translateY(-3px); box-shadow: 0 8px 24px var(--accent-glow); }
-.emoji-btn:hover .em { transform: scale(1.2); }
-.textarea { width: 100%; background: var(--surface2); border: 1.5px solid var(--border); border-radius: 14px; padding: 14px 16px; font-family: 'Figtree', sans-serif; font-size: 15px; font-weight: 500; color: var(--text); resize: none; outline: none; min-height: 160px; transition: border-color 0.2s; line-height: 1.5; }
+.star { width: 52px; height: 52px; background: var(--surface2); border: 1.5px solid var(--border); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 22px; cursor: pointer; transition: all 0.2s; user-select: none; }
+.star.active { background: var(--accent-dim); border-color: var(--accent); transform: scale(1.12); box-shadow: 0 4px 20px var(--accent-glow); }
+.rating-labels { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); font-weight: 600; }
+/* CHOICE */
+.choice-row { display: flex; gap: 10px; }
+.choice-btn { flex: 1; padding: 16px 8px 12px; background: var(--surface2); border: 1.5px solid var(--border); border-radius: 16px; cursor: pointer; text-align: center; transition: all 0.15s; user-select: none; }
+.choice-btn .em { font-size: 26px; display: block; margin-bottom: 6px; }
+.choice-btn .lbl { font-size: 11px; font-weight: 700; color: var(--text-muted); }
+.choice-btn:active, .choice-btn.selected { border-color: var(--accent); background: var(--accent-dim); transform: scale(0.97); }
+/* TEXTAREA */
+.textarea { width: 100%; background: var(--surface2); border: 1.5px solid var(--border); border-radius: 14px; padding: 14px 16px; font-family: inherit; font-size: 15px; font-weight: 500; color: var(--text); resize: none; outline: none; min-height: 130px; line-height: 1.5; }
 .textarea::placeholder { color: var(--text-muted); }
-.textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-dim); }
-.btn-primary { width: 100%; padding: 18px; background: var(--accent); border: none; border-radius: 16px; font-family: 'Figtree', sans-serif; font-size: 16px; font-weight: 800; color: #000; cursor: pointer; letter-spacing: -0.2px; transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); box-shadow: 0 4px 24px var(--accent-glow); animation: fadeUp 0.5s 0.25s ease both; display: flex; align-items: center; justify-content: center; gap: 8px; }
-.btn-primary:hover { transform: translateY(-2px) scale(1.02); box-shadow: 0 8px 32px var(--accent-glow); background: #65e002; }
-.btn-primary:active { transform: scale(0.98); }
-.dots { display: flex; justify-content: center; gap: 6px; margin-top: 24px; animation: fadeUp 0.5s 0.3s ease both; }
-.dot { width: 6px; height: 6px; border-radius: 99px; background: var(--surface2); transition: all 0.3s ease; }
-.dot.active { width: 20px; background: var(--accent); box-shadow: 0 0 8px var(--accent-glow); }
-.success-card { background: var(--surface); border-radius: var(--radius); padding: 28px 20px; text-align: center; display: none; flex-direction: column; gap: 14px; animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+.textarea:focus { border-color: var(--accent); }
+/* BUTTONS */
+.btn-primary { width: 100%; padding: 18px; background: var(--accent); border: none; border-radius: 16px; font-family: inherit; font-size: 16px; font-weight: 800; color: #000; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 24px var(--accent-glow); margin-bottom: 12px; }
+.btn-primary:hover { transform: translateY(-2px); background: #65e002; }
+.skip-btn { width: 100%; padding: 14px; background: transparent; border: 1px solid var(--border); border-radius: 14px; font-family: inherit; font-size: 14px; font-weight: 600; color: var(--text-muted); cursor: pointer; margin-bottom: 16px; }
+/* DOTS */
+.dots { display: flex; justify-content: center; gap: 6px; margin-top: 8px; }
+.dot { width: 6px; height: 6px; border-radius: 99px; background: var(--surface2); transition: all 0.3s; }
+.dot.active { width: 20px; background: var(--accent); }
+/* SUCCESS */
+.success-card { background: var(--surface); border-radius: var(--radius); padding: 28px 20px; text-align: center; display: none; flex-direction: column; gap: 14px; }
 .success-card.visible { display: flex; }
-.badge { display: inline-flex; align-items: center; gap: 5px; border-radius: 99px; padding: 5px 14px; font-size: 11px; font-weight: 700; letter-spacing: 0.3px; margin: 0 auto; }
+.badge { display: inline-flex; align-items: center; gap: 5px; border-radius: 99px; padding: 5px 14px; font-size: 11px; font-weight: 700; margin: 0 auto; }
 .badge.green { background: rgba(88,204,2,0.1); border: 1px solid rgba(88,204,2,0.2); color: var(--accent); }
 .badge.red { background: rgba(255,75,75,0.1); border: 1px solid rgba(255,75,75,0.2); color: var(--danger); }
 .success-icon { width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto; }
 .success-icon.green { background: rgba(88,204,2,0.12); border: 1.5px solid rgba(88,204,2,0.25); }
 .success-icon.orange { background: rgba(255,200,0,0.1); border: 1.5px solid rgba(255,200,0,0.2); }
-.success-title { font-size: 20px; font-weight: 900; letter-spacing: -0.4px; margin: 0; }
+.success-title { font-size: 20px; font-weight: 900; margin: 0; }
 .success-sub { font-size: 13px; color: var(--text-muted); line-height: 1.6; margin: 0; font-weight: 500; }
-.google-btn-big { background: #4285F4; border-radius: 16px; padding: 14px 16px; display: flex; align-items: center; gap: 12px; text-decoration: none; transition: all 0.2s ease; }
-.google-btn-big:hover { transform: translateY(-2px); opacity: 0.95; }
-.google-logo-wrap { width: 32px; height: 32px; background: white; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-.google-btn-big-text { flex: 1; text-align: left; }
-.google-btn-big-text .t1 { font-size: 13px; font-weight: 800; color: white; margin: 0; }
-.google-btn-big-text .t2 { font-size: 11px; color: rgba(255,255,255,0.7); margin: 2px 0 0; }
-.divider { display: flex; align-items: center; gap: 8px; }
-.divider-line { flex: 1; height: 0.5px; background: var(--border); }
-.divider-text { font-size: 11px; color: var(--text-muted); font-weight: 600; }
-.private-box { background: #1a1a1a; border: 1px solid var(--border); border-radius: 18px; padding: 16px; text-align: left; }
-.private-box-title { font-size: 14px; font-weight: 800; color: var(--text); margin: 0 0 4px; letter-spacing: -0.2px; }
-.private-box-sub { font-size: 11px; color: var(--text-muted); margin: 0 0 12px; font-weight: 500; }
-.private-textarea { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px; font-family: 'Figtree', sans-serif; font-size: 13px; color: var(--text); resize: none; outline: none; min-height: 80px; margin-bottom: 10px; transition: border-color 0.2s; }
-.private-textarea::placeholder { color: var(--text-muted); }
-.private-textarea:focus { border-color: var(--accent); }
-.send-btn { width: 100%; background: var(--accent); border: none; border-radius: 12px; padding: 11px; font-family: 'Figtree', sans-serif; font-size: 13px; font-weight: 800; color: #000; cursor: pointer; transition: all 0.2s ease; }
-.send-btn:hover { background: #65e002; transform: translateY(-1px); }
-.google-btn-small { border: 1px solid var(--border); border-radius: 14px; padding: 11px 14px; display: flex; align-items: center; gap: 10px; text-decoration: none; transition: all 0.2s ease; }
-.google-btn-small:hover { border-color: rgba(255,255,255,0.2); }
-.g-icon { width: 22px; height: 22px; background: white; border-radius: 5px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-.google-btn-small-text { flex: 1; font-size: 12px; color: var(--text-muted); font-weight: 600; }
-.powered { text-align: center; margin-top: 20px; font-size: 11px; color: rgba(255,255,255,0.15); font-weight: 600; letter-spacing: 0.5px; animation: fadeUp 0.5s 0.4s ease both; }
+.google-btn { background: #4285F4; border-radius: 16px; padding: 14px 16px; display: flex; align-items: center; gap: 12px; border: none; width: 100%; cursor: pointer; transition: all 0.2s; }
+.google-btn:hover { transform: translateY(-2px); opacity: 0.95; }
+.google-logo { width: 32px; height: 32px; min-width: 32px; background: white; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+.google-text { flex: 1; text-align: left; }
+.google-text .t1 { font-size: 13px; font-weight: 800; color: white; margin: 0; }
+.google-text .t2 { font-size: 11px; color: rgba(255,255,255,0.7); margin: 2px 0 0; }
+.toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--accent); color: #000; font-size: 13px; font-weight: 700; padding: 10px 20px; border-radius: 99px; opacity: 0; transition: all 0.3s; pointer-events: none; z-index: 999; white-space: nowrap; }
+.powered { text-align: center; margin-top: 20px; font-size: 11px; color: rgba(255,255,255,0.15); font-weight: 600; }
 .powered span { color: var(--accent); opacity: 0.5; }
-@keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes popIn { from { opacity: 0; transform: scale(0.85); } to { opacity: 1; transform: scale(1); } }
 </style>
 </head>
 <body>
+<div id="wrap">
 <div class="container">
 
   <div class="header">
-    <div class="restaurant-avatar" id="restaurantAvatar">
-      <span class="fallback">🏪</span>
-    </div>
-    <div class="restaurant-name" id="restaurantName">Chargement...</div>
-    <div class="restaurant-sub" id="restaurantSub"></div>
+    <div class="avatar">🏪</div>
+    <div class="name" id="commerceName">Mon Commerce</div>
   </div>
 
   <div id="formView">
@@ -157,54 +111,56 @@ body::before {
       </div>
     </div>
 
-    <div class="card" id="step1">
-      <div class="question">Comment était votre expérience ?</div>
-      <div class="question-sub">Soyez honnête, ça nous aide vraiment 🙏</div>
-      <div class="stars" id="starsRow">
-        <div class="star" onclick="selectStar(1)">⭐</div>
-        <div class="star" onclick="selectStar(2)">⭐</div>
-        <div class="star" onclick="selectStar(3)">⭐</div>
-        <div class="star" onclick="selectStar(4)">⭐</div>
-        <div class="star" onclick="selectStar(5)">⭐</div>
+    <!-- ÉTAPE 1 — Note -->
+    <div id="step1">
+      <div class="card">
+        <div class="q">Comment était votre expérience ?</div>
+        <div class="q-sub">Soyez honnête, ça nous aide vraiment 🙏</div>
+        <div class="stars">
+          <div class="star" onclick="selectStar(1)">⭐</div>
+          <div class="star" onclick="selectStar(2)">⭐</div>
+          <div class="star" onclick="selectStar(3)">⭐</div>
+          <div class="star" onclick="selectStar(4)">⭐</div>
+          <div class="star" onclick="selectStar(5)">⭐</div>
+        </div>
+        <div class="rating-labels"><span>Décevant</span><span>Excellent !</span></div>
       </div>
-      <div class="rating-labels">
-        <span>Décevant</span>
-        <span>Excellent !</span>
-      </div>
+      <button class="btn-primary" onclick="goToStep(2)">Continuer →</button>
     </div>
 
-    <div class="card" id="step2" style="display:none">
-      <div class="question">Qu'est-ce qui vous a le plus marqué ?</div>
-      <div class="question-sub">Choisissez ce qui correspond le mieux</div>
-      <div class="emoji-row">
-        <div class="emoji-btn" onclick="selectEmoji(this,'food')" data-cat="food">
-          <span class="em">🍽️</span>
-          <span class="label">La cuisine</span>
-        </div>
-        <div class="emoji-btn" onclick="selectEmoji(this,'service')" data-cat="service">
-          <span class="em">🤝</span>
-          <span class="label">Le service</span>
-        </div>
-        <div class="emoji-btn" onclick="selectEmoji(this,'ambiance')" data-cat="ambiance">
-          <span class="em">✨</span>
-          <span class="label">L'ambiance</span>
-        </div>
-        <div class="emoji-btn" onclick="selectEmoji(this,'price')" data-cat="price">
-          <span class="em">💰</span>
-          <span class="label">Le prix</span>
+    <!-- ÉTAPE 2 — Point fort (auto-avance) -->
+    <div id="step2" style="display:none">
+      <div class="card">
+        <div class="q">Le point fort de votre visite ?</div>
+        <div class="q-sub">Un clic et on passe à la suite ✨</div>
+        <div class="choice-row">
+          <div class="choice-btn" onclick="selectCategory('cuisine', this)">
+            <span class="em">🍽️</span><span class="lbl">Cuisine</span>
+          </div>
+          <div class="choice-btn" onclick="selectCategory('service', this)">
+            <span class="em">🤝</span><span class="lbl">Service</span>
+          </div>
+          <div class="choice-btn" onclick="selectCategory('ambiance', this)">
+            <span class="em">🎶</span><span class="lbl">Ambiance</span>
+          </div>
+          <div class="choice-btn" onclick="selectCategory('prix', this)">
+            <span class="em">💰</span><span class="lbl">Prix</span>
+          </div>
         </div>
       </div>
+      <button class="skip-btn" onclick="goToStep(3)">Passer →</button>
     </div>
 
-    <div class="card" id="step3" style="display:none">
-      <div class="question">Un commentaire ?</div>
-      <div class="question-sub">Facultatif · 20 secondes max</div>
-      <textarea class="textarea" id="commentField" placeholder="Dites-nous ce que vous avez aimé ou ce qu'on pourrait améliorer..."></textarea>
+    <!-- ÉTAPE 3 — Commentaire -->
+    <div id="step3" style="display:none">
+      <div class="card">
+        <div class="q">Un commentaire ?</div>
+        <div class="q-sub">20 secondes max ⏱️</div>
+        <textarea class="textarea" id="commentField" placeholder="Dites-nous ce que vous avez aimé..."></textarea>
+      </div>
+      <button class="btn-primary" onclick="submitFeedback()">Envoyer ✓</button>
+      <button class="skip-btn" onclick="submitFeedback()">Passer sans commentaire</button>
     </div>
-
-    <button class="btn-primary" id="nextBtn" onclick="nextStep()">
-      Continuer <span>→</span>
-    </button>
 
     <div class="dots">
       <div class="dot active" id="dot1"></div>
@@ -213,7 +169,7 @@ body::before {
     </div>
   </div>
 
-  <!-- SUCCÈS NOTE >= 4 -->
+  <!-- SUCCÈS BONNE NOTE -->
   <div class="success-card" id="successGood">
     <div class="badge green">🔥 +10 XP · Super note !</div>
     <div class="success-icon green">
@@ -222,9 +178,9 @@ body::before {
       </svg>
     </div>
     <p class="success-title">Merci beaucoup !</p>
-    <p class="success-sub">Votre avis aide ce commerce à s'améliorer chaque jour. Aidez d'autres personnes à le découvrir ✨</p>
-    <a class="google-btn-big" id="googleLinkBig" href="#" target="_blank">
-      <div class="google-logo-wrap">
+    <p class="success-sub">Votre avis aide ce commerce à s'améliorer chaque jour ✨</p>
+    <button class="google-btn" onclick="copyAndOpenGoogle()">
+      <div class="google-logo">
         <svg width="16" height="16" viewBox="0 0 24 24">
           <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
           <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
@@ -232,30 +188,16 @@ body::before {
           <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
         </svg>
       </div>
-      <div class="google-btn-big-text">
+      <div class="google-text">
         <p class="t1">Laisser un avis Google</p>
-        <p class="t2">Aidez d'autres clients à nous trouver</p>
+        <p class="t2">Votre commentaire sera déjà copié ✓</p>
       </div>
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-        <path d="M9 18l6-6-6-6" stroke="white" stroke-width="2" stroke-linecap="round"/>
-      </svg>
-    </a>
-    <div class="divider">
-      <div class="divider-line"></div>
-      <span class="divider-text">ou</span>
-      <div class="divider-line"></div>
-    </div>
-    <div style="border: 1px solid var(--border); border-radius: 14px; padding: 11px 14px; display: flex; align-items: center; justify-content: space-between; cursor: pointer;" onclick="showPrivateForm()">
-      <span style="font-size: 12px; color: var(--text-muted); font-weight: 600;">Envoyer un retour privé au gérant</span>
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-        <path d="M9 18l6-6-6-6" stroke="rgba(255,255,255,0.3)" stroke-width="2" stroke-linecap="round"/>
-      </svg>
-    </div>
+    </button>
   </div>
 
-  <!-- SUCCÈS NOTE <= 3 -->
+  <!-- SUCCÈS MAUVAISE NOTE -->
   <div class="success-card" id="successBad">
-    <div class="badge red">📣 Gérant notifié immédiatement</div>
+    <div class="badge red">📣 Gérant notifié</div>
     <div class="success-icon orange">
       <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
         <path d="M12 8v4m0 4h.01" stroke="#FFC800" stroke-width="2.5" stroke-linecap="round"/>
@@ -263,192 +205,104 @@ body::before {
       </svg>
     </div>
     <p class="success-title">Merci pour votre retour</p>
-    <p class="success-sub">On va tout faire pour améliorer votre prochaine visite. Vous pouvez aussi nous écrire directement.</p>
-    <div class="private-box">
-      <p class="private-box-title">Nous contacter en privé</p>
-      <p class="private-box-sub">Votre message va directement au gérant</p>
-      <textarea class="private-textarea" id="privateMessage" placeholder="Décrivez votre expérience..."></textarea>
-      <button class="send-btn" onclick="sendPrivateMessage()">Envoyer au gérant →</button>
-    </div>
-    <div class="divider">
-      <div class="divider-line"></div>
-      <span class="divider-text">ou quand même</span>
-      <div class="divider-line"></div>
-    </div>
-    <a class="google-btn-small" id="googleLinkSmall" href="#" target="_blank">
-      <div class="g-icon">
-        <svg width="12" height="12" viewBox="0 0 24 24">
+    <p class="success-sub">On va tout faire pour améliorer votre prochaine visite.</p>
+    <button class="google-btn" onclick="copyAndOpenGoogle()">
+      <div class="google-logo">
+        <svg width="16" height="16" viewBox="0 0 24 24">
           <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
           <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
           <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
           <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
         </svg>
       </div>
-      <span class="google-btn-small-text">Laisser un avis Google</span>
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-        <path d="M9 18l6-6-6-6" stroke="rgba(255,255,255,0.3)" stroke-width="2" stroke-linecap="round"/>
-      </svg>
-    </a>
-  </div>
-
-  <!-- MESSAGE ENVOYÉ -->
-  <div class="success-card" id="messageSent">
-    <div class="badge green">✓ Message envoyé</div>
-    <div class="success-icon green">
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-        <path d="M5 13l4 4L19 7" stroke="#58CC02" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-    </div>
-    <p class="success-title">Message reçu !</p>
-    <p class="success-sub">Le gérant va vous contacter très prochainement. Merci de votre retour.</p>
+      <div class="google-text">
+        <p class="t1">Laisser un avis Google</p>
+        <p class="t2">Votre commentaire sera déjà copié ✓</p>
+      </div>
+    </button>
   </div>
 
   <div class="powered">Propulsé par <span>Frizz</span></div>
 </div>
+</div>
+
+<div class="toast" id="toast">📋 Commentaire copié — collez-le sur Google !</div>
 
 <script>
-  let currentStep = 1;
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxpZRqqiq9zpIhBAtYvKDoxOelXAoKwHJ2T3pS0bttdgyZ7Ls7Kc1MS-LFg-DqrhItu/exec';
+
   let starRating = 0;
-  let selectedCategory = '';
-  let commerceId = '';
-  let googleLink = '';
-  let commerceName = '';
+  let category = '';
+  let userComment = '';
+  let currentStep = 1;
+  const commerceId = new URLSearchParams(window.location.search).get('id') || 'demo';
+  const googleUrl = new URLSearchParams(window.location.search).get('google') || '#';
 
-  function getUrlParam(param) {
-    const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get(param);
-  }
-
-  async function loadCommerce() {
-    commerceId = getUrlParam('id') || 'demo';
-
-    if (commerceId === 'demo') {
-      document.getElementById('restaurantName').textContent = 'Chez Marco';
-      document.getElementById('restaurantSub').textContent = 'Paris 11e · Pizza & Pasta';
-      document.getElementById('restaurantAvatar').innerHTML = '<span class="fallback">🍕</span>';
-      googleLink = '#';
-      commerceName = 'Chez Marco';
-      return;
-    }
-
-    try {
-      const response = await fetch(`https://frizz-2.bubbleapps.io/version-test/api/1.1/obj/commerce/${commerceId}`, {
-        headers: { 'Authorization': 'Bearer 1441d6c6954a281862a4c333fa3b8e62' }
-      });
-      const data = await response.json();
-      const commerce = data.response;
-      document.getElementById('restaurantName').textContent = commerce.nom || 'Mon Commerce';
-      document.getElementById('restaurantSub').textContent = commerce.ville || '';
-      if (commerce.photo) {
-        document.getElementById('restaurantAvatar').innerHTML = `<img src="${commerce.photo}" alt="${commerce.nom}">`;
-      }
-      googleLink = commerce.lien_google || '#';
-      commerceName = commerce.nom || 'ce commerce';
-    } catch(e) {
-      document.getElementById('restaurantName').textContent = 'Mon Commerce';
-    }
-  }
+  const progressMap = { 1: '33%', 2: '66%', 3: '100%' };
 
   function selectStar(val) {
     starRating = val;
-    document.querySelectorAll('.star').forEach((s, i) => {
-      s.classList.toggle('active', i < val);
-    });
+    document.querySelectorAll('.star').forEach((s, i) => s.classList.toggle('active', i < val));
   }
 
-  function selectEmoji(el, cat) {
-    el.classList.toggle('active');
-    const active = [...document.querySelectorAll('.emoji-btn.active')].map(b => b.getAttribute('data-cat'));
-    selectedCategory = active.join(',');
+  function selectCategory(cat, el) {
+    category = cat;
+    el.classList.add('selected');
+    setTimeout(() => goToStep(3), 300);
   }
 
-  function nextStep() {
-    if (currentStep === 1) {
-      if (starRating === 0) return;
-      document.getElementById('step1').style.display = 'none';
-      document.getElementById('step2').style.display = 'block';
-      currentStep = 2;
-      updateProgress();
-    } else if (currentStep === 2) {
-      document.getElementById('step2').style.display = 'none';
-      document.getElementById('step3').style.display = 'block';
-      document.getElementById('nextBtn').innerHTML = 'Envoyer ✓';
-      currentStep = 3;
-      updateProgress();
-    } else if (currentStep === 3) {
-      submitFeedback();
+  function goToStep(step) {
+    if (step === 2 && !starRating) return;
+    document.getElementById('step' + currentStep).style.display = 'none';
+    currentStep = step;
+    document.getElementById('step' + step).style.display = 'block';
+    document.getElementById('progressFill').style.width = progressMap[step];
+    document.getElementById('stepLabel').textContent = step + ' / 3';
+    for (let i = 1; i <= 3; i++) {
+      document.getElementById('dot' + i).classList.toggle('active', i === step);
     }
   }
 
   async function submitFeedback() {
-    const comment = document.getElementById('commentField').value;
-
+    userComment = document.getElementById('commentField').value;
     try {
-      await fetch('https://frizz-2.bubbleapps.io/version-test/api/1.1/wf/nouveau_avis', {
+      await fetch(SCRIPT_URL, {
         method: 'POST',
+        mode: 'no-cors',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          commerce_id: commerceId,
           note: starRating,
-          categorie: selectedCategory,
-          commentaire: comment
+          categorie: category,
+          commentaire: userComment,
+          commerce_id: commerceId
         })
       });
-    } catch(e) {
-      console.log('Erreur envoi');
-    }
+    } catch(e) {}
 
     document.getElementById('formView').style.display = 'none';
-
     if (starRating >= 4) {
-      document.getElementById('googleLinkBig').href = googleLink;
-      document.getElementById('googleLinkSmall').href = googleLink;
       document.getElementById('successGood').classList.add('visible');
     } else {
-      document.getElementById('googleLinkSmall').href = googleLink;
       document.getElementById('successBad').classList.add('visible');
     }
   }
 
-  function showPrivateForm() {
-    document.getElementById('successGood').classList.remove('visible');
-    document.getElementById('successBad').classList.add('visible');
-  }
-
-  async function sendPrivateMessage() {
-    const message = document.getElementById('privateMessage').value;
-    if (!message.trim()) return;
-
-    try {
-      await fetch('https://frizz-2.bubbleapps.io/version-test/api/1.1/wf/message_prive', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer 1441d6c6954a281862a4c333fa3b8e62'
-        },
-        body: JSON.stringify({
-          commerce_id: commerceId,
-          message: message
-        })
-      });
-    } catch(e) {
-      console.log('Mode demo');
+  function copyAndOpenGoogle() {
+    if (userComment && userComment.trim()) {
+      navigator.clipboard.writeText(userComment).then(() => showToast()).catch(() => {});
     }
-
-    document.getElementById('successBad').classList.remove('visible');
-    document.getElementById('messageSent').classList.add('visible');
+    if (googleUrl !== '#') setTimeout(() => window.open(googleUrl, '_blank'), 300);
   }
 
-  function updateProgress() {
-    const widths = { 1: '33%', 2: '66%', 3: '100%' };
-    document.getElementById('progressFill').style.width = widths[currentStep];
-    document.getElementById('stepLabel').textContent = `${currentStep} / 3`;
-    for (let i = 1; i <= 3; i++) {
-      document.getElementById(`dot${i}`).classList.toggle('active', i === currentStep);
-    }
+  function showToast() {
+    const t = document.getElementById('toast');
+    t.style.opacity = '1';
+    t.style.transform = 'translateX(-50%) translateY(0)';
+    setTimeout(() => {
+      t.style.opacity = '0';
+      t.style.transform = 'translateX(-50%) translateY(20px)';
+    }, 3000);
   }
-
-  loadCommerce();
 </script>
 </body>
 </html>
