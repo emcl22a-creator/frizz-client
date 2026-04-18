@@ -143,6 +143,31 @@ html, body { background: var(--bg); font-family: 'Figtree', sans-serif; color: v
 .btn-dl:hover { border-color: var(--accent); color: var(--accent); }
 
 .last-refresh { font-size: 11px; color: var(--text-muted); text-align: right; margin-top: 8px; }
+/* SUBSCRIPTION */
+.sub-banner { border-radius: 16px; padding: 16px 20px; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.sub-banner.trial { background: var(--accent-dim); border: 1px solid rgba(88,204,2,0.2); }
+.sub-banner.active { background: var(--accent-dim); border: 1px solid rgba(88,204,2,0.2); }
+.sub-banner.expired { background: var(--danger-dim); border: 1px solid rgba(255,75,75,0.3); }
+.sub-banner-left { display: flex; align-items: center; gap: 10px; }
+.sub-banner-icon { font-size: 22px; }
+.sub-banner-title { font-size: 14px; font-weight: 800; }
+.sub-banner-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+.sub-banner-sub.red { color: var(--danger); }
+.btn-subscribe { background: var(--accent); border: none; border-radius: 12px; padding: 10px 20px; font-family: inherit; font-size: 13px; font-weight: 800; color: #000; cursor: pointer; white-space: nowrap; text-decoration: none; display: inline-block; transition: all 0.2s; }
+.btn-subscribe:hover { background: #65e002; transform: translateY(-1px); }
+.btn-manage { background: var(--surface2); border: 1.5px solid var(--border); border-radius: 12px; padding: 10px 20px; font-family: inherit; font-size: 13px; font-weight: 700; color: var(--text-muted); cursor: pointer; white-space: nowrap; text-decoration: none; display: inline-block; transition: all 0.2s; }
+.btn-manage:hover { border-color: var(--accent); color: var(--accent); }
+
+/* PAYWALL */
+#paywall { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 500; flex-direction: column; align-items: center; justify-content: center; padding: 24px; text-align: center; }
+#paywall.visible { display: flex; }
+.paywall-box { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 40px 32px; max-width: 420px; width: 100%; }
+.paywall-icon { font-size: 48px; margin-bottom: 16px; }
+.paywall-title { font-size: 24px; font-weight: 900; margin-bottom: 8px; }
+.paywall-sub { font-size: 14px; color: var(--text-muted); line-height: 1.6; margin-bottom: 24px; }
+.paywall-price { font-size: 36px; font-weight: 900; color: var(--accent); margin-bottom: 4px; }
+.paywall-period { font-size: 13px; color: var(--text-muted); margin-bottom: 24px; }
+
 </style>
 </head>
 <body>
@@ -218,6 +243,23 @@ html, body { background: var(--bg); font-family: 'Figtree', sans-serif; color: v
 
 <!-- DASHBOARD -->
 <div class="wrap" id="mainContent" style="display:none">
+
+
+  <!-- SUBSCRIPTION BANNER -->
+  <div id="subBanner"></div>
+
+  <!-- PAYWALL -->
+  <div id="paywall">
+    <div class="paywall-box">
+      <div class="paywall-icon">⏰</div>
+      <div class="paywall-title">Votre essai gratuit est terminé</div>
+      <div class="paywall-sub">Continuez à collecter vos avis Google et accéder à votre dashboard en souscrivant à Frizz.</div>
+      <div class="paywall-price">19€</div>
+      <div class="paywall-period">par mois · sans engagement</div>
+      <a href="https://buy.stripe.com/test_8x24gAdsSgBU4LbgFrbEA00" target="_blank" class="btn-subscribe" style="width:100%;text-align:center;padding:18px;font-size:16px;border-radius:14px;display:block">S'abonner maintenant →</a>
+      <div style="font-size:11px;color:var(--text-muted);margin-top:10px">Paiement sécurisé par Stripe · Annulation en 1 clic</div>
+    </div>
+  </div>
 
   <div class="header">
     <div class="header-left">
@@ -388,6 +430,7 @@ function initDashboard() {
   document.getElementById('toggleBad').classList.toggle('on', notifBadEnabled);
   document.getElementById('toggleAll').classList.toggle('on', notifAllEnabled);
 
+  initSubscription();
   generateQR();
   loadData();
   refreshInterval = setInterval(loadData, 30000); // auto-refresh 30s
@@ -689,6 +732,78 @@ function toggleSection(header) {
   header.parentElement.classList.toggle('collapsed');
 }
 
+
+// ============================================================
+// SUBSCRIPTION
+// ============================================================
+const STRIPE_LINK = 'https://buy.stripe.com/test_8x24gAdsSgBU4LbgFrbEA00';
+const TRIAL_DAYS = 7;
+
+function initSubscription() {
+  const registeredAt = localStorage.getItem('registered_at_' + commerceId);
+  const now = Date.now();
+
+  if (!registeredAt) {
+    localStorage.setItem('registered_at_' + commerceId, now);
+    renderSubBanner('trial', TRIAL_DAYS);
+    return;
+  }
+
+  const daysPassed = Math.floor((now - parseInt(registeredAt)) / (1000 * 60 * 60 * 24));
+  const daysLeft = TRIAL_DAYS - daysPassed;
+  const isPaid = localStorage.getItem('paid_' + commerceId) === 'true';
+
+  if (isPaid) {
+    renderSubBanner('active', 0);
+  } else if (daysLeft > 0) {
+    renderSubBanner('trial', daysLeft);
+  } else {
+    renderSubBanner('expired', 0);
+    document.getElementById('paywall').classList.add('visible');
+  }
+}
+
+function renderSubBanner(status, daysLeft) {
+  const banner = document.getElementById('subBanner');
+  if (status === 'active') {
+    banner.innerHTML = `
+      <div class="sub-banner active">
+        <div class="sub-banner-left">
+          <div class="sub-banner-icon">✅</div>
+          <div>
+            <div class="sub-banner-title">Abonnement actif</div>
+            <div class="sub-banner-sub">19€/mois · Prochain prélèvement automatique</div>
+          </div>
+        </div>
+        <a href="${STRIPE_LINK}" target="_blank" class="btn-manage">Gérer mon abonnement</a>
+      </div>`;
+  } else if (status === 'trial') {
+    banner.innerHTML = `
+      <div class="sub-banner trial">
+        <div class="sub-banner-left">
+          <div class="sub-banner-icon">🎁</div>
+          <div>
+            <div class="sub-banner-title">Essai gratuit — ${daysLeft} jour${daysLeft > 1 ? 's' : ''} restant${daysLeft > 1 ? 's' : ''}</div>
+            <div class="sub-banner-sub">Après l'essai, 19€/mois prélevés automatiquement</div>
+          </div>
+        </div>
+        <a href="${STRIPE_LINK}" target="_blank" class="btn-subscribe">S'abonner maintenant →</a>
+      </div>`;
+  } else {
+    banner.innerHTML = `
+      <div class="sub-banner expired">
+        <div class="sub-banner-left">
+          <div class="sub-banner-icon">⚠️</div>
+          <div>
+            <div class="sub-banner-title">Essai expiré</div>
+            <div class="sub-banner-sub red">Abonnez-vous pour continuer à utiliser Frizz</div>
+          </div>
+        </div>
+        <a href="${STRIPE_LINK}" target="_blank" class="btn-subscribe">S'abonner — 19€/mois →</a>
+      </div>`;
+  }
+}
+
 // ============================================================
 // TOGGLE AVIS DETAIL
 // ============================================================
@@ -698,6 +813,77 @@ function toggleAvis(el) {
   const isOpen = detail.style.display !== 'none';
   detail.style.display = isOpen ? 'none' : 'block';
   if (arrow) arrow.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
+}
+
+
+// ============================================================
+// SUBSCRIPTION
+// ============================================================
+const TRIAL_DAYS = 7;
+
+function initSubscription() {
+  const registeredAt = localStorage.getItem('registered_at_' + commerceId);
+  const now = Date.now();
+
+  if (!registeredAt) {
+    localStorage.setItem('registered_at_' + commerceId, now);
+    renderSubBanner('trial', TRIAL_DAYS);
+    return;
+  }
+
+  const daysPassed = Math.floor((now - parseInt(registeredAt)) / (1000 * 60 * 60 * 24));
+  const daysLeft = TRIAL_DAYS - daysPassed;
+  const isPaid = localStorage.getItem('paid_' + commerceId) === 'true';
+
+  if (isPaid) {
+    renderSubBanner('active', 0);
+  } else if (daysLeft > 0) {
+    renderSubBanner('trial', daysLeft);
+  } else {
+    renderSubBanner('expired', 0);
+    document.getElementById('paywall').classList.add('visible');
+  }
+}
+
+function renderSubBanner(status, daysLeft) {
+  const banner = document.getElementById('subBanner');
+  if (status === 'active') {
+    banner.innerHTML = `
+      <div class="sub-banner active">
+        <div class="sub-banner-left">
+          <div class="sub-banner-icon">✅</div>
+          <div>
+            <div class="sub-banner-title">Abonnement actif</div>
+            <div class="sub-banner-sub">19€/mois · Prochain prélèvement automatique</div>
+          </div>
+        </div>
+        <a href="${STRIPE_LINK}" target="_blank" class="btn-manage">Gérer mon abonnement</a>
+      </div>`;
+  } else if (status === 'trial') {
+    banner.innerHTML = `
+      <div class="sub-banner trial">
+        <div class="sub-banner-left">
+          <div class="sub-banner-icon">🎁</div>
+          <div>
+            <div class="sub-banner-title">Essai gratuit — ${daysLeft} jour${daysLeft > 1 ? 's' : ''} restant${daysLeft > 1 ? 's' : ''}</div>
+            <div class="sub-banner-sub">Après l'essai, 19€/mois prélevés automatiquement</div>
+          </div>
+        </div>
+        <a href="${STRIPE_LINK}" target="_blank" class="btn-subscribe">S'abonner maintenant →</a>
+      </div>`;
+  } else {
+    banner.innerHTML = `
+      <div class="sub-banner expired">
+        <div class="sub-banner-left">
+          <div class="sub-banner-icon">⚠️</div>
+          <div>
+            <div class="sub-banner-title">Essai expiré</div>
+            <div class="sub-banner-sub red">Abonnez-vous pour continuer à utiliser Frizz</div>
+          </div>
+        </div>
+        <a href="${STRIPE_LINK}" target="_blank" class="btn-subscribe">S'abonner — 19€/mois →</a>
+      </div>`;
+  }
 }
 
 // ============================================================
