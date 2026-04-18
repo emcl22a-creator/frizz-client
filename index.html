@@ -23,6 +23,7 @@
 }
 html, body { background: #0A0A0A; margin: 0; padding: 0; font-family: 'Figtree', sans-serif; color: #FFFFFF; min-height: 100vh; }
 #wrap { padding: 100px 19px 40px; min-height: 100vh; }
+@media(max-width:480px){ #wrap { padding: 80px 19px 40px; } .card { margin-left: 0; margin-right: 0; } }
 .container { width: 100%; max-width: 360px; margin: 0 auto; }
 
 .header { text-align: center; margin-bottom: 28px; }
@@ -221,12 +222,11 @@ html, body { background: #0A0A0A; margin: 0; padding: 0; font-family: 'Figtree',
     <div class="badge orange">🙏 Merci pour votre retour</div>
     <div class="success-icon orange">
       <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-        <path d="M12 8v4m0 4h.01" stroke="#FFC800" stroke-width="2.5" stroke-linecap="round"/>
-        <circle cx="12" cy="12" r="9" stroke="#FFC800" stroke-width="2"/>
+        <path d="M5 13l4 4L19 7" stroke="#FFC800" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
     </div>
     <p class="success-title">Merci pour votre retour</p>
-    <p class="success-sub">Ça nous aide à nous améliorer 🙏 Vous pouvez aussi nous écrire directement.</p>
+    <p class="success-sub">Ça nous aide à nous améliorer 🙏</p>
 
     <button class="action-btn google" onclick="copyAndOpenGoogle()">
       <div class="action-logo">
