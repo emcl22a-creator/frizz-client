@@ -231,7 +231,6 @@ html, body { background: #0A0A0A; margin: 0; padding: 0; font-family: 'Figtree',
       <div class="action-logo dark">💬</div>
       <div class="action-text dark">
         <p class="t1" style="color:var(--text)">Avis en privé au gérant</p>
-        
       </div>
     </button>
   </div>
@@ -273,12 +272,11 @@ html, body { background: #0A0A0A; margin: 0; padding: 0; font-family: 'Figtree',
       <div class="action-logo dark">💬</div>
       <div class="action-text dark">
         <p class="t1" style="color:var(--text)">Écrire au gérant en privé</p>
-        
       </div>
     </button>
   </div>
 
-    <!-- MESSAGE ENVOYÉ -->
+  <!-- MESSAGE ENVOYÉ -->
   <div class="success-card" id="privateSent">
     <div class="success-icon green">
       <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
@@ -286,7 +284,6 @@ html, body { background: #0A0A0A; margin: 0; padding: 0; font-family: 'Figtree',
       </svg>
     </div>
     <p class="success-title">Message envoyé !</p>
-    
   </div>
 
   <div class="powered">Propulsé par <span>Frizz</span></div>
@@ -296,7 +293,8 @@ html, body { background: #0A0A0A; margin: 0; padding: 0; font-family: 'Figtree',
 <div class="toast" id="toast">📋 Résumé copié — collez-le sur Google !</div>
 
 <script>
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxpZRqqiq9zpIhBAtYvKDoxOelXAoKwHJ2T3pS0bttdgyZ7Ls7Kc1MS-LFg-DqrhItu/exec';
+  // ✅ URL CORRIGÉE
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwSaIXrbxT0blSpzjfXrtnfLD0BAk7gJRm0RRHmah6DrwQ9hMd6FnQ-vPwtxa-wsRdR/exec';
 
   const params = new URLSearchParams(window.location.search);
   const commerceId = params.get('id') || 'demo';
@@ -396,7 +394,6 @@ html, body { background: #0A0A0A; margin: 0; padding: 0; font-family: 'Figtree',
   }
 
   function copyAndOpenGoogle() {
-    // Enregistrer que le client a cliqué sur Google
     try {
       fetch(SCRIPT_URL, {
         method: 'POST', mode: 'no-cors',
@@ -422,8 +419,6 @@ html, body { background: #0A0A0A; margin: 0; padding: 0; font-family: 'Figtree',
       });
     } catch(e) {}
   }
-
-
 
   function showToast() {
     const t = document.getElementById('toast');
