@@ -127,6 +127,68 @@ footer { border-top: 1px solid var(--border); padding: 24px; display: flex; alig
 .footer-logo { font-size: 16px; font-weight: 800; color: var(--accent); }
 .footer-text { font-size: 12px; color: var(--muted); }
 
+
+/* MOCKUP SECTION */
+.mockup-section { padding: 60px 24px 100px; }
+.mockup-wrap { max-width: 900px; margin: 0 auto; position: relative; display: flex; align-items: flex-end; justify-content: center; gap: 0; }
+
+/* LAPTOP */
+.laptop { position: relative; width: 580px; flex-shrink: 0; z-index: 1; }
+.laptop-screen { background: #1a1a1a; border-radius: 12px 12px 0 0; border: 2px solid #333; overflow: hidden; }
+.laptop-bar { background: #111; padding: 8px 12px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #222; }
+.lb-dots { display: flex; gap: 5px; }
+.lb-dots span { width: 9px; height: 9px; border-radius: 50%; background: #333; }
+.lb-dots span:first-child { background: #FF5F57; }
+.lb-dots span:nth-child(2) { background: #FFBD2E; }
+.lb-dots span:last-child { background: #28C840; }
+.lb-url { flex: 1; background: #222; border-radius: 5px; padding: 3px 10px; font-size: 10px; color: #555; text-align: center; }
+.laptop-content { padding: 14px; }
+.lc-header { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+.lc-logo { font-size: 12px; font-weight: 900; color: var(--accent); }
+.lc-name { font-size: 11px; font-weight: 700; flex: 1; }
+.lc-live { display: flex; align-items: center; gap: 4px; font-size: 9px; color: var(--accent); font-weight: 700; background: var(--accent-dim); border-radius: 99px; padding: 2px 8px; }
+.lc-live span { width: 5px; height: 5px; background: var(--accent); border-radius: 50%; animation: blink 1.4s ease infinite; }
+.lc-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 12px; }
+.lc-stat { background: #222; border-radius: 8px; padding: 8px 6px; text-align: center; }
+.lc-stat-val { font-size: 18px; font-weight: 900; }
+.lc-stat-val.green { color: var(--accent); }
+.lc-stat-val.red { color: #FF4B4B; }
+.lc-stat-label { font-size: 8px; color: #555; margin-top: 2px; font-weight: 600; }
+.lc-avis-title { font-size: 10px; font-weight: 800; color: #666; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+.lc-avis { display: flex; flex-direction: column; gap: 4px; }
+.lc-avis-row { display: flex; align-items: center; gap: 6px; background: #222; border-radius: 8px; padding: 7px 8px; }
+.lc-stars { font-size: 9px; color: var(--accent); flex-shrink: 0; }
+.lc-avis-text { font-size: 9px; color: #888; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lc-tag { font-size: 8px; font-weight: 700; border-radius: 4px; padding: 2px 5px; flex-shrink: 0; }
+.lc-tag.green { background: var(--accent-dim); color: var(--accent); }
+.lc-tag.orange { background: rgba(255,200,0,0.1); color: #FFC800; }
+.laptop-base { background: linear-gradient(#2a2a2a, #222); height: 12px; border-radius: 0 0 4px 4px; border: 2px solid #333; border-top: none; }
+.laptop-foot { width: 200px; height: 6px; background: #222; border-radius: 0 0 8px 8px; margin: 0 auto; border: 1px solid #333; border-top: none; }
+
+/* PHONE */
+.phone { width: 180px; background: #111; border-radius: 28px; border: 2px solid #333; overflow: hidden; margin-left: -40px; margin-bottom: 18px; position: relative; z-index: 2; box-shadow: -20px 20px 60px rgba(0,0,0,0.8); }
+.phone-notch { width: 60px; height: 18px; background: #000; border-radius: 0 0 12px 12px; margin: 0 auto; }
+.phone-screen { padding: 8px 10px 14px; }
+.ph-avatar { text-align: center; font-size: 22px; margin: 4px 0 4px; }
+.ph-name { text-align: center; font-size: 10px; font-weight: 800; margin-bottom: 8px; }
+.ph-progress { margin-bottom: 8px; }
+.ph-prog-label { display: flex; justify-content: space-between; font-size: 7px; color: #555; font-weight: 700; margin-bottom: 3px; }
+.ph-prog-bar { height: 3px; background: #222; border-radius: 99px; }
+.ph-prog-fill { height: 100%; width: 50%; background: var(--accent); border-radius: 99px; }
+.ph-card { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 10px; padding: 10px 8px; margin-bottom: 8px; }
+.ph-card-title { font-size: 10px; font-weight: 900; text-align: center; margin-bottom: 2px; }
+.ph-card-sub { font-size: 8px; color: #666; text-align: center; margin-bottom: 8px; }
+.ph-stars { display: flex; gap: 3px; justify-content: center; }
+.ph-star { width: 22px; height: 22px; background: #222; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 11px; border: 1px solid #333; }
+.ph-star.active { background: rgba(88,204,2,0.15); border-color: var(--accent); }
+.ph-btn { background: var(--accent); border-radius: 8px; padding: 8px; text-align: center; font-size: 10px; font-weight: 800; color: #000; }
+
+@media(max-width:700px){
+  .mockup-wrap { flex-direction: column; align-items: center; gap: 24px; }
+  .laptop { width: 100%; max-width: 400px; }
+  .phone { margin-left: 0; margin-bottom: 0; }
+}
+
 /* REVEAL */
 .reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.6s ease, transform 0.6s ease; }
 .reveal.visible { opacity: 1; transform: translateY(0); }
@@ -161,35 +223,90 @@ footer { border-top: 1px solid var(--border); padding: 24px; display: flex; alig
 
 </section>
 
-<!-- BENTO GRID -->
-<div class="bento reveal">
-  <div class="bento-card wide">
-    <div class="bento-icon">⭐</div>
-    <div class="bento-title">Vos clients notent en 20 secondes</div>
-    <div class="bento-desc">Interface ultra-simple sur mobile. 5 étoiles, quelques critères. Frizz génère automatiquement le texte pour Google — le client n'a qu'à coller.</div>
-  </div>
-  <div class="bento-card tall">
-    <div>
-      <div class="bento-icon">📊</div>
-      <div class="bento-title">Dashboard en temps réel</div>
-      <div class="bento-desc">Tous vos avis, votre note moyenne, vos stats. Depuis n'importe quel appareil.</div>
+<!-- MOCKUP SECTION -->
+<div class="mockup-section reveal">
+  <div class="mockup-wrap">
+
+    <!-- LAPTOP -->
+    <div class="laptop">
+      <div class="laptop-screen">
+        <div class="laptop-bar">
+          <div class="lb-dots"><span></span><span></span><span></span></div>
+          <div class="lb-url">frizz.app/dashboard</div>
+        </div>
+        <div class="laptop-content">
+          <div class="lc-header">
+            <div class="lc-logo">Frizz ✦</div>
+            <div class="lc-name">Restaurant Le Gourmet</div>
+            <div class="lc-live"><span></span> En direct</div>
+          </div>
+          <div class="lc-stats">
+            <div class="lc-stat">
+              <div class="lc-stat-val green">4.8</div>
+              <div class="lc-stat-label">Note moyenne</div>
+            </div>
+            <div class="lc-stat">
+              <div class="lc-stat-val">47</div>
+              <div class="lc-stat-label">Total avis</div>
+            </div>
+            <div class="lc-stat">
+              <div class="lc-stat-val green">38</div>
+              <div class="lc-stat-label">Bons avis</div>
+            </div>
+            <div class="lc-stat">
+              <div class="lc-stat-val red">3</div>
+              <div class="lc-stat-label">À surveiller</div>
+            </div>
+          </div>
+          <div class="lc-avis-title">Derniers avis</div>
+          <div class="lc-avis">
+            <div class="lc-avis-row">
+              <span class="lc-stars">★★★★★</span>
+              <span class="lc-avis-text">"Excellent repas, service impeccable !"</span>
+              <span class="lc-tag green">Google ✓</span>
+            </div>
+            <div class="lc-avis-row">
+              <span class="lc-stars">★★★★★</span>
+              <span class="lc-avis-text">"Je recommande, ambiance parfaite."</span>
+              <span class="lc-tag green">Google ✓</span>
+            </div>
+            <div class="lc-avis-row">
+              <span class="lc-stars" style="color:#FFC800">★★★☆☆</span>
+              <span class="lc-avis-text">"Service un peu lent ce soir."</span>
+              <span class="lc-tag orange">Privé</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="laptop-base"></div>
+      <div class="laptop-foot"></div>
     </div>
 
-  </div>
-  <div class="bento-card">
-    <div class="bento-icon">🔔</div>
-    <div class="bento-title">Alerte mauvaise note</div>
-    <div class="bento-desc">Notification immédiate dès qu'un client laisse ≤ 3 étoiles. Réagissez avant qu'il parte.</div>
-  </div>
-  <div class="bento-card">
-    <div class="bento-icon">📱</div>
-    <div class="bento-title">QR code prêt à imprimer</div>
-    <div class="bento-desc">Haute résolution. À coller en caisse, sur les tables ou les tickets.</div>
-  </div>
-  <div class="bento-card wide">
-    <div class="bento-icon">🛡️</div>
-    <div class="bento-title">Filtre intelligent — protégez votre réputation</div>
-    <div class="bento-desc">Les bonnes notes vont sur Google. Les mauvaises restent dans votre dashboard privé. Vous gardez le contrôle total de votre image en ligne.</div>
+    <!-- PHONE -->
+    <div class="phone">
+      <div class="phone-notch"></div>
+      <div class="phone-screen">
+        <div class="ph-avatar">🍽️</div>
+        <div class="ph-name">Restaurant Le Gourmet</div>
+        <div class="ph-progress">
+          <div class="ph-prog-label"><span>VOTRE AVIS</span><span>1 / 2</span></div>
+          <div class="ph-prog-bar"><div class="ph-prog-fill"></div></div>
+        </div>
+        <div class="ph-card">
+          <div class="ph-card-title">Votre avis compte 🙌</div>
+          <div class="ph-card-sub">Ça prend 20 secondes ⏱️</div>
+          <div class="ph-stars">
+            <div class="ph-star active">⭐</div>
+            <div class="ph-star active">⭐</div>
+            <div class="ph-star active">⭐</div>
+            <div class="ph-star active">⭐</div>
+            <div class="ph-star active">⭐</div>
+          </div>
+        </div>
+        <div class="ph-btn">Continuer →</div>
+      </div>
+    </div>
+
   </div>
 </div>
 
