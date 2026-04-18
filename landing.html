@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Frizz — Plus d'avis Google, automatiquement</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --bg: #000000;
+  --surface: #111111;
+  --surface2: #1a1a1a;
+  --border: rgba(255,255,255,0.08);
+  --text: #FFFFFF;
+  --muted: rgba(255,255,255,0.5);
+  --accent: #7CFC00;
+  --accent-dim: rgba(88,204,2,0.12);
+  --accent-glow: rgba(88,204,2,0.3);
+}
+html { scroll-behavior: smooth; }
+body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; overflow-x: hidden; }
+
+/* NAV */
+nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 0 24px; height: 60px; display: flex; align-items: center; justify-content: space-between; background: rgba(0,0,0,0.8); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); }
+.nav-logo { font-size: 18px; font-weight: 800; color: var(--accent); }
+.nav-cta { background: var(--accent); color: #000; border: none; border-radius: 99px; padding: 8px 20px; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.2s; text-decoration: none; }
+.nav-cta:hover { transform: scale(1.04); box-shadow: 0 0 20px var(--accent-glow); }
+
+/* HERO */
+.hero { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 80px 24px 60px; text-align: center; position: relative; overflow: hidden; }
+.hero-glow { position: absolute; width: 700px; height: 700px; background: radial-gradient(circle, rgba(88,204,2,0.07) 0%, transparent 65%); border-radius: 50%; top: 50%; left: 50%; transform: translate(-50%, -55%); pointer-events: none; }
+
+.pill { display: inline-flex; align-items: center; gap: 7px; background: var(--accent-dim); border: 1px solid rgba(88,204,2,0.2); border-radius: 99px; padding: 6px 14px; font-size: 12px; font-weight: 700; color: var(--accent); margin-bottom: 32px; animation: fadeUp 0.5s ease both; }
+.pill-dot { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; animation: blink 1.4s ease infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+h1 { font-size: clamp(40px, 8vw, 86px); font-weight: 900; line-height: 1.02; letter-spacing: -3px; margin-bottom: 24px; animation: fadeUp 0.5s 0.1s ease both; }
+h1 em { color: var(--accent); font-style: normal; }
+
+.hero-sub { font-size: clamp(16px, 2.5vw, 20px); color: var(--muted); max-width: 500px; line-height: 1.6; font-weight: 400; margin-bottom: 40px; animation: fadeUp 0.5s 0.2s ease both; }
+
+.cta-wrap { display: flex; flex-direction: column; align-items: center; gap: 12px; animation: fadeUp 0.5s 0.3s ease both; }
+.btn-big { background: var(--accent); color: #000; border: none; border-radius: 16px; padding: 18px 48px; font-family: 'Inter', sans-serif; font-size: 17px; font-weight: 800; cursor: pointer; transition: all 0.25s; text-decoration: none; display: inline-block; }
+.btn-big:hover { transform: translateY(-2px) scale(1.02); box-shadow: 0 8px 40px var(--accent-glow); }
+.cta-hint { font-size: 13px; color: var(--muted); font-weight: 500; }
+.cta-hint strong { color: var(--text); }
+
+@keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+
+/* SOCIAL PROOF */
+.proof { display: flex; align-items: center; justify-content: center; gap: 16px; margin-top: 56px; animation: fadeUp 0.5s 0.4s ease both; flex-wrap: wrap; }
+.proof-avatars { display: flex; }
+.proof-avatar { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--bg); background: var(--surface2); display: flex; align-items: center; justify-content: center; font-size: 14px; margin-left: -8px; }
+.proof-avatar:first-child { margin-left: 0; }
+.proof-text { font-size: 13px; color: var(--muted); }
+.proof-text strong { color: var(--text); }
+.proof-stars { color: var(--accent); font-size: 13px; letter-spacing: 1px; }
+
+/* FEATURES — BENTO GRID */
+.bento { max-width: 900px; margin: 0 auto; padding: 100px 24px; display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: auto; gap: 12px; }
+@media(max-width:700px){ .bento { grid-template-columns: 1fr; } }
+
+.bento-card { background: var(--surface); border: 1px solid var(--border); border-radius: 24px; padding: 32px 28px; transition: border-color 0.2s, transform 0.2s; }
+.bento-card:hover { border-color: rgba(88,204,2,0.2); transform: translateY(-2px); }
+.bento-card.wide { grid-column: span 2; }
+.bento-card.tall { display: flex; flex-direction: column; justify-content: space-between; }
+@media(max-width:700px){ .bento-card.wide { grid-column: span 1; } }
+
+.bento-icon { font-size: 36px; margin-bottom: 16px; }
+.bento-title { font-size: 20px; font-weight: 800; margin-bottom: 8px; letter-spacing: -0.5px; }
+.bento-desc { font-size: 14px; color: var(--muted); line-height: 1.6; }
+.bento-number { font-size: 56px; font-weight: 900; color: var(--accent); letter-spacing: -2px; margin-top: 16px; }
+.bento-number-label { font-size: 13px; color: var(--muted); }
+
+/* STEPS */
+.steps-section { max-width: 900px; margin: 0 auto; padding: 0 24px 100px; }
+.section-label { font-size: 12px; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 16px; }
+.section-title { font-size: clamp(28px, 4vw, 44px); font-weight: 900; letter-spacing: -1.5px; margin-bottom: 48px; line-height: 1.1; }
+
+.steps-list { display: flex; flex-direction: column; gap: 2px; }
+.step-row { display: flex; align-items: flex-start; gap: 20px; background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 28px 24px; transition: border-color 0.2s; }
+.step-row:hover { border-color: rgba(88,204,2,0.15); }
+.step-num-wrap { width: 40px; height: 40px; background: var(--accent-dim); border: 1px solid rgba(88,204,2,0.2); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 900; color: var(--accent); flex-shrink: 0; }
+.step-content { flex: 1; }
+.step-title { font-size: 17px; font-weight: 800; margin-bottom: 6px; }
+.step-desc { font-size: 14px; color: var(--muted); line-height: 1.6; }
+.step-emoji { font-size: 32px; flex-shrink: 0; }
+
+/* PRICING */
+.pricing-section { max-width: 480px; margin: 0 auto; padding: 0 24px 100px; text-align: center; }
+.pricing-card { background: var(--surface); border: 1px solid var(--border); border-radius: 28px; overflow: hidden; margin-top: 40px; }
+.pricing-top { padding: 36px 32px 28px; }
+.price-row { display: flex; align-items: flex-end; justify-content: center; gap: 4px; margin: 20px 0 8px; }
+.price-currency { font-size: 22px; font-weight: 700; color: var(--muted); margin-bottom: 6px; }
+.price-amount { font-size: 72px; font-weight: 900; line-height: 1; letter-spacing: -3px; }
+.price-period { font-size: 15px; color: var(--muted); margin-bottom: 6px; }
+.price-trial { display: inline-flex; align-items: center; gap: 6px; background: var(--accent-dim); border: 1px solid rgba(88,204,2,0.2); border-radius: 99px; padding: 7px 16px; font-size: 13px; font-weight: 700; color: var(--accent); }
+
+.pricing-features { padding: 0 32px; display: flex; flex-direction: column; gap: 14px; text-align: left; }
+.pf { display: flex; align-items: center; gap: 12px; font-size: 14px; color: var(--muted); padding: 10px 0; border-bottom: 1px solid var(--border); }
+.pf:last-child { border-bottom: none; }
+.pf-check { width: 20px; height: 20px; background: var(--accent-dim); border: 1px solid rgba(88,204,2,0.3); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 11px; color: var(--accent); flex-shrink: 0; }
+
+.pricing-cta-wrap { padding: 24px 32px 32px; }
+.btn-full { width: 100%; padding: 18px; background: var(--accent); color: #000; border: none; border-radius: 16px; font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 800; cursor: pointer; transition: all 0.2s; text-decoration: none; display: block; text-align: center; }
+.btn-full:hover { transform: translateY(-1px); box-shadow: 0 6px 30px var(--accent-glow); }
+.no-card { font-size: 12px; color: var(--muted); margin-top: 10px; }
+
+/* FAQ */
+.faq-section { max-width: 640px; margin: 0 auto; padding: 0 24px 100px; }
+.faq-item { border-bottom: 1px solid var(--border); }
+.faq-q { padding: 20px 0; font-size: 15px; font-weight: 600; cursor: pointer; display: flex; justify-content: space-between; align-items: center; user-select: none; }
+.faq-arrow { color: var(--muted); font-size: 11px; transition: transform 0.3s; flex-shrink: 0; }
+.faq-item.open .faq-arrow { transform: rotate(180deg); }
+.faq-a { display: none; padding-bottom: 20px; font-size: 14px; color: var(--muted); line-height: 1.7; }
+.faq-item.open .faq-a { display: block; }
+
+/* CTA FINAL */
+.cta-final { text-align: center; padding: 100px 24px 120px; }
+.cta-final h2 { font-size: clamp(32px, 5vw, 60px); font-weight: 900; letter-spacing: -2px; line-height: 1.05; margin-bottom: 16px; }
+.cta-final h2 em { color: var(--accent); font-style: normal; }
+.cta-final p { font-size: 16px; color: var(--muted); margin-bottom: 36px; }
+
+/* FOOTER */
+footer { border-top: 1px solid var(--border); padding: 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+.footer-logo { font-size: 16px; font-weight: 800; color: var(--accent); }
+.footer-text { font-size: 12px; color: var(--muted); }
+
+/* REVEAL */
+.reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.6s ease, transform 0.6s ease; }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">Frizz ✦</div>
+  <a href="inscription.html" class="nav-cta">Essai gratuit →</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-glow"></div>
+
+  <div class="pill">
+    <div class="pill-dot"></div>
+    7 jours gratuits — sans carte bancaire
+  </div>
+
+  <h1>Plus d'avis Google.<br><em>Sans effort.</em></h1>
+
+  <p class="hero-sub">Frizz transforme chaque client satisfait en avis Google en 20 secondes. QR code, dashboard, alertes. Prêt en 2 minutes.</p>
+
+  <div class="cta-wrap">
+    <a href="inscription.html" class="btn-big">Commencer gratuitement →</a>
+    <div class="cta-hint"><strong>7 jours gratuits</strong> · Pas de carte · Annulation en 1 clic</div>
+  </div>
+
+
+</section>
+
+<!-- BENTO GRID -->
+<div class="bento reveal">
+  <div class="bento-card wide">
+    <div class="bento-icon">⭐</div>
+    <div class="bento-title">Vos clients notent en 20 secondes</div>
+    <div class="bento-desc">Interface ultra-simple sur mobile. 5 étoiles, quelques critères. Frizz génère automatiquement le texte pour Google — le client n'a qu'à coller.</div>
+  </div>
+  <div class="bento-card tall">
+    <div>
+      <div class="bento-icon">📊</div>
+      <div class="bento-title">Dashboard en temps réel</div>
+      <div class="bento-desc">Tous vos avis, votre note moyenne, vos stats. Depuis n'importe quel appareil.</div>
+    </div>
+
+  </div>
+  <div class="bento-card">
+    <div class="bento-icon">🔔</div>
+    <div class="bento-title">Alerte mauvaise note</div>
+    <div class="bento-desc">Notification immédiate dès qu'un client laisse ≤ 3 étoiles. Réagissez avant qu'il parte.</div>
+  </div>
+  <div class="bento-card">
+    <div class="bento-icon">📱</div>
+    <div class="bento-title">QR code prêt à imprimer</div>
+    <div class="bento-desc">Haute résolution. À coller en caisse, sur les tables ou les tickets.</div>
+  </div>
+  <div class="bento-card wide">
+    <div class="bento-icon">🛡️</div>
+    <div class="bento-title">Filtre intelligent — protégez votre réputation</div>
+    <div class="bento-desc">Les bonnes notes vont sur Google. Les mauvaises restent dans votre dashboard privé. Vous gardez le contrôle total de votre image en ligne.</div>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<div class="steps-section reveal">
+  <div class="section-label">Comment ça marche</div>
+  <div class="section-title">3 étapes.<br>2 minutes.</div>
+  <div class="steps-list">
+    <div class="step-row">
+      <div class="step-num-wrap">1</div>
+      <div class="step-content">
+        <div class="step-title">Inscrivez-vous en 2 minutes</div>
+        <div class="step-desc">Remplissez votre nom, email, adresse. Vous recevez immédiatement votre QR code personnalisé et votre dashboard.</div>
+      </div>
+      <div class="step-emoji">⚡</div>
+    </div>
+    <div class="step-row">
+      <div class="step-num-wrap">2</div>
+      <div class="step-content">
+        <div class="step-title">Affichez le QR code en caisse</div>
+        <div class="step-desc">Imprimez et collez. Vos clients scannent après leur repas. L'expérience prend 20 secondes — taux de complétion 3x supérieur aux méthodes classiques.</div>
+      </div>
+      <div class="step-emoji">📱</div>
+    </div>
+    <div class="step-row">
+      <div class="step-num-wrap">3</div>
+      <div class="step-content">
+        <div class="step-title">Regardez vos avis Google exploser</div>
+        <div class="step-desc">Chaque client satisfait devient un avis Google. Suivez tout en temps réel depuis votre dashboard. Les alertes mauvaises notes vous permettent de réagir immédiatement.</div>
+      </div>
+      <div class="step-emoji">🚀</div>
+    </div>
+  </div>
+</div>
+
+<!-- PRICING -->
+<div class="pricing-section reveal">
+  <div class="section-label" style="text-align:center">Tarif</div>
+  <div class="section-title" style="text-align:center">Simple.<br>Tout inclus.</div>
+  <div class="pricing-card">
+    <div class="pricing-top">
+      <div style="font-size:13px;font-weight:700;color:var(--muted)">Plan Restaurant</div>
+      <div class="price-row">
+        <div class="price-currency">CHF</div>
+        <div class="price-amount">19</div>
+      </div>
+      <div class="price-period">par mois · sans engagement</div>
+      <div style="margin-top:16px">
+        <div class="price-trial">🎁 7 jours gratuits — sans carte</div>
+      </div>
+    </div>
+    <div class="pricing-features">
+      <div class="pf"><div class="pf-check">✓</div> Page d'avis personnalisée</div>
+      <div class="pf"><div class="pf-check">✓</div> QR code haute résolution</div>
+      <div class="pf"><div class="pf-check">✓</div> Dashboard temps réel</div>
+      <div class="pf"><div class="pf-check">✓</div> Alertes mauvaises notes</div>
+      <div class="pf"><div class="pf-check">✓</div> Résumé IA pour Google</div>
+      <div class="pf"><div class="pf-check">✓</div> Avis illimités</div>
+      <div class="pf"><div class="pf-check">✓</div> Support inclus</div>
+    </div>
+    <div class="pricing-cta-wrap">
+      <a href="inscription.html" class="btn-full">Commencer l'essai gratuit →</a>
+      <div class="no-card">Aucune carte bancaire requise · Annulation en 1 clic</div>
+    </div>
+  </div>
+</div>
+
+<!-- FAQ -->
+<div class="faq-section reveal">
+  <div class="section-label">FAQ</div>
+  <div class="section-title" style="font-size:clamp(24px,3vw,36px)">Questions fréquentes</div>
+  <div class="faq-item">
+    <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
+      Comment fonctionne l'essai gratuit ?
+      <span class="faq-arrow">▼</span>
+    </div>
+    <div class="faq-a">7 jours d'accès complet, sans carte bancaire. À la fin de l'essai vous choisissez de continuer à 19 CHF/mois ou d'arrêter. Aucun prélèvement automatique.</div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
+      Faut-il des compétences techniques ?
+      <span class="faq-arrow">▼</span>
+    </div>
+    <div class="faq-a">Zéro. Vous remplissez un formulaire, vous recevez votre QR code par email, vous l'imprimez. C'est tout.</div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
+      Que se passe-t-il avec les mauvaises notes ?
+      <span class="faq-arrow">▼</span>
+    </div>
+    <div class="faq-a">Elles restent dans votre dashboard privé. Vous recevez une alerte immédiate et pouvez régler le problème avec le client. Elles ne sont pas dirigées vers Google.</div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
+      Puis-je annuler à tout moment ?
+      <span class="faq-arrow">▼</span>
+    </div>
+    <div class="faq-a">Oui, sans condition et sans frais. Depuis votre dashboard ou en nous contactant sur contact@frizz.app.</div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
+      Ça marche pour quel type de restaurant ?
+      <span class="faq-arrow">▼</span>
+    </div>
+    <div class="faq-a">Tous — restaurant, café, brasserie, take-away, bar, fast-food. Si vous avez des clients, Frizz collecte leurs avis.</div>
+  </div>
+</div>
+
+<!-- CTA FINAL -->
+<div class="cta-final reveal">
+  <h2>Prêt à avoir<br><em>plus d'avis Google ?</em></h2>
+  <p>Rejoignez les restaurants qui utilisent Frizz. Résultats dès la première semaine.</p>
+  <a href="inscription.html" class="btn-big">Commencer gratuitement →</a>
+  <div style="margin-top:14px;font-size:13px;color:var(--muted)">7 jours gratuits · Pas de carte · Annulation en 1 clic</div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Frizz ✦</div>
+  <div class="footer-text">© 2026 Frizz · Suisse · contact@frizz.app</div>
+</footer>
+
+<script>
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.08 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
