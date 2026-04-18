@@ -22,7 +22,7 @@
   --radius: 20px;
 }
 html, body { background: #0A0A0A; margin: 0; padding: 0; font-family: 'Figtree', sans-serif; color: #FFFFFF; min-height: 100vh; }
-#wrap { padding: 24px 16px 40px; min-height: 100vh; }
+#wrap { padding: 64px 16px 40px; min-height: 100vh; }
 .container { width: 100%; max-width: 420px; margin: 0 auto; }
 
 .header { text-align: center; margin-bottom: 28px; }
@@ -212,18 +212,6 @@ html, body { background: #0A0A0A; margin: 0; padding: 0; font-family: 'Figtree',
       </div>
     </button>
 
-    <div class="divider">
-      <div class="divider-line"></div>
-      <span class="divider-text">ou</span>
-      <div class="divider-line"></div>
-    </div>
-
-    <button class="action-btn private" onclick="showPrivateForm()">
-      <div class="action-logo dark">💬</div>
-      <div class="action-text dark">
-        <p class="t1" style="color:var(--text)">Avis en privé au gérant</p>
-      </div>
-    </button>
   </div>
 
   <!-- SUCCÈS MAUVAISE NOTE (≤3) -->
@@ -253,18 +241,6 @@ html, body { background: #0A0A0A; margin: 0; padding: 0; font-family: 'Figtree',
       </div>
     </button>
 
-    <div class="divider">
-      <div class="divider-line"></div>
-      <span class="divider-text">ou</span>
-      <div class="divider-line"></div>
-    </div>
-
-    <button class="action-btn private" onclick="showPrivateForm()">
-      <div class="action-logo dark">💬</div>
-      <div class="action-text dark">
-        <p class="t1" style="color:var(--text)">Écrire au gérant en privé</p>
-      </div>
-    </button>
   </div>
 
   <!-- MESSAGE ENVOYÉ -->
@@ -351,6 +327,23 @@ html, body { background: #0A0A0A; margin: 0; padding: 0; font-family: 'Figtree',
     btn.disabled = true;
     userComment = document.getElementById('commentField').value;
     generatedText = generateSummary();
+
+    // Sauvegarde locale pour le dashboard
+    const avisData = {
+      date: new Date().toISOString(),
+      note_globale: globalRating,
+      note_cuisine: catRatings.cuisine,
+      note_service: catRatings.service,
+      note_prix: catRatings.prix,
+      commentaire: userComment,
+      resume: generatedText,
+      avis_google: 'non ❌'
+    };
+    try {
+      const existing = JSON.parse(localStorage.getItem('avis_' + commerceId) || '[]');
+      existing.push(avisData);
+      localStorage.setItem('avis_' + commerceId, JSON.stringify(existing));
+    } catch(e) {}
 
     const url = new URL(SCRIPT_URL);
     url.searchParams.set('note_globale', globalRating);
