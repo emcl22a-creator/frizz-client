@@ -414,7 +414,7 @@ html, body { background: var(--bg); font-family: 'Figtree', sans-serif; color: v
 // ============================================================
 // CONFIG — À MODIFIER
 // ============================================================
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz3x4WbYo1KyxOlgUM6B9fuPT24oyOlb10RG6G4yORV5YDYFSLjm817GZHBISX4sJoa/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbztxjoXWsWAnS9nzk3erOpeT0ebgCJkrDL8fBzALMWDP-lzsIEU5LWjU9Ka65gKnkU/exec';
 const BASE_URL = 'https://emcl22a-creator.github.io/frizz-client/';
 
 // ============================================================
@@ -545,25 +545,41 @@ async function loadData() {
   }
 }
 
-function renderFromStorage() {
-  // Read avis from localStorage (submitted via index.html which stores them)
-  // This works because both pages are on the same domain
-  const stored = localStorage.getItem('avis_' + commerceId);
-  if (stored) {
-    try {
-      allAvis = JSON.parse(stored);
-    } catch(e) { allAvis = []; }
+async function renderFromStorage() {
+  try {
+    const url = new URL(SCRIPT_URL);
+    url.searchParams.set('action', 'get_avis');
+    url.searchParams.set('commerce_id', commerceId);
+    const response = await fetch(url.toString());
+    const json = await response.json();
+    if (json && json.avis) {
+      const newAvis = json.avis.map(a => ({
+        date: a.date,
+        note_globale: a.note_globale,
+        note_cuisine: a.note_cuisine,
+        note_service: a.note_service,
+        note_prix: a.note_prix,
+        commentaire: a.commentaire,
+        resume: a.resume,
+        type: a.type,
+        commerce_id: a.commerce_id,
+        avis_google: a.avis_google
+      }));
+      // Check for new bad notes
+      if (newAvis.length > lastKnownCount && lastKnownCount > 0) {
+        const newOnes = newAvis.slice(lastKnownCount);
+        const hasBad = newOnes.some(a => parseInt(a.note_globale) <= 3);
+        if (hasBad && notifBadEnabled) showAlert('⚠️ Nouvelle mauvaise note reçue ! Consultez vos avis.');
+        if (!hasBad && notifAllEnabled) showAlert('📬 Nouveau avis reçu !');
+      }
+      allAvis = newAvis;
+      lastKnownCount = allAvis.length;
+    }
+  } catch(e) {
+    // Fallback localStorage
+    const stored = localStorage.getItem('avis_' + commerceId);
+    if (stored) { try { allAvis = JSON.parse(stored); } catch(e) { allAvis = []; } }
   }
-
-  // Check for new bad notes
-  if (allAvis.length > lastKnownCount && lastKnownCount > 0) {
-    const newOnes = allAvis.slice(lastKnownCount);
-    const hasBad = newOnes.some(a => parseInt(a.note_globale) <= 3);
-    if (hasBad && notifBadEnabled) showAlert('⚠️ Nouvelle mauvaise note reçue ! Consultez vos avis.');
-    if (!hasBad && notifAllEnabled) showAlert('📬 Nouveau avis reçu !');
-  }
-  lastKnownCount = allAvis.length;
-
   updateStats();
   renderAvis();
   renderChart();
