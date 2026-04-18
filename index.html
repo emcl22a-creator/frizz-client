@@ -39,13 +39,11 @@ html, body { background: #0A0A0A; margin: 0; padding: 0; font-family: 'Figtree',
 .q { font-size: 18px; font-weight: 800; margin-bottom: 6px; line-height: 1.3; }
 .q-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 24px; font-weight: 500; }
 
-/* PAGE 1 STARS */
 .stars-big { display: flex; gap: 8px; justify-content: center; margin-bottom: 12px; }
 .star-big { width: 52px; height: 52px; background: var(--surface2); border: 1.5px solid var(--border); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 22px; cursor: pointer; transition: all 0.2s; user-select: none; }
 .star-big.active { background: var(--accent-dim); border-color: var(--accent); transform: scale(1.12); box-shadow: 0 4px 20px var(--accent-glow); }
 .rating-labels { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); font-weight: 600; margin-bottom: 4px; }
 
-/* PAGE 2 CATEGORY STARS */
 .cat-row { display: flex; align-items: center; justify-content: space-between; padding: 14px 0; border-bottom: 1px solid var(--border); }
 .cat-row:last-child { border-bottom: none; }
 .cat-label { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 700; }
@@ -54,22 +52,18 @@ html, body { background: #0A0A0A; margin: 0; padding: 0; font-family: 'Figtree',
 .cat-star { font-size: 20px; cursor: pointer; transition: transform 0.15s; user-select: none; filter: grayscale(1) opacity(0.4); }
 .cat-star.active { filter: none; transform: scale(1.1); }
 
-/* TEXTAREA */
 .textarea { width: 100%; background: var(--surface2); border: 1.5px solid var(--border); border-radius: 14px; padding: 14px 16px; font-family: inherit; font-size: 14px; font-weight: 500; color: var(--text); resize: none; outline: none; min-height: 100px; line-height: 1.6; transition: border-color 0.2s; margin-top: 16px; }
 .textarea:focus { border-color: var(--accent); }
 .textarea::placeholder { color: var(--text-muted); }
 .optional-label { font-size: 12px; color: var(--text-muted); font-weight: 600; margin-top: 20px; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
 
-/* BUTTONS */
 .btn-primary { width: 100%; padding: 18px; background: var(--accent); border: none; border-radius: 16px; font-family: inherit; font-size: 16px; font-weight: 800; color: #000; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 24px var(--accent-glow); margin-bottom: 12px; }
 .btn-primary:hover { transform: translateY(-2px); background: #65e002; }
 
-/* DOTS */
 .dots { display: flex; justify-content: center; gap: 6px; margin-top: 8px; }
 .dot { width: 6px; height: 6px; border-radius: 99px; background: var(--surface2); transition: all 0.3s; }
 .dot.active { width: 20px; background: var(--accent); }
 
-/* SUCCESS */
 .success-card { background: var(--surface); border-radius: var(--radius); padding: 28px 20px; text-align: center; display: none; flex-direction: column; gap: 16px; }
 .success-card.visible { display: flex; }
 .badge { display: inline-flex; align-items: center; gap: 5px; border-radius: 99px; padding: 6px 16px; font-size: 12px; font-weight: 700; margin: 0 auto; }
@@ -81,7 +75,6 @@ html, body { background: #0A0A0A; margin: 0; padding: 0; font-family: 'Figtree',
 .success-title { font-size: 20px; font-weight: 900; margin: 0; }
 .success-sub { font-size: 13px; color: var(--text-muted); line-height: 1.6; margin: 0; font-weight: 500; }
 
-/* ACTION BUTTONS */
 .action-btn { width: 100%; border-radius: 16px; padding: 16px; display: flex; align-items: center; gap: 12px; border: none; cursor: pointer; transition: all 0.2s; text-decoration: none; }
 .action-btn:hover { transform: translateY(-2px); opacity: 0.95; }
 .action-btn.google { background: #4285F4; }
@@ -94,12 +87,10 @@ html, body { background: #0A0A0A; margin: 0; padding: 0; font-family: 'Figtree',
 .action-text.dark .t1 { color: var(--text); }
 .action-text.dark .t2 { color: var(--text-muted); }
 
-/* DIVIDER */
 .divider { display: flex; align-items: center; gap: 10px; }
 .divider-line { flex: 1; height: 1px; background: var(--border); }
 .divider-text { font-size: 11px; color: var(--text-muted); font-weight: 600; }
 
-/* TOAST */
 .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--accent); color: #000; font-size: 13px; font-weight: 700; padding: 10px 20px; border-radius: 99px; opacity: 0; transition: all 0.3s; pointer-events: none; z-index: 999; white-space: nowrap; }
 
 @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
@@ -293,7 +284,6 @@ html, body { background: #0A0A0A; margin: 0; padding: 0; font-family: 'Figtree',
 <div class="toast" id="toast">📋 Résumé copié — collez-le sur Google !</div>
 
 <script>
-  // ✅ URL CORRIGÉE
   const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwSaIXrbxT0blSpzjfXrtnfLD0BAk7gJRm0RRHmah6DrwQ9hMd6FnQ-vPwtxa-wsRdR/exec';
 
   const params = new URLSearchParams(window.location.search);
@@ -333,17 +323,14 @@ html, body { background: #0A0A0A; margin: 0; padding: 0; font-family: 'Figtree',
   function generateSummary() {
     const isGood = globalRating >= 4;
     let parts = [];
-
     if (isGood) {
       parts.push(globalRating === 5 ? "Excellent restaurant !" : "Très bonne expérience !");
     } else {
       parts.push("Expérience mitigée.");
     }
-
     const catLabels = { cuisine: "cuisine", service: "service", prix: "rapport qualité/prix" };
     const goodCats = Object.entries(catRatings).filter(([,v]) => v >= 4).map(([k]) => catLabels[k]);
     const badCats = Object.entries(catRatings).filter(([,v]) => v > 0 && v <= 3).map(([k]) => catLabels[k]);
-
     if (goodCats.length > 0) {
       const list = goodCats.length === 1 ? goodCats[0] : goodCats.slice(0,-1).join(', ') + ' et ' + goodCats[goodCats.length-1];
       parts.push("J'ai apprécié " + list + ".");
@@ -352,12 +339,9 @@ html, body { background: #0A0A0A; margin: 0; padding: 0; font-family: 'Figtree',
       const list = badCats.length === 1 ? badCats[0] : badCats.slice(0,-1).join(', ') + ' et ' + badCats[badCats.length-1];
       parts.push("Le " + list + " pourrait être amélioré.");
     }
-
     const comment = document.getElementById('commentField').value.trim();
     if (comment) parts.push(comment);
-
     if (isGood) parts.push("Je recommande !");
-
     return parts.join(' ');
   }
 
@@ -368,22 +352,16 @@ html, body { background: #0A0A0A; margin: 0; padding: 0; font-family: 'Figtree',
     userComment = document.getElementById('commentField').value;
     generatedText = generateSummary();
 
-    try {
-      await fetch(SCRIPT_URL, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          note_globale: globalRating,
-          note_cuisine: catRatings.cuisine,
-          note_service: catRatings.service,
-          note_prix: catRatings.prix,
-          commentaire: userComment,
-          resume: generatedText,
-          commerce_id: commerceId
-        })
-      });
-    } catch(e) {}
+    const url = new URL(SCRIPT_URL);
+    url.searchParams.set('note_globale', globalRating);
+    url.searchParams.set('note_cuisine', catRatings.cuisine);
+    url.searchParams.set('note_service', catRatings.service);
+    url.searchParams.set('note_prix', catRatings.prix);
+    url.searchParams.set('commentaire', userComment);
+    url.searchParams.set('resume', generatedText);
+    url.searchParams.set('commerce_id', commerceId);
+
+    try { await fetch(url.toString(), { method: 'GET', mode: 'no-cors' }); } catch(e) {}
 
     document.getElementById('formView').style.display = 'none';
     if (globalRating >= 4) {
@@ -394,16 +372,13 @@ html, body { background: #0A0A0A; margin: 0; padding: 0; font-family: 'Figtree',
   }
 
   function copyAndOpenGoogle() {
-    try {
-      fetch(SCRIPT_URL, {
-        method: 'POST', mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type: 'google_click', commerce_id: commerceId, note: globalRating, resume: generatedText })
-      });
-    } catch(e) {}
-    if (generatedText) {
-      navigator.clipboard.writeText(generatedText).then(() => showToast()).catch(() => {});
-    }
+    const url = new URL(SCRIPT_URL);
+    url.searchParams.set('type', 'google_click');
+    url.searchParams.set('commerce_id', commerceId);
+    url.searchParams.set('note', globalRating);
+    url.searchParams.set('resume', generatedText);
+    try { fetch(url.toString(), { method: 'GET', mode: 'no-cors' }); } catch(e) {}
+    if (generatedText) navigator.clipboard.writeText(generatedText).then(() => showToast()).catch(() => {});
     if (googleUrl !== '#') setTimeout(() => window.open(googleUrl, '_blank'), 400);
   }
 
@@ -411,13 +386,13 @@ html, body { background: #0A0A0A; margin: 0; padding: 0; font-family: 'Figtree',
     document.getElementById('successGood').classList.remove('visible');
     document.getElementById('successBad').classList.remove('visible');
     document.getElementById('privateSent').classList.add('visible');
-    try {
-      fetch(SCRIPT_URL, {
-        method: 'POST', mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type: 'avis_prive', note: globalRating, resume: generatedText, commentaire: userComment, commerce_id: commerceId })
-      });
-    } catch(e) {}
+    const url = new URL(SCRIPT_URL);
+    url.searchParams.set('type', 'avis_prive');
+    url.searchParams.set('note', globalRating);
+    url.searchParams.set('resume', generatedText);
+    url.searchParams.set('commentaire', userComment);
+    url.searchParams.set('commerce_id', commerceId);
+    try { fetch(url.toString(), { method: 'GET', mode: 'no-cors' }); } catch(e) {}
   }
 
   function showToast() {
