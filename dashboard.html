@@ -589,7 +589,7 @@ function renderAvis() {
         <div class="avis-detail" style="display:none;margin-top:10px;padding-top:10px;border-top:1px solid var(--border)">
           ${cats ? `<div class="avis-cats">${cats}</div>` : ''}
           ${a.commentaire ? `<div class="avis-comment">"${a.commentaire}"</div>` : ''}
-          ${a.resume ? `<div class="avis-resume">📝 ${a.resume}</div>` : ''}
+
           ${a.avis_google === 'oui ✅' ? '<div class="avis-google-tag">✅ Publié sur Google</div>' : ''}
         </div>
       </div>`;
