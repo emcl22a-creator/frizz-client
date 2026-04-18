@@ -746,6 +746,7 @@ function initSubscription() {
   if (!registeredAt) {
     localStorage.setItem('registered_at_' + commerceId, now);
     renderSubBanner('trial', TRIAL_DAYS);
+  renderSubDetails('trial', TRIAL_DAYS);
     return;
   }
 
@@ -755,11 +756,63 @@ function initSubscription() {
 
   if (isPaid) {
     renderSubBanner('active', 0);
+    renderSubDetails('active', 0);
   } else if (daysLeft > 0) {
     renderSubBanner('trial', daysLeft);
   } else {
     renderSubBanner('expired', 0);
+    renderSubDetails('expired', 0);
     document.getElementById('paywall').classList.add('visible');
+  }
+}
+
+function renderSubDetails(status, daysLeft) {
+  const el = document.getElementById('subDetails');
+  if (!el) return;
+  if (status === 'active') {
+    el.innerHTML = `
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border)">
+          <div>
+            <div style="font-size:14px;font-weight:700">Statut</div>
+            <div style="font-size:12px;color:var(--accent);margin-top:2px">✅ Abonnement actif</div>
+          </div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border)">
+          <div>
+            <div style="font-size:14px;font-weight:700">Montant</div>
+            <div style="font-size:12px;color:var(--text-muted);margin-top:2px">19€ / mois · prélevé automatiquement</div>
+          </div>
+        </div>
+        <a href="${STRIPE_LINK}" target="_blank" class="btn-manage" style="text-align:center;width:100%">⚙️ Gérer mon abonnement</a>
+        <div style="font-size:11px;color:var(--text-muted);text-align:center">Vous pouvez annuler à tout moment depuis le portail Stripe</div>
+      </div>`;
+  } else if (status === 'trial') {
+    el.innerHTML = `
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border)">
+          <div>
+            <div style="font-size:14px;font-weight:700">Statut</div>
+            <div style="font-size:12px;color:var(--accent);margin-top:2px">🎁 Essai gratuit — ${daysLeft} jour${daysLeft > 1 ? 's' : ''} restant${daysLeft > 1 ? 's' : ''}</div>
+          </div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border)">
+          <div>
+            <div style="font-size:14px;font-weight:700">Après l'essai</div>
+            <div style="font-size:12px;color:var(--text-muted);margin-top:2px">19€ / mois</div>
+          </div>
+        </div>
+        <a href="${STRIPE_LINK}" target="_blank" class="btn-subscribe" style="text-align:center;width:100%">S'abonner maintenant — 19€/mois →</a>
+        <div style="font-size:11px;color:var(--text-muted);text-align:center">Paiement sécurisé par Stripe</div>
+      </div>`;
+  } else {
+    el.innerHTML = `
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="padding:12px;background:var(--danger-dim);border:1px solid rgba(255,75,75,0.2);border-radius:12px;font-size:13px;color:var(--danger)">
+          ⚠️ Votre essai est expiré. Abonnez-vous pour continuer.
+        </div>
+        <a href="${STRIPE_LINK}" target="_blank" class="btn-subscribe" style="text-align:center;width:100%">S'abonner — 19€/mois →</a>
+      </div>`;
   }
 }
 
@@ -784,7 +837,7 @@ function renderSubBanner(status, daysLeft) {
           <div class="sub-banner-icon">🎁</div>
           <div>
             <div class="sub-banner-title">Essai gratuit — ${daysLeft} jour${daysLeft > 1 ? 's' : ''} restant${daysLeft > 1 ? 's' : ''}</div>
-            <div class="sub-banner-sub">Après l'essai, 19€/mois prélevés automatiquement</div>
+            <div class="sub-banner-sub">Après l'essai, 19€/mois</div>
           </div>
         </div>
         <a href="${STRIPE_LINK}" target="_blank" class="btn-subscribe">S'abonner maintenant →</a>
@@ -819,7 +872,6 @@ function toggleAvis(el) {
 // ============================================================
 // SUBSCRIPTION
 // ============================================================
-const TRIAL_DAYS = 7;
 
 function initSubscription() {
   const registeredAt = localStorage.getItem('registered_at_' + commerceId);
@@ -828,6 +880,7 @@ function initSubscription() {
   if (!registeredAt) {
     localStorage.setItem('registered_at_' + commerceId, now);
     renderSubBanner('trial', TRIAL_DAYS);
+  renderSubDetails('trial', TRIAL_DAYS);
     return;
   }
 
@@ -837,11 +890,63 @@ function initSubscription() {
 
   if (isPaid) {
     renderSubBanner('active', 0);
+    renderSubDetails('active', 0);
   } else if (daysLeft > 0) {
     renderSubBanner('trial', daysLeft);
   } else {
     renderSubBanner('expired', 0);
+    renderSubDetails('expired', 0);
     document.getElementById('paywall').classList.add('visible');
+  }
+}
+
+function renderSubDetails(status, daysLeft) {
+  const el = document.getElementById('subDetails');
+  if (!el) return;
+  if (status === 'active') {
+    el.innerHTML = `
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border)">
+          <div>
+            <div style="font-size:14px;font-weight:700">Statut</div>
+            <div style="font-size:12px;color:var(--accent);margin-top:2px">✅ Abonnement actif</div>
+          </div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border)">
+          <div>
+            <div style="font-size:14px;font-weight:700">Montant</div>
+            <div style="font-size:12px;color:var(--text-muted);margin-top:2px">19€ / mois · prélevé automatiquement</div>
+          </div>
+        </div>
+        <a href="${STRIPE_LINK}" target="_blank" class="btn-manage" style="text-align:center;width:100%">⚙️ Gérer mon abonnement</a>
+        <div style="font-size:11px;color:var(--text-muted);text-align:center">Vous pouvez annuler à tout moment depuis le portail Stripe</div>
+      </div>`;
+  } else if (status === 'trial') {
+    el.innerHTML = `
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border)">
+          <div>
+            <div style="font-size:14px;font-weight:700">Statut</div>
+            <div style="font-size:12px;color:var(--accent);margin-top:2px">🎁 Essai gratuit — ${daysLeft} jour${daysLeft > 1 ? 's' : ''} restant${daysLeft > 1 ? 's' : ''}</div>
+          </div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border)">
+          <div>
+            <div style="font-size:14px;font-weight:700">Après l'essai</div>
+            <div style="font-size:12px;color:var(--text-muted);margin-top:2px">19€ / mois</div>
+          </div>
+        </div>
+        <a href="${STRIPE_LINK}" target="_blank" class="btn-subscribe" style="text-align:center;width:100%">S'abonner maintenant — 19€/mois →</a>
+        <div style="font-size:11px;color:var(--text-muted);text-align:center">Paiement sécurisé par Stripe</div>
+      </div>`;
+  } else {
+    el.innerHTML = `
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="padding:12px;background:var(--danger-dim);border:1px solid rgba(255,75,75,0.2);border-radius:12px;font-size:13px;color:var(--danger)">
+          ⚠️ Votre essai est expiré. Abonnez-vous pour continuer.
+        </div>
+        <a href="${STRIPE_LINK}" target="_blank" class="btn-subscribe" style="text-align:center;width:100%">S'abonner — 19€/mois →</a>
+      </div>`;
   }
 }
 
@@ -866,7 +971,7 @@ function renderSubBanner(status, daysLeft) {
           <div class="sub-banner-icon">🎁</div>
           <div>
             <div class="sub-banner-title">Essai gratuit — ${daysLeft} jour${daysLeft > 1 ? 's' : ''} restant${daysLeft > 1 ? 's' : ''}</div>
-            <div class="sub-banner-sub">Après l'essai, 19€/mois prélevés automatiquement</div>
+            <div class="sub-banner-sub">Après l'essai, 19€/mois</div>
           </div>
         </div>
         <a href="${STRIPE_LINK}" target="_blank" class="btn-subscribe">S'abonner maintenant →</a>
