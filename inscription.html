@@ -5,7 +5,49 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Frizz — Inscription</title>
 <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js">
+// LOGIN
+const SCRIPT_URL_LOGIN = 'https://script.google.com/macros/s/AKfycbw3CkZbo3VWXBbXET2uAvyhyGkwjksfXimKXU_gLlOrTh-nzMrJl-wAs9paJ0by97iK/exec';
+
+function openLogin() {
+  document.getElementById('loginModal').classList.add('visible');
+}
+function closeLogin() {
+  document.getElementById('loginModal').classList.remove('visible');
+  document.getElementById('loginError').style.display = 'none';
+  document.getElementById('loginEmail').value = '';
+}
+
+async function handleLogin() {
+  const email = document.getElementById('loginEmail').value.trim();
+  if (!email) return;
+
+  const btn = document.querySelector('#loginModal .btn-primary');
+  btn.textContent = 'Recherche en cours...';
+  btn.disabled = true;
+
+  try {
+    const url = new URL(SCRIPT_URL_LOGIN);
+    url.searchParams.set('action', 'get_commerce');
+    url.searchParams.set('email', email);
+    const response = await fetch(url.toString());
+    const json = await response.json();
+
+    if (json && json.commerce_id) {
+      window.location.href = 'dashboard.html?id=' + json.commerce_id + '&name=' + encodeURIComponent(json.nom);
+    } else {
+      document.getElementById('loginError').style.display = 'block';
+      btn.textContent = 'Accéder à mon dashboard →';
+      btn.disabled = false;
+    }
+  } catch(e) {
+    document.getElementById('loginError').style.display = 'block';
+    btn.textContent = 'Accéder à mon dashboard →';
+    btn.disabled = false;
+  }
+}
+
+</script>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 :root {
@@ -84,6 +126,15 @@ html, body { background: var(--bg); font-family: 'Figtree', sans-serif; color: v
 .email-confirm { display: flex; align-items: center; gap: 10px; background: var(--accent-dim); border: 1px solid rgba(88,204,2,0.2); border-radius: 12px; padding: 14px 16px; margin-bottom: 16px; }
 .email-confirm-text { font-size: 13px; color: var(--accent); font-weight: 600; line-height: 1.4; }
 
+
+/* LOGIN MODAL */
+#loginModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 200; align-items: center; justify-content: center; padding: 16px; backdrop-filter: blur(8px); }
+#loginModal.visible { display: flex; }
+.login-box { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); width: 100%; max-width: 400px; padding: 32px 28px; }
+.login-title { font-size: 20px; font-weight: 900; margin-bottom: 6px; }
+.login-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 24px; line-height: 1.5; }
+.login-close { float: right; background: none; border: none; color: var(--text-muted); font-size: 20px; cursor: pointer; margin-top: -4px; }
+
 .powered { text-align: center; margin-top: 24px; font-size: 11px; color: rgba(255,255,255,0.15); font-weight: 600; }
 .powered span { color: var(--accent); opacity: 0.5; }
 </style>
@@ -141,6 +192,7 @@ html, body { background: var(--bg); font-family: 'Figtree', sans-serif; color: v
     </div>
 
     <button class="btn-primary" id="submitBtn" onclick="submitInscription()">Créer ma page d'avis →</button>
+  <p style="text-align:center;margin-top:14px;font-size:13px;color:var(--text-muted)">Déjà un compte ? <button onclick="openLogin()" style="background:none;border:none;color:var(--accent);font-weight:700;cursor:pointer;font-family:inherit;font-size:13px">Se connecter</button></p>
   </div>
 
   <!-- SUCCESS VIEW -->
@@ -325,6 +377,65 @@ function downloadQR() {
     a.click();
   }, 200);
 }
+
+// LOGIN
+const SCRIPT_URL_LOGIN = 'https://script.google.com/macros/s/AKfycbw3CkZbo3VWXBbXET2uAvyhyGkwjksfXimKXU_gLlOrTh-nzMrJl-wAs9paJ0by97iK/exec';
+
+function openLogin() {
+  document.getElementById('loginModal').classList.add('visible');
+}
+function closeLogin() {
+  document.getElementById('loginModal').classList.remove('visible');
+  document.getElementById('loginError').style.display = 'none';
+  document.getElementById('loginEmail').value = '';
+}
+
+async function handleLogin() {
+  const email = document.getElementById('loginEmail').value.trim();
+  if (!email) return;
+
+  const btn = document.querySelector('#loginModal .btn-primary');
+  btn.textContent = 'Recherche en cours...';
+  btn.disabled = true;
+
+  try {
+    const url = new URL(SCRIPT_URL_LOGIN);
+    url.searchParams.set('action', 'get_commerce');
+    url.searchParams.set('email', email);
+    const response = await fetch(url.toString());
+    const json = await response.json();
+
+    if (json && json.commerce_id) {
+      window.location.href = 'dashboard.html?id=' + json.commerce_id + '&name=' + encodeURIComponent(json.nom);
+    } else {
+      document.getElementById('loginError').style.display = 'block';
+      btn.textContent = 'Accéder à mon dashboard →';
+      btn.disabled = false;
+    }
+  } catch(e) {
+    document.getElementById('loginError').style.display = 'block';
+    btn.textContent = 'Accéder à mon dashboard →';
+    btn.disabled = false;
+  }
+}
+
 </script>
+
+<!-- LOGIN MODAL -->
+<div id="loginModal">
+  <div class="login-box">
+    <button class="login-close" onclick="closeLogin()">✕</button>
+    <div class="login-title">Se connecter</div>
+    <div class="login-sub">Entrez votre email pour accéder à votre dashboard.</div>
+
+    <div class="field">
+      <div class="field-label">Email</div>
+      <input class="input" id="loginEmail" type="email" placeholder="gerant@moncommerce.fr">
+      <div class="field-error" id="loginError" style="display:none">Email non trouvé. Vérifiez ou créez un compte.</div>
+    </div>
+    <button class="btn-primary" onclick="handleLogin()" style="margin-top:8px">Accéder à mon dashboard →</button>
+  </div>
+</div>
+
 </body>
 </html>
