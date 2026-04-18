@@ -382,6 +382,32 @@ html, body { background: var(--bg); font-family: 'Figtree', sans-serif; color: v
     </div>
   </div>
 
+  <!-- MON ABONNEMENT -->
+  <div class="section" style="margin-top:14px">
+    <div class="section-header" onclick="toggleSection(this)">
+      <div class="section-title">💳 Mon abonnement</div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="section-body">
+      <div id="subDetails">
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div id="subStatusBadge" style="padding:12px;background:var(--accent-dim);border:1px solid rgba(88,204,2,0.2);border-radius:12px;display:flex;align-items:center;gap:10px">
+            <span style="font-size:18px">🎁</span>
+            <div>
+              <div id="subStatusTitle" style="font-size:13px;font-weight:800;color:var(--accent)">Essai gratuit — 7 jours restants</div>
+              <div style="font-size:11px;color:var(--text-muted);margin-top:2px">Après l'essai, 19€/mois</div>
+            </div>
+          </div>
+          <a href="https://buy.stripe.com/test_8x24gAdsSgBU4LbgFrbEA00" target="_blank" class="btn-subscribe" style="text-align:center;width:100%;display:block;padding:14px">💳 S'abonner — 19€/mois →</a>
+          <button id="cancelBtn" onclick="cancelSubscription()" style="display:none;width:100%;padding:14px;background:transparent;border:1.5px solid var(--danger);border-radius:12px;font-family:inherit;font-size:13px;font-weight:700;color:var(--danger);cursor:pointer">🚫 Annuler mon abonnement</button>
+          <div style="font-size:11px;color:var(--text-muted);text-align:center">Paiement sécurisé par Stripe · Annulation effective à la fin de la période</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="powered">Propulsé par <span style="color:var(--accent);font-weight:800;opacity:1">Frizz</span> · <a href="mailto:Frizz.avis@gmail.com" style="color:var(--accent);opacity:0.6;text-decoration:none;font-weight:600">Frizz.avis@gmail.com</a></div>
+
 </div><!-- end wrap -->
 
 <script>
@@ -430,9 +456,9 @@ function initDashboard() {
   document.getElementById('toggleBad').classList.toggle('on', notifBadEnabled);
   document.getElementById('toggleAll').classList.toggle('on', notifAllEnabled);
 
-  initSubscription();
   generateQR();
   loadData();
+  setTimeout(initSubscription, 100);
   refreshInterval = setInterval(loadData, 30000); // auto-refresh 30s
 }
 
@@ -753,6 +779,8 @@ function initSubscription() {
   const daysPassed = Math.floor((now - parseInt(registeredAt)) / (1000 * 60 * 60 * 24));
   const daysLeft = TRIAL_DAYS - daysPassed;
   const isPaid = localStorage.getItem('paid_' + commerceId) === 'true';
+  const cancelBtn = document.getElementById('cancelBtn');
+  if (isPaid && cancelBtn) cancelBtn.style.display = 'block';
 
   if (isPaid) {
     renderSubBanner('active', 0);
@@ -784,8 +812,9 @@ function renderSubDetails(status, daysLeft) {
             <div style="font-size:12px;color:var(--text-muted);margin-top:2px">19€ / mois · prélevé automatiquement</div>
           </div>
         </div>
-        <a href="${STRIPE_LINK}" target="_blank" class="btn-manage" style="text-align:center;width:100%">⚙️ Gérer mon abonnement</a>
-        <div style="font-size:11px;color:var(--text-muted);text-align:center">Vous pouvez annuler à tout moment depuis le portail Stripe</div>
+        <a href="${STRIPE_LINK}" target="_blank" class="btn-subscribe" style="text-align:center;width:100%;display:block;padding:14px">💳 Gérer mon abonnement</a>
+        <button onclick="cancelSubscription()" style="width:100%;margin-top:0;padding:14px;background:transparent;border:1.5px solid var(--danger);border-radius:12px;font-family:inherit;font-size:13px;font-weight:700;color:var(--danger);cursor:pointer">🚫 Annuler mon abonnement</button>
+        <div style="font-size:11px;color:var(--text-muted);text-align:center">Annulation effective à la fin de la période en cours</div>
       </div>`;
   } else if (status === 'trial') {
     el.innerHTML = `
@@ -873,123 +902,11 @@ function toggleAvis(el) {
 // SUBSCRIPTION
 // ============================================================
 
-function initSubscription() {
-  const registeredAt = localStorage.getItem('registered_at_' + commerceId);
-  const now = Date.now();
 
-  if (!registeredAt) {
-    localStorage.setItem('registered_at_' + commerceId, now);
-    renderSubBanner('trial', TRIAL_DAYS);
-  renderSubDetails('trial', TRIAL_DAYS);
-    return;
-  }
 
-  const daysPassed = Math.floor((now - parseInt(registeredAt)) / (1000 * 60 * 60 * 24));
-  const daysLeft = TRIAL_DAYS - daysPassed;
-  const isPaid = localStorage.getItem('paid_' + commerceId) === 'true';
 
-  if (isPaid) {
-    renderSubBanner('active', 0);
-    renderSubDetails('active', 0);
-  } else if (daysLeft > 0) {
-    renderSubBanner('trial', daysLeft);
-  } else {
-    renderSubBanner('expired', 0);
-    renderSubDetails('expired', 0);
-    document.getElementById('paywall').classList.add('visible');
-  }
-}
 
-function renderSubDetails(status, daysLeft) {
-  const el = document.getElementById('subDetails');
-  if (!el) return;
-  if (status === 'active') {
-    el.innerHTML = `
-      <div style="display:flex;flex-direction:column;gap:12px">
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border)">
-          <div>
-            <div style="font-size:14px;font-weight:700">Statut</div>
-            <div style="font-size:12px;color:var(--accent);margin-top:2px">✅ Abonnement actif</div>
-          </div>
-        </div>
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border)">
-          <div>
-            <div style="font-size:14px;font-weight:700">Montant</div>
-            <div style="font-size:12px;color:var(--text-muted);margin-top:2px">19€ / mois · prélevé automatiquement</div>
-          </div>
-        </div>
-        <a href="${STRIPE_LINK}" target="_blank" class="btn-manage" style="text-align:center;width:100%">⚙️ Gérer mon abonnement</a>
-        <div style="font-size:11px;color:var(--text-muted);text-align:center">Vous pouvez annuler à tout moment depuis le portail Stripe</div>
-      </div>`;
-  } else if (status === 'trial') {
-    el.innerHTML = `
-      <div style="display:flex;flex-direction:column;gap:12px">
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border)">
-          <div>
-            <div style="font-size:14px;font-weight:700">Statut</div>
-            <div style="font-size:12px;color:var(--accent);margin-top:2px">🎁 Essai gratuit — ${daysLeft} jour${daysLeft > 1 ? 's' : ''} restant${daysLeft > 1 ? 's' : ''}</div>
-          </div>
-        </div>
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border)">
-          <div>
-            <div style="font-size:14px;font-weight:700">Après l'essai</div>
-            <div style="font-size:12px;color:var(--text-muted);margin-top:2px">19€ / mois</div>
-          </div>
-        </div>
-        <a href="${STRIPE_LINK}" target="_blank" class="btn-subscribe" style="text-align:center;width:100%">S'abonner maintenant — 19€/mois →</a>
-        <div style="font-size:11px;color:var(--text-muted);text-align:center">Paiement sécurisé par Stripe</div>
-      </div>`;
-  } else {
-    el.innerHTML = `
-      <div style="display:flex;flex-direction:column;gap:12px">
-        <div style="padding:12px;background:var(--danger-dim);border:1px solid rgba(255,75,75,0.2);border-radius:12px;font-size:13px;color:var(--danger)">
-          ⚠️ Votre essai est expiré. Abonnez-vous pour continuer.
-        </div>
-        <a href="${STRIPE_LINK}" target="_blank" class="btn-subscribe" style="text-align:center;width:100%">S'abonner — 19€/mois →</a>
-      </div>`;
-  }
-}
 
-function renderSubBanner(status, daysLeft) {
-  const banner = document.getElementById('subBanner');
-  if (status === 'active') {
-    banner.innerHTML = `
-      <div class="sub-banner active">
-        <div class="sub-banner-left">
-          <div class="sub-banner-icon">✅</div>
-          <div>
-            <div class="sub-banner-title">Abonnement actif</div>
-            <div class="sub-banner-sub">19€/mois · Prochain prélèvement automatique</div>
-          </div>
-        </div>
-        <a href="${STRIPE_LINK}" target="_blank" class="btn-manage">Gérer mon abonnement</a>
-      </div>`;
-  } else if (status === 'trial') {
-    banner.innerHTML = `
-      <div class="sub-banner trial">
-        <div class="sub-banner-left">
-          <div class="sub-banner-icon">🎁</div>
-          <div>
-            <div class="sub-banner-title">Essai gratuit — ${daysLeft} jour${daysLeft > 1 ? 's' : ''} restant${daysLeft > 1 ? 's' : ''}</div>
-            <div class="sub-banner-sub">Après l'essai, 19€/mois</div>
-          </div>
-        </div>
-        <a href="${STRIPE_LINK}" target="_blank" class="btn-subscribe">S'abonner maintenant →</a>
-      </div>`;
-  } else {
-    banner.innerHTML = `
-      <div class="sub-banner expired">
-        <div class="sub-banner-left">
-          <div class="sub-banner-icon">⚠️</div>
-          <div>
-            <div class="sub-banner-title">Essai expiré</div>
-            <div class="sub-banner-sub red">Abonnez-vous pour continuer à utiliser Frizz</div>
-          </div>
-        </div>
-        <a href="${STRIPE_LINK}" target="_blank" class="btn-subscribe">S'abonner — 19€/mois →</a>
-      </div>`;
-  }
-}
 
 // ============================================================
 // TOGGLE AVIS DETAIL
@@ -1006,6 +923,12 @@ function toggleAvis(el) {
 // RECEIVE AVIS FROM index.html (same origin localStorage)
 // index.html doit appeler: storeAvis(data) avant d'envoyer au sheet
 // ============================================================
+
+function cancelSubscription() {
+  if (confirm('Annuler votre abonnement Frizz ?')) {
+    window.open('mailto:Frizz.avis@gmail.com?subject=Annulation Frizz&body=ID: ' + commerceId, '_blank');
+  }
+}
 window.addEventListener('storage', (e) => {
   if (e.key === 'avis_' + commerceId) {
     renderFromStorage();
