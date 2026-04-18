@@ -21,6 +21,37 @@
 html { scroll-behavior: smooth; }
 body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; overflow-x: hidden; }
 
+
+/* BG ANIMATIONS */
+.bg-orbs { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+.orb { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.12; animation: orbFloat linear infinite; }
+.orb1 { width: 400px; height: 400px; background: #58CC02; top: -100px; left: -100px; animation-duration: 20s; }
+.orb2 { width: 300px; height: 300px; background: #00C8FF; top: 40%; right: -80px; animation-duration: 15s; animation-delay: -5s; }
+.orb3 { width: 250px; height: 250px; background: #58CC02; bottom: 10%; left: 20%; animation-duration: 18s; animation-delay: -10s; }
+@keyframes orbFloat {
+  0% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(30px, -40px) scale(1.05); }
+  50% { transform: translate(-20px, 30px) scale(0.95); }
+  75% { transform: translate(40px, 20px) scale(1.02); }
+  100% { transform: translate(0, 0) scale(1); }
+}
+
+/* FLOATING PARTICLES */
+.particles { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+.particle { position: absolute; width: 4px; height: 4px; background: var(--accent); border-radius: 50%; opacity: 0; animation: particleRise linear infinite; }
+@keyframes particleRise {
+  0% { opacity: 0; transform: translateY(0) scale(0); }
+  10% { opacity: 0.6; transform: translateY(-20px) scale(1); }
+  90% { opacity: 0.2; transform: translateY(-300px) scale(0.5); }
+  100% { opacity: 0; transform: translateY(-320px) scale(0); }
+}
+
+/* GRID LINES */
+.grid-lines { position: fixed; inset: 0; pointer-events: none; z-index: 0; background-image: linear-gradient(rgba(88,204,2,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(88,204,2,0.03) 1px, transparent 1px); background-size: 60px 60px; }
+
+/* Make sure content is above bg */
+nav, .hero, .mockup-section, .steps-section, .pricing-section, .faq-section, .cta-final, footer { position: relative; z-index: 1; }
+
 /* NAV */
 nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 0 24px; height: 60px; display: flex; align-items: center; justify-content: space-between; background: rgba(0,0,0,0.8); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); }
 .nav-logo { font-size: 18px; font-weight: 800; color: var(--accent); }
@@ -74,7 +105,7 @@ h1 em { color: var(--accent); font-style: normal; }
 .bento-number-label { font-size: 13px; color: var(--muted); }
 
 /* STEPS */
-.steps-section { max-width: 900px; margin: 0 auto; padding: 0 24px 100px; }
+.steps-section { max-width: 900px; margin: 0 auto; padding: 0 24px 60px; }
 .section-label { font-size: 12px; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 16px; }
 .section-title { font-size: clamp(28px, 4vw, 44px); font-weight: 900; letter-spacing: -1.5px; margin-bottom: 48px; line-height: 1.1; }
 
@@ -108,7 +139,7 @@ h1 em { color: var(--accent); font-style: normal; }
 .no-card { font-size: 12px; color: var(--muted); margin-top: 10px; }
 
 /* FAQ */
-.faq-section { max-width: 640px; margin: 0 auto; padding: 0 24px 100px; }
+.faq-section { max-width: 640px; margin: 0 auto; padding: 0 24px 60px; }
 .faq-item { border-bottom: 1px solid var(--border); }
 .faq-q { padding: 20px 0; font-size: 15px; font-weight: 600; cursor: pointer; display: flex; justify-content: space-between; align-items: center; user-select: none; }
 .faq-arrow { color: var(--muted); font-size: 11px; transition: transform 0.3s; flex-shrink: 0; }
@@ -117,7 +148,7 @@ h1 em { color: var(--accent); font-style: normal; }
 .faq-item.open .faq-a { display: block; }
 
 /* CTA FINAL */
-.cta-final { text-align: center; padding: 100px 24px 120px; }
+.cta-final { text-align: center; padding: 60px 24px 80px; }
 .cta-final h2 { font-size: clamp(32px, 5vw, 60px); font-weight: 900; letter-spacing: -2px; line-height: 1.05; margin-bottom: 16px; }
 .cta-final h2 em { color: var(--accent); font-style: normal; }
 .cta-final p { font-size: 16px; color: var(--muted); margin-bottom: 36px; }
@@ -129,7 +160,7 @@ footer { border-top: 1px solid var(--border); padding: 24px; display: flex; alig
 
 
 /* MOCKUP SECTION */
-.mockup-section { padding: 60px 24px 100px; }
+.mockup-section { padding: 20px 24px 60px; }
 .mockup-wrap { max-width: 900px; margin: 0 auto; position: relative; display: flex; align-items: flex-end; justify-content: center; gap: 0; }
 
 /* LAPTOP */
@@ -195,6 +226,14 @@ footer { border-top: 1px solid var(--border); padding: 24px; display: flex; alig
 </style>
 </head>
 <body>
+
+<div class="bg-orbs">
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+  <div class="orb orb3"></div>
+</div>
+<div class="grid-lines"></div>
+<div class="particles" id="particles"></div>
 
 <!-- NAV -->
 <nav>
@@ -430,6 +469,20 @@ footer { border-top: 1px solid var(--border); padding: 24px; display: flex; alig
 </footer>
 
 <script>
+// PARTICLES
+const particlesEl = document.getElementById('particles');
+for (let i = 0; i < 20; i++) {
+  const p = document.createElement('div');
+  p.className = 'particle';
+  p.style.left = Math.random() * 100 + '%';
+  p.style.bottom = Math.random() * 20 + '%';
+  p.style.animationDuration = (8 + Math.random() * 12) + 's';
+  p.style.animationDelay = (Math.random() * 10) + 's';
+  p.style.width = p.style.height = (2 + Math.random() * 4) + 'px';
+  p.style.opacity = 0;
+  particlesEl.appendChild(p);
+}
+
 const observer = new IntersectionObserver((entries) => {
   entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
 }, { threshold: 0.08 });
