@@ -383,12 +383,7 @@ html, body { background: var(--bg); font-family: 'Figtree', sans-serif; color: v
           </div>
         </div>
         <div class="qr-url" id="qrUrl">—</div>
-        <div style="width:100%;background:var(--surface2);border:1.5px dashed var(--border);border-radius:12px;padding:14px;text-align:center;cursor:pointer" onclick="document.getElementById('logoUpload').click()">
-          <div style="font-size:13px;font-weight:700;margin-bottom:4px">🖼️ Personnaliser le logo</div>
-          <div style="font-size:11px;color:var(--text-muted)">Cliquez pour uploader votre logo (PNG, JPG)</div>
-          <input type="file" id="logoUpload" accept="image/*" style="display:none" onchange="handleLogoUpload(this)">
-        </div>
-        <button id="removeLogo" style="display:none;background:none;border:none;font-size:12px;color:var(--danger);cursor:pointer;font-family:inherit" onclick="removeLogo()">✕ Supprimer le logo</button>
+
         <button class="btn-dl" onclick="downloadQR()">⬇ Télécharger le QR Code</button>
       </div>
     </div>
@@ -427,7 +422,7 @@ html, body { background: var(--bg); font-family: 'Figtree', sans-serif; color: v
 // ============================================================
 // CONFIG — À MODIFIER
 // ============================================================
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw3CkZbo3VWXBbXET2uAvyhyGkwjksfXimKXU_gLlOrTh-nzMrJl-wAs9paJ0by97iK/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw0jIFnX5irh-Wl90_WdoLSO3PTAur8OyYmyZK2AKbWzyewdPH-ZXzZdCAvaSj3sXUA/exec';
 const BASE_URL = 'https://emcl22a-creator.github.io/frizz-client/';
 
 // ============================================================
@@ -799,15 +794,24 @@ function handleLogoUpload(input) {
   const file = input.files[0];
   if (!file) return;
   const reader = new FileReader();
-  reader.onload = (e) => {
+  reader.onload = async (e) => {
+    const logoData = e.target.result;
     const img = document.getElementById('qrLogoImg');
     const txt = document.getElementById('qrLogoText');
-    img.src = e.target.result;
+    img.src = logoData;
     img.style.display = 'block';
     txt.style.display = 'none';
     document.getElementById('removeLogo').style.display = 'block';
-    localStorage.setItem('logo_' + commerceId, e.target.result);
+    localStorage.setItem('logo_' + commerceId, logoData);
     generateQR();
+    // Save to Sheet
+    try {
+      const url = new URL(SCRIPT_URL);
+      url.searchParams.set('action', 'save_logo');
+      url.searchParams.set('commerce_id', commerceId);
+      url.searchParams.set('logo_url', logoData);
+      await fetch(url.toString(), { method: 'GET', mode: 'no-cors' });
+    } catch(e) {}
   };
   reader.readAsDataURL(file);
 }
@@ -818,10 +822,29 @@ function removeLogo() {
   document.getElementById('removeLogo').style.display = 'none';
   localStorage.removeItem('logo_' + commerceId);
   generateQR();
+  try {
+    const url = new URL(SCRIPT_URL);
+    url.searchParams.set('action', 'save_logo');
+    url.searchParams.set('commerce_id', commerceId);
+    url.searchParams.set('logo_url', '');
+    fetch(url.toString(), { method: 'GET', mode: 'no-cors' });
+  } catch(e) {}
 }
 
-function loadSavedLogo() {
-  const saved = localStorage.getItem('logo_' + commerceId);
+async function loadSavedLogo() {
+  // First try localStorage
+  let saved = localStorage.getItem('logo_' + commerceId);
+  // If not in localStorage, try Sheet
+  if (!saved) {
+    try {
+      const url = new URL(SCRIPT_URL);
+      url.searchParams.set('action', 'get_logo');
+      url.searchParams.set('commerce_id', commerceId);
+      const res = await fetch(url.toString());
+      const json = await res.json();
+      if (json && json.logo_url) saved = json.logo_url;
+    } catch(e) {}
+  }
   if (saved) {
     const img = document.getElementById('qrLogoImg');
     const txt = document.getElementById('qrLogoText');
@@ -830,6 +853,7 @@ function loadSavedLogo() {
       img.style.display = 'block';
       txt.style.display = 'none';
       document.getElementById('removeLogo').style.display = 'block';
+      localStorage.setItem('logo_' + commerceId, saved);
     }
   }
 }
