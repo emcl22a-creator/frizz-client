@@ -374,42 +374,29 @@ footer { border-top: 1px solid var(--border); padding: 24px; display: flex; alig
   <!-- CARDS AMÉLIORATION -->
   <div class="amelio-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
 
-    <!-- Cuisine -->
+    <!-- Critères combinés -->
     <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:28px;transition:border-color 0.2s" onmouseover="this.style.borderColor='rgba(200,241,53,0.3)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.08)'">
-      <div style="font-size:36px;margin-bottom:14px">🍽️</div>
-      <div style="font-size:18px;font-weight:800;margin-bottom:8px;letter-spacing:-0.5px">Cuisine</div>
-      <div style="font-size:14px;color:var(--muted);line-height:1.7">Vos clients notent la qualité de vos plats après chaque repas. Détectez immédiatement si un nouveau plat déçoit ou si la qualité baisse. <strong style="color:var(--text)">Agissez sur le feedback de vos clients.</strong></div>
-      <div style="margin-top:16px;display:flex;align-items:center;gap:8px">
-        <div style="height:4px;flex:1;background:var(--surface2);border-radius:99px;overflow:hidden"><div style="height:100%;width:82%;background:var(--accent);border-radius:99px"></div></div>
-        <div style="font-size:12px;font-weight:800;color:var(--accent)">4.1 / 5</div>
+      <div style="font-size:36px;margin-bottom:14px">📊</div>
+      <div style="font-size:18px;font-weight:800;margin-bottom:8px;letter-spacing:-0.5px">Cuisine · Service · Prix</div>
+      <div style="font-size:14px;color:var(--muted);line-height:1.7;margin-bottom:16px">Vos clients évaluent chaque aspect de leur expérience. <strong style="color:var(--text)">Identifiez précisément ce qui plaît et ce qui doit s'améliorer.</strong></div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="font-size:14px;width:20px">🍽️</span>
+          <div style="height:4px;flex:1;background:var(--surface2);border-radius:99px;overflow:hidden"><div style="height:100%;width:82%;background:var(--accent);border-radius:99px"></div></div>
+          <span style="font-size:11px;font-weight:800;color:var(--accent);width:32px">4.1</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="font-size:14px;width:20px">😊</span>
+          <div style="height:4px;flex:1;background:var(--surface2);border-radius:99px;overflow:hidden"><div style="height:100%;width:74%;background:var(--accent);border-radius:99px"></div></div>
+          <span style="font-size:11px;font-weight:800;color:var(--accent);width:32px">3.7</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="font-size:14px;width:20px">💰</span>
+          <div style="height:4px;flex:1;background:var(--surface2);border-radius:99px;overflow:hidden"><div style="height:100%;width:90%;background:var(--accent);border-radius:99px"></div></div>
+          <span style="font-size:11px;font-weight:800;color:var(--accent);width:32px">4.5</span>
+        </div>
       </div>
-      <div style="font-size:11px;color:var(--muted);margin-top:4px">Note moyenne cuisine — exemple</div>
-    </div>
-
-    <!-- Service -->
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:28px;transition:border-color 0.2s" onmouseover="this.style.borderColor='rgba(200,241,53,0.3)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.08)'">
-      <div style="font-size:36px;margin-bottom:14px">😊</div>
-      <div style="font-size:18px;font-weight:800;margin-bottom:8px;letter-spacing:-0.5px">Service</div>
-      <div style="font-size:14px;color:var(--muted);line-height:1.7">Vos clients évaluent l'accueil, la rapidité et l'amabilité. Identifiez les jours ou les équipes qui performent moins bien. <strong style="color:var(--text)">Formez, ajustez, progressez.</strong></div>
-      <div style="margin-top:16px;display:flex;align-items:center;gap:8px">
-        <div style="height:4px;flex:1;background:var(--surface2);border-radius:99px;overflow:hidden"><div style="height:100%;width:74%;background:var(--accent);border-radius:99px"></div></div>
-        <div style="font-size:12px;font-weight:800;color:var(--accent)">3.7 / 5</div>
-      </div>
-      <div style="font-size:11px;color:var(--muted);margin-top:4px">Note moyenne service — exemple</div>
-    </div>
-  </div>
-
-  <div class="amelio-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
-    <!-- Prix -->
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:28px;transition:border-color 0.2s" onmouseover="this.style.borderColor='rgba(200,241,53,0.3)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.08)'">
-      <div style="font-size:36px;margin-bottom:14px">💰</div>
-      <div style="font-size:18px;font-weight:800;margin-bottom:8px;letter-spacing:-0.5px">Rapport qualité/prix</div>
-      <div style="font-size:14px;color:var(--muted);line-height:1.7">Sachez si vos clients trouvent votre offre justifiée. Une note basse ici peut signaler qu'il faut revoir la carte ou mieux communiquer la valeur. <strong style="color:var(--text)">Gardez vos clients fidèles.</strong></div>
-      <div style="margin-top:16px;display:flex;align-items:center;gap:8px">
-        <div style="height:4px;flex:1;background:var(--surface2);border-radius:99px;overflow:hidden"><div style="height:100%;width:90%;background:var(--accent);border-radius:99px"></div></div>
-        <div style="font-size:12px;font-weight:800;color:var(--accent)">4.5 / 5</div>
-      </div>
-      <div style="font-size:11px;color:var(--muted);margin-top:4px">Note qualité/prix — exemple</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:10px">Notes moyennes — exemple</div>
     </div>
 
     <!-- Google -->
