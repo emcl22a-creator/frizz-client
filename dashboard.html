@@ -770,7 +770,7 @@ function toggleNotif(btn) {
 function generateQR() {
   const googleLink = localStorage.getItem('google_link_' + commerceId) || '';
   const clientUrl = `${BASE_URL}?id=${commerceId}&name=${encodeURIComponent(commerceName)}&google=${encodeURIComponent(googleLink)}`;
-  const shortUrl = `${BASE_URL}?id=${commerceId}`;
+  const shortUrl = `${BASE_URL}landing.html`;
   document.getElementById('qrUrl').textContent = shortUrl;
 
   const qrEl = document.getElementById('qrcode');
