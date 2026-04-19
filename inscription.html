@@ -300,7 +300,7 @@ async function submitInscription() {
   btn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" style="animation:spin 0.8s linear infinite;vertical-align:middle"><circle cx="12" cy="12" r="10" stroke="rgba(0,0,0,0.2)" stroke-width="3"/><path d="M12 2a10 10 0 0 1 10 10" stroke="#000" stroke-width="3" stroke-linecap="round"/></svg> Création en cours...';
 
   const commerceId = generateId(name);
-  const clientUrl = `${BASE_URL}?id=${commerceId}&name=${encodeURIComponent(name)}&google=${encodeURIComponent(google)}`;
+  const clientUrl = `${BASE_URL}landing.html?id=${commerceId}&name=${encodeURIComponent(name)}`;
   const dashUrl = `${BASE_URL}dashboard.html?id=${commerceId}&name=${encodeURIComponent(name)}`;
 
   // Envoyer au sheet
