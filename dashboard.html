@@ -378,20 +378,13 @@ html, body { background: var(--bg); font-family: 'Figtree', sans-serif; color: v
     </div>
     <div class="section-body">
       <div class="qr-wrap">
-        <div style="position:relative;display:inline-block">
-          <canvas id="qrCanvas" width="220" height="220" style="border-radius:16px;display:block"></canvas>
-          <div id="qrLogo" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:44px;height:44px;background:#000;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:900;color:#58CC02;border:2px solid #58CC02;overflow:hidden">
-            <img id="qrLogoImg" style="display:none;width:100%;height:100%;object-fit:cover">
-            <span id="qrLogoText">F</span>
-          </div>
-        </div>
+        <div id="qrcode" style="background:white;padding:16px;border-radius:16px;display:inline-block"></div>
         <div class="qr-url" id="qrUrl">—</div>
 
         <button class="btn-dl" onclick="downloadQR()">⬇ Télécharger le QR Code</button>
       </div>
     </div>
   </div>
-  <div id="qrcode" style="display:none"></div>
 
   <!-- MON COMMERCE -->
   <div class="section collapsed" style="margin-top:14px">
@@ -497,7 +490,6 @@ function initDashboard() {
   document.getElementById('toggleAll').classList.toggle('on', notifAllEnabled);
 
   generateQR();
-  setTimeout(loadSavedLogo, 400);
   loadData();
   setTimeout(initSubscription, 100);
   refreshInterval = setInterval(loadData, 30000); // auto-refresh 30s
@@ -771,124 +763,25 @@ function generateQR() {
   const googleLink = localStorage.getItem('google_link_' + commerceId) || '';
   const clientUrl = `${BASE_URL}?id=${commerceId}&name=${encodeURIComponent(commerceName)}&google=${encodeURIComponent(googleLink)}`;
   document.getElementById('qrUrl').textContent = clientUrl;
-
-  // Generate QR in hidden div first
   const qrEl = document.getElementById('qrcode');
   qrEl.innerHTML = '';
   new QRCode(qrEl, {
     text: clientUrl,
-    width: 200,
-    height: 200,
-    colorDark: '#000000',
-    colorLight: '#ffffff',
+    width: 200, height: 200,
+    colorDark: '#000000', colorLight: '#ffffff',
     correctLevel: QRCode.CorrectLevel.H
   });
-
-  // Then draw styled version on canvas
-  setTimeout(() => { requestAnimationFrame(() => {
-    const srcCanvas = qrEl.querySelector('canvas');
-    if (!srcCanvas) return;
-    const dst = document.getElementById('qrCanvas');
-    if (!dst) { setTimeout(() => generateQR(), 300); return; }
-    const ctx = dst.getContext('2d');
-    dst.width = 220;
-    dst.height = 220;
-
-    // Background
-    ctx.fillStyle = '#111111';
-    ctx.roundRect(0, 0, 220, 220, 20);
-    ctx.fill();
-
-    // Draw QR centered
-    ctx.drawImage(srcCanvas, 10, 10, 200, 200);
-
-    // Green tint overlay using multiply - just recolor dark pixels
-    const imgData = ctx.getImageData(0, 0, 220, 220);
-    const d = imgData.data;
-    for (let i = 0; i < d.length; i += 4) {
-      if (d[i] < 50 && d[i+1] < 50 && d[i+2] < 50 && d[i+3] > 200) {
-        // Dark pixel → make green
-        d[i] = 40;
-        d[i+1] = 160;
-        d[i+2] = 10;
-      } else if (d[i] > 200 && d[i+1] > 200 && d[i+2] > 200) {
-        // White pixel → dark background
-        d[i] = 17;
-        d[i+1] = 17;
-        d[i+2] = 17;
-      }
-    }
-    ctx.putImageData(imgData, 0, 0);
-  }); }, 300);
-}
-
-function handleLogoUpload(input) {
-  const file = input.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = async (e) => {
-    const logoData = e.target.result;
-    // Update preview
-    const preview = document.getElementById('logoPreview');
-    if (preview) preview.innerHTML = '<img src="' + logoData + '" style="width:100%;height:100%;object-fit:cover;border-radius:14px">';
-    document.getElementById('removeLogo').style.display = 'block';
-    localStorage.setItem('logo_' + commerceId, logoData);
-    // Save to Sheet
-    try {
-      const url = new URL(SCRIPT_URL);
-      url.searchParams.set('action', 'save_logo');
-      url.searchParams.set('commerce_id', commerceId);
-      url.searchParams.set('logo_url', logoData);
-      await fetch(url.toString(), { method: 'GET', mode: 'no-cors' });
-    } catch(e) {}
-  };
-  reader.readAsDataURL(file);
-}
-
-function removeLogo() {
-  const preview = document.getElementById('logoPreview');
-  if (preview) preview.innerHTML = '🏪';
-  document.getElementById('removeLogo').style.display = 'none';
-  localStorage.removeItem('logo_' + commerceId);
-  try {
-    const url = new URL(SCRIPT_URL);
-    url.searchParams.set('action', 'save_logo');
-    url.searchParams.set('commerce_id', commerceId);
-    url.searchParams.set('logo_url', '');
-    fetch(url.toString(), { method: 'GET', mode: 'no-cors' });
-  } catch(e) {}
-}
-
-async function loadSavedLogo() {
-  // First try localStorage
-  let saved = localStorage.getItem('logo_' + commerceId);
-  // If not in localStorage, try Sheet
-  if (!saved) {
-    try {
-      const url = new URL(SCRIPT_URL);
-      url.searchParams.set('action', 'get_logo');
-      url.searchParams.set('commerce_id', commerceId);
-      const res = await fetch(url.toString());
-      const json = await res.json();
-      if (json && json.logo_url) saved = json.logo_url;
-    } catch(e) {}
-  }
-  if (saved) {
-    const preview = document.getElementById('logoPreview');
-    if (preview) preview.innerHTML = '<img src="' + saved + '" style="width:100%;height:100%;object-fit:cover;border-radius:14px">';
-    const removeBtn = document.getElementById('removeLogo');
-    if (removeBtn) removeBtn.style.display = 'block';
-    localStorage.setItem('logo_' + commerceId, saved);
-  }
 }
 
 function downloadQR() {
-  const canvas = document.getElementById('qrCanvas');
-  if (!canvas) return;
-  const a = document.createElement('a');
-  a.download = `QRCode_Frizz_${commerceId}.png`;
-  a.href = canvas.toDataURL('image/png');
-  a.click();
+  setTimeout(() => {
+    const canvas = document.querySelector('#qrcode canvas');
+    if (!canvas) return;
+    const a = document.createElement('a');
+    a.download = `QRCode_Frizz_${commerceId}.png`;
+    a.href = canvas.toDataURL();
+    a.click();
+  }, 200);
 }
 
 // ============================================================
