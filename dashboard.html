@@ -777,14 +777,13 @@ function toggleNotif(btn) {
 // ============================================================
 function generateQR() {
   const googleLink = localStorage.getItem('google_link_' + commerceId) || '';
-  const clientUrl = `${BASE_URL}?id=${commerceId}&name=${encodeURIComponent(commerceName)}&google=${encodeURIComponent(googleLink)}`;
-  const shortUrl = `${BASE_URL}landing.html`;
-  document.getElementById('qrUrl').textContent = shortUrl;
+  const clientUrl = `${BASE_URL}landing.html?id=${commerceId}&name=${encodeURIComponent(commerceName)}&google=${encodeURIComponent(googleLink)}`;
+  document.getElementById('qrUrl').textContent = `${BASE_URL}?id=${commerceId}`;
 
   const qrEl = document.getElementById('qrcode');
   qrEl.innerHTML = '';
   new QRCode(qrEl, {
-    text: shortUrl,
+    text: clientUrl,
     width: 200, height: 200,
     colorDark: '#000000', colorLight: '#ffffff',
     correctLevel: QRCode.CorrectLevel.L
