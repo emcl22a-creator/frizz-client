@@ -490,6 +490,7 @@ function initDashboard() {
   document.getElementById('toggleAll').classList.toggle('on', notifAllEnabled);
 
   generateQR();
+  setTimeout(loadSavedLogo, 400);
   loadData();
   setTimeout(initSubscription, 100);
   refreshInterval = setInterval(loadData, 30000); // auto-refresh 30s
@@ -939,6 +940,68 @@ function renderSubBanner(status, daysLeft) {
   }
 }
 
+
+// ============================================================
+// LOGO
+// ============================================================
+function handleLogoUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    const logoData = e.target.result;
+    const preview = document.getElementById('logoPreview');
+    if (preview) preview.innerHTML = '<img src="' + logoData + '" style="width:100%;height:100%;object-fit:cover;border-radius:14px">';
+    const removeBtn = document.getElementById('removeLogo');
+    if (removeBtn) removeBtn.style.display = 'block';
+    localStorage.setItem('logo_' + commerceId, logoData);
+    try {
+      const url = new URL(SCRIPT_URL);
+      url.searchParams.set('action', 'save_logo');
+      url.searchParams.set('commerce_id', commerceId);
+      url.searchParams.set('logo_url', logoData);
+      await fetch(url.toString(), { method: 'GET', mode: 'no-cors' });
+    } catch(e) {}
+  };
+  reader.readAsDataURL(file);
+}
+
+function removeLogo() {
+  const preview = document.getElementById('logoPreview');
+  if (preview) preview.innerHTML = '🏪';
+  const removeBtn = document.getElementById('removeLogo');
+  if (removeBtn) removeBtn.style.display = 'none';
+  localStorage.removeItem('logo_' + commerceId);
+  try {
+    const url = new URL(SCRIPT_URL);
+    url.searchParams.set('action', 'save_logo');
+    url.searchParams.set('commerce_id', commerceId);
+    url.searchParams.set('logo_url', '');
+    fetch(url.toString(), { method: 'GET', mode: 'no-cors' });
+  } catch(e) {}
+}
+
+async function loadSavedLogo() {
+  let saved = localStorage.getItem('logo_' + commerceId);
+  if (!saved) {
+    try {
+      const url = new URL(SCRIPT_URL);
+      url.searchParams.set('action', 'get_logo');
+      url.searchParams.set('commerce_id', commerceId);
+      const res = await fetch(url.toString());
+      const json = await res.json();
+      if (json && json.logo_url) saved = json.logo_url;
+    } catch(e) {}
+  }
+  if (saved) {
+    const preview = document.getElementById('logoPreview');
+    if (preview) preview.innerHTML = '<img src="' + saved + '" style="width:100%;height:100%;object-fit:cover;border-radius:14px">';
+    const removeBtn = document.getElementById('removeLogo');
+    if (removeBtn) removeBtn.style.display = 'block';
+    localStorage.setItem('logo_' + commerceId, saved);
+  }
+}
+
 // ============================================================
 // TOGGLE AVIS DETAIL
 // ============================================================
@@ -960,6 +1023,68 @@ function toggleAvis(el) {
 
 
 
+
+
+// ============================================================
+// LOGO
+// ============================================================
+function handleLogoUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    const logoData = e.target.result;
+    const preview = document.getElementById('logoPreview');
+    if (preview) preview.innerHTML = '<img src="' + logoData + '" style="width:100%;height:100%;object-fit:cover;border-radius:14px">';
+    const removeBtn = document.getElementById('removeLogo');
+    if (removeBtn) removeBtn.style.display = 'block';
+    localStorage.setItem('logo_' + commerceId, logoData);
+    try {
+      const url = new URL(SCRIPT_URL);
+      url.searchParams.set('action', 'save_logo');
+      url.searchParams.set('commerce_id', commerceId);
+      url.searchParams.set('logo_url', logoData);
+      await fetch(url.toString(), { method: 'GET', mode: 'no-cors' });
+    } catch(e) {}
+  };
+  reader.readAsDataURL(file);
+}
+
+function removeLogo() {
+  const preview = document.getElementById('logoPreview');
+  if (preview) preview.innerHTML = '🏪';
+  const removeBtn = document.getElementById('removeLogo');
+  if (removeBtn) removeBtn.style.display = 'none';
+  localStorage.removeItem('logo_' + commerceId);
+  try {
+    const url = new URL(SCRIPT_URL);
+    url.searchParams.set('action', 'save_logo');
+    url.searchParams.set('commerce_id', commerceId);
+    url.searchParams.set('logo_url', '');
+    fetch(url.toString(), { method: 'GET', mode: 'no-cors' });
+  } catch(e) {}
+}
+
+async function loadSavedLogo() {
+  let saved = localStorage.getItem('logo_' + commerceId);
+  if (!saved) {
+    try {
+      const url = new URL(SCRIPT_URL);
+      url.searchParams.set('action', 'get_logo');
+      url.searchParams.set('commerce_id', commerceId);
+      const res = await fetch(url.toString());
+      const json = await res.json();
+      if (json && json.logo_url) saved = json.logo_url;
+    } catch(e) {}
+  }
+  if (saved) {
+    const preview = document.getElementById('logoPreview');
+    if (preview) preview.innerHTML = '<img src="' + saved + '" style="width:100%;height:100%;object-fit:cover;border-radius:14px">';
+    const removeBtn = document.getElementById('removeLogo');
+    if (removeBtn) removeBtn.style.display = 'block';
+    localStorage.setItem('logo_' + commerceId, saved);
+  }
+}
 
 // ============================================================
 // TOGGLE AVIS DETAIL
