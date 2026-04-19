@@ -319,7 +319,7 @@ async function submitInscription() {
   // Afficher succès
   document.getElementById('formView').style.display = 'none';
   document.getElementById('successView').style.display = 'block';
-  document.getElementById('confirmEmail').textContent = email;
+  if(document.getElementById('confirmEmail')) document.getElementById('confirmEmail').textContent = email;
   document.getElementById('clientLink').textContent = clientUrl;
   document.getElementById('dashLink').textContent = dashUrl;
 
