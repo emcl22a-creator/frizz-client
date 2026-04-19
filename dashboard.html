@@ -401,18 +401,21 @@ html, body { background: var(--bg); font-family: 'Figtree', sans-serif; color: v
 
         <!-- Logo -->
         <div>
-          <div style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px">Logo affiché sur la page avis</div>
-          <div style="display:flex;align-items:center;gap:14px;margin-bottom:10px">
-            <div id="logoPreview" style="width:64px;height:64px;background:var(--surface2);border:1.5px solid var(--border);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;overflow:hidden;flex-shrink:0">🏪</div>
-            <div style="flex:1;font-size:12px;color:var(--text-muted);line-height:1.5">Aperçu de votre logo actuel</div>
+          <div style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px">Logo affiché sur la page avis</div>
+          <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px">
+            <div id="logoPreview" style="width:72px;height:72px;background:var(--surface2);border:1.5px solid var(--border);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:32px;overflow:hidden;flex-shrink:0">🏪</div>
+            <div style="flex:1">
+              <div style="font-size:13px;font-weight:700;margin-bottom:4px">Votre logo</div>
+              <div style="font-size:11px;color:var(--text-muted)">Apparaît sur la page avis de vos clients</div>
+            </div>
           </div>
-          <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px">Collez l'URL de votre logo (hébergé sur internet) :</div>
-          <div style="display:flex;gap:8px">
-            <input class="input-field" id="logoUrlInput" type="url" placeholder="https://votre-site.com/logo.png" style="flex:1;font-size:13px">
-            <button onclick="saveLogoUrl()" class="btn-save" style="white-space:nowrap;padding:10px 16px">Sauvegarder</button>
-          </div>
-          <div style="font-size:11px;color:var(--text-muted);margin-top:8px">💡 Uploadez votre logo sur <strong style="color:var(--text)">imgbb.com</strong> (gratuit) et collez le lien ici.</div>
-          <div id="logoSavedOk" style="display:none;font-size:12px;color:var(--accent);font-weight:700;margin-top:6px">✅ Logo sauvegardé !</div>
+          <button onclick="document.getElementById('logoUpload').click()" style="width:100%;padding:14px;background:var(--accent-dim);border:1.5px solid rgba(88,204,2,0.3);border-radius:12px;font-family:inherit;font-size:14px;font-weight:700;color:var(--accent);cursor:pointer;transition:all 0.2s">
+            📷 Choisir mon logo
+          </button>
+          <input type="file" id="logoUpload" accept="image/*" style="display:none" onchange="handleLogoUpload(this)">
+          <button id="removeLogo" onclick="removeLogo()" style="display:none;width:100%;margin-top:8px;padding:10px;background:none;border:1.5px solid var(--danger);border-radius:12px;font-family:inherit;font-size:13px;font-weight:700;color:var(--danger);cursor:pointer">✕ Supprimer le logo</button>
+          <div id="logoSavedOk" style="display:none;font-size:12px;color:var(--accent);font-weight:700;margin-top:8px;text-align:center">✅ Logo sauvegardé !</div>
+          <div id="logoSaving" style="display:none;font-size:12px;color:var(--text-muted);margin-top:8px;text-align:center">⏳ Sauvegarde en cours...</div>
         </div>
 
       </div>
@@ -983,21 +986,38 @@ function saveLogoUrl() {
 function handleLogoUpload(input) {
   const file = input.files[0];
   if (!file) return;
+  const saving = document.getElementById('logoSaving');
+  if (saving) saving.style.display = 'block';
   const reader = new FileReader();
-  reader.onload = async (e) => {
-    const logoData = e.target.result;
-    const preview = document.getElementById('logoPreview');
-    if (preview) preview.innerHTML = '<img src="' + logoData + '" style="width:100%;height:100%;object-fit:cover;border-radius:14px">';
-    const removeBtn = document.getElementById('removeLogo');
-    if (removeBtn) removeBtn.style.display = 'block';
-    localStorage.setItem('logo_' + commerceId, logoData);
-    try {
-      const url = new URL(SCRIPT_URL);
-      url.searchParams.set('action', 'save_logo');
-      url.searchParams.set('commerce_id', commerceId);
-      url.searchParams.set('logo_url', logoData);
-      await fetch(url.toString(), { method: 'GET', mode: 'no-cors' });
-    } catch(e) {}
+  reader.onload = (e) => {
+    // Compress image to max 100x100px
+    const img = new Image();
+    img.onload = async () => {
+      const canvas = document.createElement('canvas');
+      const max = 120;
+      let w = img.width, h = img.height;
+      if (w > h) { if (w > max) { h = h * max / w; w = max; } }
+      else { if (h > max) { w = w * max / h; h = max; } }
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      const compressed = canvas.toDataURL('image/jpeg', 0.7);
+      const preview = document.getElementById('logoPreview');
+      if (preview) preview.innerHTML = "<img src='" + compressed + "' style='width:100%;height:100%;object-fit:cover;border-radius:14px'>";
+      const removeBtn = document.getElementById('removeLogo');
+      if (removeBtn) removeBtn.style.display = 'block';
+      localStorage.setItem('logo_' + commerceId, compressed);
+      try {
+        const url = new URL(SCRIPT_URL);
+        url.searchParams.set('action', 'save_logo');
+        url.searchParams.set('commerce_id', commerceId);
+        url.searchParams.set('logo_url', compressed);
+        await fetch(url.toString(), { method: 'GET', mode: 'no-cors' });
+      } catch(e) {}
+      if (saving) saving.style.display = 'none';
+      const ok = document.getElementById('logoSavedOk');
+      if (ok) { ok.style.display = 'block'; setTimeout(() => ok.style.display = 'none', 2500); }
+    };
+    img.src = e.target.result;
   };
   reader.readAsDataURL(file);
 }
@@ -1084,21 +1104,38 @@ function saveLogoUrl() {
 function handleLogoUpload(input) {
   const file = input.files[0];
   if (!file) return;
+  const saving = document.getElementById('logoSaving');
+  if (saving) saving.style.display = 'block';
   const reader = new FileReader();
-  reader.onload = async (e) => {
-    const logoData = e.target.result;
-    const preview = document.getElementById('logoPreview');
-    if (preview) preview.innerHTML = '<img src="' + logoData + '" style="width:100%;height:100%;object-fit:cover;border-radius:14px">';
-    const removeBtn = document.getElementById('removeLogo');
-    if (removeBtn) removeBtn.style.display = 'block';
-    localStorage.setItem('logo_' + commerceId, logoData);
-    try {
-      const url = new URL(SCRIPT_URL);
-      url.searchParams.set('action', 'save_logo');
-      url.searchParams.set('commerce_id', commerceId);
-      url.searchParams.set('logo_url', logoData);
-      await fetch(url.toString(), { method: 'GET', mode: 'no-cors' });
-    } catch(e) {}
+  reader.onload = (e) => {
+    // Compress image to max 100x100px
+    const img = new Image();
+    img.onload = async () => {
+      const canvas = document.createElement('canvas');
+      const max = 120;
+      let w = img.width, h = img.height;
+      if (w > h) { if (w > max) { h = h * max / w; w = max; } }
+      else { if (h > max) { w = w * max / h; h = max; } }
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      const compressed = canvas.toDataURL('image/jpeg', 0.7);
+      const preview = document.getElementById('logoPreview');
+      if (preview) preview.innerHTML = "<img src='" + compressed + "' style='width:100%;height:100%;object-fit:cover;border-radius:14px'>";
+      const removeBtn = document.getElementById('removeLogo');
+      if (removeBtn) removeBtn.style.display = 'block';
+      localStorage.setItem('logo_' + commerceId, compressed);
+      try {
+        const url = new URL(SCRIPT_URL);
+        url.searchParams.set('action', 'save_logo');
+        url.searchParams.set('commerce_id', commerceId);
+        url.searchParams.set('logo_url', compressed);
+        await fetch(url.toString(), { method: 'GET', mode: 'no-cors' });
+      } catch(e) {}
+      if (saving) saving.style.display = 'none';
+      const ok = document.getElementById('logoSavedOk');
+      if (ok) { ok.style.display = 'block'; setTimeout(() => ok.style.display = 'none', 2500); }
+    };
+    img.src = e.target.result;
   };
   reader.readAsDataURL(file);
 }
