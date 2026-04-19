@@ -105,7 +105,7 @@ h1 em { color: var(--accent); font-style: normal; }
 .bento-number-label { font-size: 13px; color: var(--muted); }
 
 /* STEPS */
-.steps-section { max-width: 900px; margin: 0 auto; padding: 0 24px 60px; }
+.steps-section { max-width: 900px; margin: 0 auto; padding: 0 24px 80px; }
 .section-label { font-size: 12px; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 16px; }
 .section-title { font-size: clamp(28px, 4vw, 44px); font-weight: 900; letter-spacing: -1.5px; margin-bottom: 48px; line-height: 1.1; }
 
@@ -139,7 +139,7 @@ h1 em { color: var(--accent); font-style: normal; }
 .no-card { font-size: 12px; color: var(--muted); margin-top: 10px; }
 
 /* FAQ */
-.faq-section { max-width: 640px; margin: 0 auto; padding: 0 24px 60px; }
+.faq-section { max-width: 640px; margin: 0 auto; padding: 0 24px 100px; }
 .faq-item { border-bottom: 1px solid var(--border); }
 .faq-q { padding: 20px 0; font-size: 15px; font-weight: 600; cursor: pointer; display: flex; justify-content: space-between; align-items: center; user-select: none; }
 .faq-arrow { color: var(--muted); font-size: 11px; transition: transform 0.3s; flex-shrink: 0; }
@@ -225,9 +225,9 @@ footer { border-top: 1px solid var(--border); padding: 24px; display: flex; alig
 @media(min-width: 768px) {
   .hero { padding-bottom: 20px; }
   .mockup-section { padding: 0px 24px 80px; }
-  .steps-section { padding: 0 24px 80px; }
-  .pricing-section { padding: 0 24px 80px; }
-  .faq-section { padding: 0 24px 80px; }
+  .steps-section { padding: 60px 24px 100px; }
+  .pricing-section { padding: 60px 24px 100px; }
+  .faq-section { padding: 60px 24px 100px; }
   .cta-final { padding: 80px 24px 100px; }
   .bento { padding: 80px 24px; }
 }
@@ -265,13 +265,21 @@ footer { border-top: 1px solid var(--border); padding: 24px; display: flex; alig
     7 jours gratuits — sans carte bancaire
   </div>
 
-  <h1>Connaissez l'opinion<br>de vos clients.<br><em>En temps réel.</em></h1>
+  <h1>Améliorez votre restaurant.<br><em>Gagnez plus de clients.</em></h1>
 
-  <p class="hero-sub">Frizz collecte les avis de vos clients après chaque repas. Comprenez ce qui fonctionne, ce qui doit s'améliorer — et boostez votre réputation en ligne.</p>
+  <p class="hero-sub">Frizz collecte les avis de vos clients après chaque repas. Identifiez ce qui doit changer, corrigez le tir — et générez plus d'avis Google pour attirer de nouveaux clients.</p>
 
   <div class="cta-wrap">
     <a href="inscription.html" class="btn-big">Commencer gratuitement →</a>
     <div class="cta-hint"><strong>7 jours gratuits</strong> · Pas de carte bancaire · Annulation en 1 clic</div>
+  <div style="margin-top:20px;background:rgba(200,241,53,0.08);border:1px solid rgba(200,241,53,0.15);border-radius:14px;padding:14px 20px;max-width:480px;text-align:left">
+    <div style="font-size:12px;font-weight:800;color:var(--accent);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px">Notre promesse</div>
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <div style="font-size:13px;color:var(--text);display:flex;align-items:center;gap:8px"><span style="color:var(--accent)">✓</span> Obtenez vos premiers avis clients en 7 jours</div>
+      <div style="font-size:13px;color:var(--text);display:flex;align-items:center;gap:8px"><span style="color:var(--accent)">✓</span> Générez plus d'avis Google automatiquement</div>
+      <div style="font-size:13px;color:var(--text);display:flex;align-items:center;gap:8px"><span style="color:var(--accent)">✓</span> Gratuit 7 jours → puis 19€/mois seulement</div>
+    </div>
+  </div>
   </div>
 
 
@@ -405,7 +413,7 @@ footer { border-top: 1px solid var(--border); padding: 24px; display: flex; alig
       <div style="position:absolute;top:0;right:0;width:120px;height:120px;background:radial-gradient(circle,rgba(200,241,53,0.08),transparent);border-radius:50%;transform:translate(30%,-30%)"></div>
       <div style="font-size:36px;margin-bottom:14px">⭐</div>
       <div style="font-size:18px;font-weight:800;margin-bottom:8px;letter-spacing:-0.5px">Boostez votre réputation</div>
-      <div style="font-size:14px;color:var(--muted);line-height:1.7">Vos clients satisfaits sont invités à partager leur avis sur Google. Frizz génère le texte automatiquement — ils n'ont qu'à coller. <strong style="color:var(--text)">Plus d'avis Google = plus de visibilité.</strong></div>
+      <div style="font-size:14px;color:var(--muted);line-height:1.7">Chaque client est invité à partager son avis sur Google. Frizz génère le texte automatiquement — il n'a qu'à coller. <strong style="color:var(--text)">Plus d'avis Google = plus de visibilité = plus de nouveaux clients.</strong></div>
       <div style="margin-top:16px;background:rgba(200,241,53,0.08);border:1px solid rgba(200,241,53,0.15);border-radius:12px;padding:10px 14px;display:flex;align-items:center;gap:10px">
         <svg width="16" height="16" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
         <div style="font-size:12px;font-weight:700;color:var(--accent)">Bouton "Laisser un avis Google" intégré</div>
