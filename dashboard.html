@@ -777,7 +777,8 @@ function toggleNotif(btn) {
 // ============================================================
 function generateQR() {
   const googleLink = localStorage.getItem('google_link_' + commerceId) || '';
-  const clientUrl = `${BASE_URL}landing.html?id=${commerceId}&name=${encodeURIComponent(commerceName)}&google=${encodeURIComponent(googleLink)}`;
+  const clientUrl = `${BASE_URL}landing.html?id=${commerceId}&name=${encodeURIComponent(commerceName)}`;
+  const fullClientUrl = `${BASE_URL}landing.html?id=${commerceId}&name=${encodeURIComponent(commerceName)}&google=${encodeURIComponent(googleLink)}`;
   document.getElementById('qrUrl').textContent = `${BASE_URL}?id=${commerceId}`;
 
   const qrEl = document.getElementById('qrcode');
