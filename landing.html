@@ -289,9 +289,10 @@ html, body { background: #0A0A0A; margin: 0; padding: 0; font-family: 'Figtree',
         }
         if (json.google && json.google.trim() !== '') {
           googleUrl = json.google.trim();
+          console.log('Google URL loaded:', googleUrl);
         }
       }
-    } catch(e) {}
+    } catch(e) { console.log('Error loading commerce info:', e); }
   })();
 
   let globalRating = 0;
@@ -398,7 +399,11 @@ html, body { background: #0A0A0A; margin: 0; padding: 0; font-family: 'Figtree',
     url.searchParams.set('resume', generatedText);
     try { fetch(url.toString(), { method: 'GET', mode: 'no-cors' }); } catch(e) {}
     if (generatedText) navigator.clipboard.writeText(generatedText).then(() => showToast()).catch(() => {});
-    if (googleUrl !== '#') setTimeout(() => window.open(googleUrl, '_blank'), 400);
+    // Get latest googleUrl from localStorage as backup
+    const savedGoogle = localStorage.getItem('google_link_' + commerceId);
+    const finalUrl = (googleUrl && googleUrl !== '#') ? googleUrl : (savedGoogle || '#');
+    console.log('Opening Google URL:', finalUrl);
+    if (finalUrl !== '#') setTimeout(() => window.open(finalUrl, '_blank'), 400);
   }
 
   function showPrivateForm() {
