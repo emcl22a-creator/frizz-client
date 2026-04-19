@@ -390,6 +390,35 @@ html, body { background: var(--bg); font-family: 'Figtree', sans-serif; color: v
   </div>
   <div id="qrcode" style="display:none"></div>
 
+  <!-- MON COMMERCE -->
+  <div class="section collapsed" style="margin-top:14px">
+    <div class="section-header" onclick="toggleSection(this)">
+      <div class="section-title">🏪 Mon commerce</div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="section-body">
+      <div style="display:flex;flex-direction:column;gap:16px">
+
+        <!-- Logo -->
+        <div>
+          <div style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px">Logo affiché sur la page avis</div>
+          <div style="display:flex;align-items:center;gap:14px">
+            <div id="logoPreview" style="width:64px;height:64px;background:var(--surface2);border:1.5px solid var(--border);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;overflow:hidden;flex-shrink:0">🏪</div>
+            <div style="flex:1">
+              <button onclick="document.getElementById('logoUpload').click()" style="width:100%;padding:12px;background:var(--surface2);border:1.5px dashed var(--border);border-radius:12px;font-family:inherit;font-size:13px;font-weight:700;color:var(--text);cursor:pointer;transition:all 0.2s" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+                📷 Uploader mon logo
+              </button>
+              <input type="file" id="logoUpload" accept="image/*" style="display:none" onchange="handleLogoUpload(this)">
+              <button id="removeLogo" onclick="removeLogo()" style="display:none;width:100%;margin-top:6px;padding:8px;background:none;border:none;font-family:inherit;font-size:12px;font-weight:700;color:var(--danger);cursor:pointer">✕ Supprimer le logo</button>
+            </div>
+          </div>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:8px">Ce logo apparaît en haut de la page avis de vos clients. Format PNG ou JPG recommandé.</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
   <!-- MON ABONNEMENT -->
   <div class="section collapsed" style="margin-top:14px">
     <div class="section-header" onclick="toggleSection(this)">
@@ -796,14 +825,11 @@ function handleLogoUpload(input) {
   const reader = new FileReader();
   reader.onload = async (e) => {
     const logoData = e.target.result;
-    const img = document.getElementById('qrLogoImg');
-    const txt = document.getElementById('qrLogoText');
-    img.src = logoData;
-    img.style.display = 'block';
-    txt.style.display = 'none';
+    // Update preview
+    const preview = document.getElementById('logoPreview');
+    if (preview) preview.innerHTML = '<img src="' + logoData + '" style="width:100%;height:100%;object-fit:cover;border-radius:14px">';
     document.getElementById('removeLogo').style.display = 'block';
     localStorage.setItem('logo_' + commerceId, logoData);
-    generateQR();
     // Save to Sheet
     try {
       const url = new URL(SCRIPT_URL);
@@ -817,11 +843,10 @@ function handleLogoUpload(input) {
 }
 
 function removeLogo() {
-  document.getElementById('qrLogoImg').style.display = 'none';
-  document.getElementById('qrLogoText').style.display = 'block';
+  const preview = document.getElementById('logoPreview');
+  if (preview) preview.innerHTML = '🏪';
   document.getElementById('removeLogo').style.display = 'none';
   localStorage.removeItem('logo_' + commerceId);
-  generateQR();
   try {
     const url = new URL(SCRIPT_URL);
     url.searchParams.set('action', 'save_logo');
@@ -846,15 +871,11 @@ async function loadSavedLogo() {
     } catch(e) {}
   }
   if (saved) {
-    const img = document.getElementById('qrLogoImg');
-    const txt = document.getElementById('qrLogoText');
-    if (img && txt) {
-      img.src = saved;
-      img.style.display = 'block';
-      txt.style.display = 'none';
-      document.getElementById('removeLogo').style.display = 'block';
-      localStorage.setItem('logo_' + commerceId, saved);
-    }
+    const preview = document.getElementById('logoPreview');
+    if (preview) preview.innerHTML = '<img src="' + saved + '" style="width:100%;height:100%;object-fit:cover;border-radius:14px">';
+    const removeBtn = document.getElementById('removeLogo');
+    if (removeBtn) removeBtn.style.display = 'block';
+    localStorage.setItem('logo_' + commerceId, saved);
   }
 }
 
