@@ -3,426 +3,591 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Frizz — Votre avis</title>
-<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<title>Frizz — Plus d'avis Google, automatiquement</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 :root {
-  --bg: #0A0A0A;
-  --surface: #161616;
-  --surface2: #1E1E1E;
-  --border: rgba(255,255,255,0.07);
+  --bg: #000000;
+  --surface: #111111;
+  --surface2: #1a1a1a;
+  --border: rgba(255,255,255,0.08);
   --text: #FFFFFF;
-  --text-muted: rgba(255,255,255,0.45);
-  --accent: #58CC02;
+  --muted: rgba(255,255,255,0.5);
+  --accent: #7CFC00;
   --accent-dim: rgba(88,204,2,0.12);
-  --accent-glow: rgba(88,204,2,0.25);
-  --danger: #FF4B4B;
-  --warning: #FFC800;
-  --radius: 20px;
+  --accent-glow: rgba(88,204,2,0.3);
 }
-html, body { background: #0A0A0A; margin: 0; padding: 0; font-family: 'Figtree', sans-serif; color: #FFFFFF; min-height: 100vh; }
-#wrap { padding: 100px 19px 40px; min-height: 100vh; }
-@media(max-width:480px){ #wrap { padding: 80px 19px 40px; } .card { margin-left: 0; margin-right: 0; } }
-.container { width: 100%; max-width: 360px; margin: 0 auto; padding-left: 19px; padding-right: 19px; }
+html { scroll-behavior: smooth; }
+body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; overflow-x: hidden; }
 
-.header { text-align: center; margin-bottom: 28px; }
-.avatar { width: 72px; height: 72px; background: linear-gradient(135deg, #1a1a1a, #2a2a2a); border: 1.5px solid var(--border); border-radius: 20px; display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; font-size: 32px; overflow: hidden; }
-.avatar img { width: 100%; height: 100%; object-fit: cover; }
-.name { font-size: 22px; font-weight: 800; }
 
-.progress-wrap { margin-bottom: 24px; }
-.progress-label { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 12px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; }
-.progress-bar { height: 6px; background: var(--surface2); border-radius: 99px; overflow: hidden; }
-.progress-fill { height: 100%; width: 50%; background: var(--accent); border-radius: 99px; transition: width 0.5s cubic-bezier(0.34,1.56,0.64,1); box-shadow: 0 0 12px var(--accent-glow); }
+/* BG ANIMATIONS */
+.bg-orbs { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+.orb { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.12; animation: orbFloat linear infinite; }
+.orb1 { width: 400px; height: 400px; background: #58CC02; top: -100px; left: -100px; animation-duration: 20s; }
+.orb2 { width: 300px; height: 300px; background: #00C8FF; top: 40%; right: -80px; animation-duration: 15s; animation-delay: -5s; }
+.orb3 { width: 250px; height: 250px; background: #58CC02; bottom: 10%; left: 20%; animation-duration: 18s; animation-delay: -10s; }
+@keyframes orbFloat {
+  0% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(30px, -40px) scale(1.05); }
+  50% { transform: translate(-20px, 30px) scale(0.95); }
+  75% { transform: translate(40px, 20px) scale(1.02); }
+  100% { transform: translate(0, 0) scale(1); }
+}
 
-.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px 20px; margin-bottom: 16px; }
-.q { font-size: 18px; font-weight: 800; margin-bottom: 6px; line-height: 1.3; }
-.q-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 24px; font-weight: 500; }
+/* FLOATING PARTICLES */
+.particles { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+.particle { position: absolute; width: 4px; height: 4px; background: var(--accent); border-radius: 50%; opacity: 0; animation: particleRise linear infinite; }
+@keyframes particleRise {
+  0% { opacity: 0; transform: translateY(0) scale(0); }
+  10% { opacity: 0.6; transform: translateY(-20px) scale(1); }
+  90% { opacity: 0.2; transform: translateY(-300px) scale(0.5); }
+  100% { opacity: 0; transform: translateY(-320px) scale(0); }
+}
 
-.stars-big { display: flex; gap: 8px; justify-content: center; margin-bottom: 12px; }
-.star-big { width: 52px; height: 52px; background: var(--surface2); border: 1.5px solid var(--border); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 22px; cursor: pointer; transition: all 0.2s; user-select: none; }
-.star-big.active { background: var(--accent-dim); border-color: var(--accent); transform: scale(1.12); box-shadow: 0 4px 20px var(--accent-glow); }
-.rating-labels { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); font-weight: 600; margin-bottom: 4px; }
+/* GRID LINES */
+.grid-lines { position: fixed; inset: 0; pointer-events: none; z-index: 0; background-image: linear-gradient(rgba(88,204,2,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(88,204,2,0.03) 1px, transparent 1px); background-size: 60px 60px; }
 
-.cat-row { display: flex; align-items: center; justify-content: space-between; padding: 14px 0; border-bottom: 1px solid var(--border); }
-.cat-row:last-child { border-bottom: none; }
-.cat-label { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 700; }
-.cat-label .em { font-size: 20px; }
-.cat-stars { display: flex; gap: 4px; }
-.cat-star { font-size: 20px; cursor: pointer; transition: transform 0.15s; user-select: none; filter: grayscale(1) opacity(0.4); }
-.cat-star.active { filter: none; transform: scale(1.1); }
+/* Make sure content is above bg */
+nav, .hero, .mockup-section, .steps-section, .pricing-section, .faq-section, .cta-final, footer { position: relative; z-index: 1; }
 
-.textarea { width: 100%; background: var(--surface2); border: 1.5px solid var(--border); border-radius: 14px; padding: 14px 16px; font-family: inherit; font-size: 14px; font-weight: 500; color: var(--text); resize: none; outline: none; min-height: 100px; line-height: 1.6; transition: border-color 0.2s; margin-top: 16px; }
-.textarea:focus { border-color: var(--accent); }
-.textarea::placeholder { color: var(--text-muted); }
-.optional-label { font-size: 12px; color: var(--text-muted); font-weight: 600; margin-top: 20px; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+/* NAV */
+nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 0 24px; height: 60px; display: flex; align-items: center; justify-content: space-between; background: rgba(0,0,0,0.8); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); }
+.nav-logo { font-size: 18px; font-weight: 800; color: var(--accent); }
+.nav-cta { background: var(--accent); color: #000; border: none; border-radius: 99px; padding: 8px 20px; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.2s; text-decoration: none; }
+.nav-cta:hover { transform: scale(1.04); box-shadow: 0 0 20px var(--accent-glow); }
 
-.btn-primary { width: 100%; padding: 18px; background: var(--accent); border: none; border-radius: 16px; font-family: inherit; font-size: 16px; font-weight: 800; color: #000; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 24px var(--accent-glow); margin-bottom: 12px; }
-.btn-primary:hover { transform: translateY(-2px); background: #65e002; }
+/* HERO */
+.hero { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 80px 24px 60px; text-align: center; position: relative; overflow: hidden; }
+.hero-glow { position: absolute; width: 700px; height: 700px; background: radial-gradient(circle, rgba(88,204,2,0.07) 0%, transparent 65%); border-radius: 50%; top: 50%; left: 50%; transform: translate(-50%, -55%); pointer-events: none; }
 
-.dots { display: flex; justify-content: center; gap: 6px; margin-top: 8px; }
-.dot { width: 6px; height: 6px; border-radius: 99px; background: var(--surface2); transition: all 0.3s; }
-.dot.active { width: 20px; background: var(--accent); }
+.pill { display: inline-flex; align-items: center; gap: 7px; background: var(--accent-dim); border: 1px solid rgba(88,204,2,0.2); border-radius: 99px; padding: 6px 14px; font-size: 12px; font-weight: 700; color: var(--accent); margin-bottom: 32px; animation: fadeUp 0.5s ease both; }
+.pill-dot { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; animation: blink 1.4s ease infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
 
-.success-card { background: var(--surface); border-radius: var(--radius); padding: 28px 20px; text-align: center; display: none; flex-direction: column; gap: 16px; }
-.success-card.visible { display: flex; }
-.badge { display: inline-flex; align-items: center; gap: 5px; border-radius: 99px; padding: 6px 16px; font-size: 12px; font-weight: 700; margin: 0 auto; }
-.badge.green { background: rgba(88,204,2,0.1); border: 1px solid rgba(88,204,2,0.2); color: var(--accent); }
-.badge.orange { background: rgba(255,200,0,0.1); border: 1px solid rgba(255,200,0,0.2); color: var(--warning); }
-.success-icon { width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto; }
-.success-icon.green { background: rgba(88,204,2,0.12); border: 1.5px solid rgba(88,204,2,0.25); }
-.success-icon.orange { background: rgba(255,200,0,0.1); border: 1.5px solid rgba(255,200,0,0.2); }
-.success-title { font-size: 20px; font-weight: 900; margin: 0; }
-.success-sub { font-size: 13px; color: var(--text-muted); line-height: 1.6; margin: 0; font-weight: 500; }
+h1 { font-size: clamp(40px, 8vw, 86px); font-weight: 900; line-height: 1.02; letter-spacing: -3px; margin-bottom: 24px; animation: fadeUp 0.5s 0.1s ease both; }
+h1 em { color: var(--accent); font-style: normal; }
 
-.action-btn { width: 100%; border-radius: 16px; padding: 16px; display: flex; align-items: center; gap: 12px; border: none; cursor: pointer; transition: all 0.2s; text-decoration: none; }
-.action-btn:hover { transform: translateY(-2px); opacity: 0.95; }
-.action-btn.google { background: #4285F4; }
-.action-btn.private { background: var(--surface2); border: 1.5px solid var(--border); }
-.action-logo { width: 36px; height: 36px; min-width: 36px; background: white; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
-.action-logo.dark { background: var(--surface); border: 1px solid var(--border); font-size: 18px; }
-.action-text { flex: 1; text-align: left; }
-.action-text .t1 { font-size: 14px; font-weight: 800; color: white; margin: 0; }
-.action-text .t2 { font-size: 11px; color: rgba(255,255,255,0.65); margin: 2px 0 0; }
-.action-text.dark .t1 { color: var(--text); }
-.action-text.dark .t2 { color: var(--text-muted); }
+.hero-sub { font-size: clamp(16px, 2.5vw, 20px); color: var(--muted); max-width: 500px; line-height: 1.6; font-weight: 400; margin-bottom: 40px; animation: fadeUp 0.5s 0.2s ease both; }
 
-.divider { display: flex; align-items: center; gap: 10px; }
-.divider-line { flex: 1; height: 1px; background: var(--border); }
-.divider-text { font-size: 11px; color: var(--text-muted); font-weight: 600; }
+.cta-wrap { display: flex; flex-direction: column; align-items: center; gap: 12px; animation: fadeUp 0.5s 0.3s ease both; }
+.btn-big { background: var(--accent); color: #000; border: none; border-radius: 16px; padding: 18px 48px; font-family: 'Inter', sans-serif; font-size: 17px; font-weight: 800; cursor: pointer; transition: all 0.25s; text-decoration: none; display: inline-block; }
+.btn-big:hover { transform: translateY(-2px) scale(1.02); box-shadow: 0 8px 40px var(--accent-glow); }
+.cta-hint { font-size: 13px; color: var(--muted); font-weight: 500; }
+.cta-hint strong { color: var(--text); }
 
-.toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--accent); color: #000; font-size: 13px; font-weight: 700; padding: 10px 20px; border-radius: 99px; opacity: 0; transition: all 0.3s; pointer-events: none; z-index: 999; white-space: nowrap; }
+@keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
 
-@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-.powered { text-align: center; margin-top: 20px; font-size: 11px; color: rgba(255,255,255,0.15); font-weight: 600; }
-.powered span { color: var(--accent); opacity: 0.5; }
+/* SOCIAL PROOF */
+.proof { display: flex; align-items: center; justify-content: center; gap: 16px; margin-top: 56px; animation: fadeUp 0.5s 0.4s ease both; flex-wrap: wrap; }
+.proof-avatars { display: flex; }
+.proof-avatar { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--bg); background: var(--surface2); display: flex; align-items: center; justify-content: center; font-size: 14px; margin-left: -8px; }
+.proof-avatar:first-child { margin-left: 0; }
+.proof-text { font-size: 13px; color: var(--muted); }
+.proof-text strong { color: var(--text); }
+.proof-stars { color: var(--accent); font-size: 13px; letter-spacing: 1px; }
+
+/* FEATURES — BENTO GRID */
+.bento { max-width: 900px; margin: 0 auto; padding: 100px 24px; display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: auto; gap: 12px; }
+@media(max-width:700px){ .bento { grid-template-columns: 1fr; } }
+
+.bento-card { background: var(--surface); border: 1px solid var(--border); border-radius: 24px; padding: 32px 28px; transition: border-color 0.2s, transform 0.2s; }
+.bento-card:hover { border-color: rgba(88,204,2,0.2); transform: translateY(-2px); }
+.bento-card.wide { grid-column: span 2; }
+.bento-card.tall { display: flex; flex-direction: column; justify-content: space-between; }
+@media(max-width:700px){ .bento-card.wide { grid-column: span 1; } }
+
+.bento-icon { font-size: 36px; margin-bottom: 16px; }
+.bento-title { font-size: 20px; font-weight: 800; margin-bottom: 8px; letter-spacing: -0.5px; }
+.bento-desc { font-size: 14px; color: var(--muted); line-height: 1.6; }
+.bento-number { font-size: 56px; font-weight: 900; color: var(--accent); letter-spacing: -2px; margin-top: 16px; }
+.bento-number-label { font-size: 13px; color: var(--muted); }
+
+/* STEPS */
+.steps-section { max-width: 900px; margin: 0 auto; padding: 0 24px 60px; }
+.section-label { font-size: 12px; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 16px; }
+.section-title { font-size: clamp(28px, 4vw, 44px); font-weight: 900; letter-spacing: -1.5px; margin-bottom: 48px; line-height: 1.1; }
+
+.steps-list { display: flex; flex-direction: column; gap: 2px; }
+.step-row { display: flex; align-items: flex-start; gap: 20px; background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 28px 24px; transition: border-color 0.2s; }
+.step-row:hover { border-color: rgba(88,204,2,0.15); }
+.step-num-wrap { width: 40px; height: 40px; background: var(--accent-dim); border: 1px solid rgba(88,204,2,0.2); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 900; color: var(--accent); flex-shrink: 0; }
+.step-content { flex: 1; }
+.step-title { font-size: 17px; font-weight: 800; margin-bottom: 6px; }
+.step-desc { font-size: 14px; color: var(--muted); line-height: 1.6; }
+.step-emoji { font-size: 32px; flex-shrink: 0; }
+
+/* PRICING */
+.pricing-section { max-width: 480px; margin: 0 auto; padding: 0 24px 100px; text-align: center; }
+.pricing-card { background: var(--surface); border: 1px solid var(--border); border-radius: 28px; overflow: hidden; margin-top: 40px; }
+.pricing-top { padding: 36px 32px 28px; }
+.price-row { display: flex; align-items: flex-end; justify-content: center; gap: 4px; margin: 20px 0 8px; }
+.price-currency { font-size: 22px; font-weight: 700; color: var(--muted); margin-bottom: 6px; }
+.price-amount { font-size: 72px; font-weight: 900; line-height: 1; letter-spacing: -3px; }
+.price-period { font-size: 15px; color: var(--muted); margin-bottom: 6px; }
+.price-trial { display: inline-flex; align-items: center; gap: 6px; background: var(--accent-dim); border: 1px solid rgba(88,204,2,0.2); border-radius: 99px; padding: 7px 16px; font-size: 13px; font-weight: 700; color: var(--accent); }
+
+.pricing-features { padding: 0 32px; display: flex; flex-direction: column; gap: 14px; text-align: left; }
+.pf { display: flex; align-items: center; gap: 12px; font-size: 14px; color: var(--muted); padding: 10px 0; border-bottom: 1px solid var(--border); }
+.pf:last-child { border-bottom: none; }
+.pf-check { width: 20px; height: 20px; background: var(--accent-dim); border: 1px solid rgba(88,204,2,0.3); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 11px; color: var(--accent); flex-shrink: 0; }
+
+.pricing-cta-wrap { padding: 24px 32px 32px; }
+.btn-full { width: 100%; padding: 18px; background: var(--accent); color: #000; border: none; border-radius: 16px; font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 800; cursor: pointer; transition: all 0.2s; text-decoration: none; display: block; text-align: center; }
+.btn-full:hover { transform: translateY(-1px); box-shadow: 0 6px 30px var(--accent-glow); }
+.no-card { font-size: 12px; color: var(--muted); margin-top: 10px; }
+
+/* FAQ */
+.faq-section { max-width: 640px; margin: 0 auto; padding: 0 24px 60px; }
+.faq-item { border-bottom: 1px solid var(--border); }
+.faq-q { padding: 20px 0; font-size: 15px; font-weight: 600; cursor: pointer; display: flex; justify-content: space-between; align-items: center; user-select: none; }
+.faq-arrow { color: var(--muted); font-size: 11px; transition: transform 0.3s; flex-shrink: 0; }
+.faq-item.open .faq-arrow { transform: rotate(180deg); }
+.faq-a { display: none; padding-bottom: 20px; font-size: 14px; color: var(--muted); line-height: 1.7; }
+.faq-item.open .faq-a { display: block; }
+
+/* CTA FINAL */
+.cta-final { text-align: center; padding: 60px 24px 80px; }
+.cta-final h2 { font-size: clamp(32px, 5vw, 60px); font-weight: 900; letter-spacing: -2px; line-height: 1.05; margin-bottom: 16px; }
+.cta-final h2 em { color: var(--accent); font-style: normal; }
+.cta-final p { font-size: 16px; color: var(--muted); margin-bottom: 36px; }
+
+/* FOOTER */
+footer { border-top: 1px solid var(--border); padding: 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+.footer-logo { font-size: 16px; font-weight: 800; color: var(--accent); }
+.footer-text { font-size: 12px; color: var(--muted); }
+
+
+/* MOCKUP SECTION */
+.mockup-section { padding: 20px 24px 60px; }
+.mockup-wrap { max-width: 900px; margin: 0 auto; position: relative; display: flex; align-items: flex-end; justify-content: center; gap: 0; }
+
+/* LAPTOP */
+.laptop { position: relative; width: 580px; flex-shrink: 0; z-index: 1; }
+.laptop-screen { background: #1a1a1a; border-radius: 12px 12px 0 0; border: 2px solid #333; overflow: hidden; }
+.laptop-bar { background: #111; padding: 8px 12px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #222; }
+.lb-dots { display: flex; gap: 5px; }
+.lb-dots span { width: 9px; height: 9px; border-radius: 50%; background: #333; }
+.lb-dots span:first-child { background: #FF5F57; }
+.lb-dots span:nth-child(2) { background: #FFBD2E; }
+.lb-dots span:last-child { background: #28C840; }
+.lb-url { flex: 1; background: #222; border-radius: 5px; padding: 3px 10px; font-size: 10px; color: #555; text-align: center; }
+.laptop-content { padding: 14px; }
+.lc-header { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+.lc-logo { font-size: 12px; font-weight: 900; color: var(--accent); }
+.lc-name { font-size: 11px; font-weight: 700; flex: 1; }
+.lc-live { display: flex; align-items: center; gap: 4px; font-size: 9px; color: var(--accent); font-weight: 700; background: var(--accent-dim); border-radius: 99px; padding: 2px 8px; }
+.lc-live span { width: 5px; height: 5px; background: var(--accent); border-radius: 50%; animation: blink 1.4s ease infinite; }
+.lc-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 12px; }
+.lc-stat { background: #222; border-radius: 8px; padding: 8px 6px; text-align: center; }
+.lc-stat-val { font-size: 18px; font-weight: 900; }
+.lc-stat-val.green { color: var(--accent); }
+.lc-stat-val.red { color: #FF4B4B; }
+.lc-stat-label { font-size: 8px; color: #555; margin-top: 2px; font-weight: 600; }
+.lc-avis-title { font-size: 10px; font-weight: 800; color: #666; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+.lc-avis { display: flex; flex-direction: column; gap: 4px; }
+.lc-avis-row { display: flex; align-items: center; gap: 6px; background: #222; border-radius: 8px; padding: 7px 8px; }
+.lc-stars { font-size: 9px; color: var(--accent); flex-shrink: 0; }
+.lc-avis-text { font-size: 9px; color: #888; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lc-tag { font-size: 8px; font-weight: 700; border-radius: 4px; padding: 2px 5px; flex-shrink: 0; }
+.lc-tag.green { background: var(--accent-dim); color: var(--accent); }
+.lc-tag.orange { background: rgba(255,200,0,0.1); color: #FFC800; }
+.laptop-base { background: linear-gradient(#2a2a2a, #222); height: 12px; border-radius: 0 0 4px 4px; border: 2px solid #333; border-top: none; }
+.laptop-foot { width: 200px; height: 6px; background: #222; border-radius: 0 0 8px 8px; margin: 0 auto; border: 1px solid #333; border-top: none; }
+
+/* PHONE */
+.phone { width: 180px; background: #111; border-radius: 28px; border: 2px solid #333; overflow: hidden; margin-left: -40px; margin-bottom: 18px; position: relative; z-index: 2; box-shadow: -20px 20px 60px rgba(0,0,0,0.8); }
+.phone-notch { width: 60px; height: 18px; background: #000; border-radius: 0 0 12px 12px; margin: 0 auto; }
+.phone-screen { padding: 8px 10px 14px; }
+.ph-avatar { text-align: center; font-size: 22px; margin: 4px 0 4px; }
+.ph-name { text-align: center; font-size: 10px; font-weight: 800; margin-bottom: 8px; }
+.ph-progress { margin-bottom: 8px; }
+.ph-prog-label { display: flex; justify-content: space-between; font-size: 7px; color: #555; font-weight: 700; margin-bottom: 3px; }
+.ph-prog-bar { height: 3px; background: #222; border-radius: 99px; }
+.ph-prog-fill { height: 100%; width: 50%; background: var(--accent); border-radius: 99px; }
+.ph-card { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 10px; padding: 10px 8px; margin-bottom: 8px; }
+.ph-card-title { font-size: 10px; font-weight: 900; text-align: center; margin-bottom: 2px; }
+.ph-card-sub { font-size: 8px; color: #666; text-align: center; margin-bottom: 8px; }
+.ph-stars { display: flex; gap: 3px; justify-content: center; }
+.ph-star { width: 22px; height: 22px; background: #222; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 11px; border: 1px solid #333; }
+.ph-star.active { background: rgba(88,204,2,0.15); border-color: var(--accent); }
+.ph-btn { background: var(--accent); border-radius: 8px; padding: 8px; text-align: center; font-size: 10px; font-weight: 800; color: #000; }
+
+@media(max-width:700px){
+  .mockup-wrap { flex-direction: column; align-items: center; gap: 24px; }
+  .laptop { width: 100%; max-width: 400px; }
+  .phone { display: none !important; }
+}
+
+/* DESKTOP SPACING */
+@media(min-width: 768px) {
+  .hero { padding-bottom: 20px; }
+  .mockup-section { padding: 0px 24px 80px; }
+  .steps-section { padding: 0 24px 80px; }
+  .pricing-section { padding: 0 24px 80px; }
+  .faq-section { padding: 0 24px 80px; }
+  .cta-final { padding: 80px 24px 100px; }
+  .bento { padding: 80px 24px; }
+}
+
+@media(max-width:640px) {
+  .amelio-grid { grid-template-columns: 1fr !important; }
+}
+/* REVEAL */
+.reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.6s ease, transform 0.6s ease; }
+.reveal.visible { opacity: 1; transform: translateY(0); }
 </style>
 </head>
 <body>
-<div id="wrap">
-<div class="container">
 
-  <div class="header">
-    <div class="avatar" id="avatarEl">🏪</div>
-    <div class="name" id="commerceName">Mon Commerce</div>
-  </div>
-
-  <div id="formView">
-    <div class="progress-wrap">
-      <div class="progress-label">
-        <span>Votre avis</span>
-        <span id="stepLabel">1 / 2</span>
-      </div>
-      <div class="progress-bar">
-        <div class="progress-fill" id="progressFill"></div>
-      </div>
-    </div>
-
-    <!-- PAGE 1 — Note globale -->
-    <div id="step1">
-      <div class="card">
-        <div class="q" style="text-align:center; margin-bottom: 4px; font-size:26px;">Votre avis compte 🙌</div>
-        <div class="q-sub" style="text-align:center; margin-bottom: 20px;">Ça prend 20 secondes ⏱️</div>
-        <div style="font-weight:800; text-align:center; margin-bottom:16px; font-size:18px;">Comment s'est passée votre expérience ?</div>
-        <div class="stars-big" id="starsGlobal">
-          <div class="star-big" onclick="selectGlobal(1)">⭐</div>
-          <div class="star-big" onclick="selectGlobal(2)">⭐</div>
-          <div class="star-big" onclick="selectGlobal(3)">⭐</div>
-          <div class="star-big" onclick="selectGlobal(4)">⭐</div>
-          <div class="star-big" onclick="selectGlobal(5)">⭐</div>
-        </div>
-        <div class="rating-labels"><span>Décevant</span><span>Excellent !</span></div>
-      </div>
-      <button class="btn-primary" onclick="goToStep(2)">Continuer →</button>
-      <div class="dots">
-        <div class="dot active" id="dot1"></div>
-        <div class="dot" id="dot2"></div>
-      </div>
-    </div>
-
-    <!-- PAGE 2 — Détail + commentaire -->
-    <div id="step2" style="display:none">
-      <div class="card">
-        <div class="q">Comment évaluez-vous ces points ?</div>
-        <div class="q-sub" style="margin-bottom: 8px;">Optionnel — 1 clic par critère</div>
-
-        <div class="cat-row">
-          <div class="cat-label"><span class="em">🍽️</span> Cuisine</div>
-          <div class="cat-stars" id="starsCuisine">
-            <span class="cat-star" onclick="selectCat('cuisine',1,this)">⭐</span>
-            <span class="cat-star" onclick="selectCat('cuisine',2,this)">⭐</span>
-            <span class="cat-star" onclick="selectCat('cuisine',3,this)">⭐</span>
-            <span class="cat-star" onclick="selectCat('cuisine',4,this)">⭐</span>
-            <span class="cat-star" onclick="selectCat('cuisine',5,this)">⭐</span>
-          </div>
-        </div>
-        <div class="cat-row">
-          <div class="cat-label"><span class="em">😊</span> Service</div>
-          <div class="cat-stars" id="starsService">
-            <span class="cat-star" onclick="selectCat('service',1,this)">⭐</span>
-            <span class="cat-star" onclick="selectCat('service',2,this)">⭐</span>
-            <span class="cat-star" onclick="selectCat('service',3,this)">⭐</span>
-            <span class="cat-star" onclick="selectCat('service',4,this)">⭐</span>
-            <span class="cat-star" onclick="selectCat('service',5,this)">⭐</span>
-          </div>
-        </div>
-        <div class="cat-row">
-          <div class="cat-label"><span class="em">💰</span> Qualité/Prix</div>
-          <div class="cat-stars" id="starsPrix">
-            <span class="cat-star" onclick="selectCat('prix',1,this)">⭐</span>
-            <span class="cat-star" onclick="selectCat('prix',2,this)">⭐</span>
-            <span class="cat-star" onclick="selectCat('prix',3,this)">⭐</span>
-            <span class="cat-star" onclick="selectCat('prix',4,this)">⭐</span>
-            <span class="cat-star" onclick="selectCat('prix',5,this)">⭐</span>
-          </div>
-        </div>
-
-        <div class="optional-label">Un mot sur votre expérience ? (optionnel)</div>
-        <textarea class="textarea" id="commentField" placeholder="Partagez votre ressenti..."></textarea>
-      </div>
-      <button class="btn-primary" id="submitBtn" onclick="submitFeedback()">Envoyer mon avis ✓</button>
-      <div class="dots">
-        <div class="dot" id="dot1b"></div>
-        <div class="dot active" id="dot2b"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- SUCCÈS BONNE NOTE (≥4) -->
-  <div class="success-card" id="successGood">
-    <div class="badge green">🙏 Merci beaucoup !</div>
-    <div class="success-icon green">
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-        <path d="M5 13l4 4L19 7" stroke="#58CC02" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-    </div>
-    <p class="success-title">Merci beaucoup 🙏</p>
-    <p class="success-sub">Ça nous aide énormément ! Si vous avez 30 secondes, partagez votre avis sur Google.</p>
-
-    <button class="action-btn google" onclick="copyAndOpenGoogle()">
-      <div class="action-logo">
-        <svg width="18" height="18" viewBox="0 0 24 24">
-          <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-          <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-          <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-          <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-        </svg>
-      </div>
-      <div class="action-text">
-        <p class="t1">Laisser un avis Google</p>
-        <p class="t2">Votre résumé est déjà copié ✓</p>
-      </div>
-    </button>
-
-  </div>
-
-  <!-- SUCCÈS MAUVAISE NOTE (≤3) -->
-  <div class="success-card" id="successBad">
-    <div class="badge orange">🙏 Merci pour votre retour</div>
-    <div class="success-icon orange">
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-        <path d="M5 13l4 4L19 7" stroke="#FFC800" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-    </div>
-    <p class="success-title">Merci pour votre retour</p>
-    <p class="success-sub">Ça nous aide à nous améliorer 🙏</p>
-
-    <button class="action-btn google" onclick="copyAndOpenGoogle()">
-      <div class="action-logo">
-        <svg width="18" height="18" viewBox="0 0 24 24">
-          <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-          <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-          <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-          <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-        </svg>
-      </div>
-      <div class="action-text">
-        <p class="t1">Laisser un avis Google</p>
-        <p class="t2">Votre résumé est déjà copié ✓</p>
-      </div>
-    </button>
-
-  </div>
-
-  <!-- MESSAGE ENVOYÉ -->
-  <div class="success-card" id="privateSent">
-    <div class="success-icon green">
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-        <path d="M5 13l4 4L19 7" stroke="#58CC02" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-    </div>
-    <p class="success-title">Message envoyé !</p>
-  </div>
-
-  <div class="powered">Propulsé par <span>Frizz</span></div>
+<div class="bg-orbs">
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+  <div class="orb orb3"></div>
 </div>
+<div class="grid-lines"></div>
+<div class="particles" id="particles"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">Frizz ✦</div>
+  <a href="inscription.html" class="nav-cta">Essai gratuit →</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-glow"></div>
+
+  <div class="pill">
+    <div class="pill-dot"></div>
+    7 jours gratuits — sans carte bancaire
+  </div>
+
+  <h1>Connaissez l'opinion<br>de vos clients.<br><em>En temps réel.</em></h1>
+
+  <p class="hero-sub">Frizz collecte l'avis de vos clients après chaque repas. Comprenez ce qu'ils pensent vraiment — et transformez les satisfaits en avis Google.</p>
+
+  <div class="cta-wrap">
+    <a href="inscription.html" class="btn-big">Commencer gratuitement →</a>
+    <div class="cta-hint"><strong>7 jours gratuits</strong> · Pas de carte bancaire · Annulation en 1 clic</div>
+  </div>
+
+
+</section>
+
+<!-- MOCKUP SECTION -->
+<div class="mockup-section reveal">
+  <div class="mockup-wrap">
+
+    <!-- LAPTOP -->
+    <div class="laptop">
+      <div class="laptop-screen">
+        <div class="laptop-bar">
+          <div class="lb-dots"><span></span><span></span><span></span></div>
+          <div class="lb-url">frizz.app/dashboard</div>
+        </div>
+        <div class="laptop-content">
+          <div class="lc-header">
+            <div class="lc-logo">Frizz ✦</div>
+            <div class="lc-name">Restaurant Le Gourmet</div>
+            <div class="lc-live"><span></span> En direct</div>
+          </div>
+          <div class="lc-stats">
+            <div class="lc-stat">
+              <div class="lc-stat-val green">4.8</div>
+              <div class="lc-stat-label">Note moyenne</div>
+            </div>
+            <div class="lc-stat">
+              <div class="lc-stat-val">47</div>
+              <div class="lc-stat-label">Total avis</div>
+            </div>
+            <div class="lc-stat">
+              <div class="lc-stat-val green">38</div>
+              <div class="lc-stat-label">Bons avis</div>
+            </div>
+            <div class="lc-stat">
+              <div class="lc-stat-val red">3</div>
+              <div class="lc-stat-label">À surveiller</div>
+            </div>
+          </div>
+          <div class="lc-avis-title">Derniers avis</div>
+          <div class="lc-avis">
+            <div class="lc-avis-row">
+              <span class="lc-stars">★★★★★</span>
+              <span class="lc-avis-text">"Excellent repas, service impeccable !"</span>
+              <span class="lc-tag green">Google ✓</span>
+            </div>
+            <div class="lc-avis-row">
+              <span class="lc-stars">★★★★★</span>
+              <span class="lc-avis-text">"Je recommande, ambiance parfaite."</span>
+              <span class="lc-tag green">Google ✓</span>
+            </div>
+            <div class="lc-avis-row">
+              <span class="lc-stars" style="color:#FFC800">★★★☆☆</span>
+              <span class="lc-avis-text">"Service un peu lent ce soir."</span>
+              <span class="lc-tag orange">Privé</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="laptop-base"></div>
+      <div class="laptop-foot"></div>
+    </div>
+
+    <!-- PHONE -->
+    <div class="phone">
+      <div class="phone-notch"></div>
+      <div class="phone-screen">
+        <div class="ph-avatar">🍽️</div>
+        <div class="ph-name">Restaurant Le Gourmet</div>
+        <div class="ph-progress">
+          <div class="ph-prog-label"><span>VOTRE AVIS</span><span>1 / 2</span></div>
+          <div class="ph-prog-bar"><div class="ph-prog-fill"></div></div>
+        </div>
+        <div class="ph-card">
+          <div class="ph-card-title">Votre avis compte 🙌</div>
+          <div class="ph-card-sub">Ça prend 20 secondes ⏱️</div>
+          <div class="ph-stars">
+            <div class="ph-star active">⭐</div>
+            <div class="ph-star active">⭐</div>
+            <div class="ph-star active">⭐</div>
+            <div class="ph-star active">⭐</div>
+            <div class="ph-star active">⭐</div>
+          </div>
+        </div>
+        <div class="ph-btn">Continuer →</div>
+      </div>
+    </div>
+
+  </div>
 </div>
 
-<div class="toast" id="toast">📋 Résumé copié — collez-le sur Google !</div>
+<!-- AMÉLIORATION SECTION -->
+<div style="max-width:900px;margin:0 auto;padding:0 24px 80px;" class="reveal">
+
+  <div class="section-label" style="text-align:center;margin:0 auto 20px;display:inline-flex;left:50%;position:relative;transform:translateX(-50%)">✦ Pourquoi Frizz</div>
+
+  <h2 class="section-title" style="text-align:center;font-size:clamp(28px,4vw,44px);margin-bottom:12px">Améliorez votre restaurant.<br><em style="color:var(--accent);font-style:normal">Gagnez plus de clients.</em></h2>
+  <p style="text-align:center;font-size:16px;color:var(--muted);max-width:520px;margin:0 auto 48px;line-height:1.7">Frizz vous donne les données concrètes pour progresser — et transforme vos clients satisfaits en ambassadeurs sur Google.</p>
+
+  <!-- CARDS AMÉLIORATION -->
+  <div class="amelio-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+
+    <!-- Cuisine -->
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:28px;transition:border-color 0.2s" onmouseover="this.style.borderColor='rgba(200,241,53,0.3)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.08)'">
+      <div style="font-size:36px;margin-bottom:14px">🍽️</div>
+      <div style="font-size:18px;font-weight:800;margin-bottom:8px;letter-spacing:-0.5px">Cuisine</div>
+      <div style="font-size:14px;color:var(--muted);line-height:1.7">Vos clients notent la qualité de vos plats après chaque repas. Détectez immédiatement si un nouveau plat déçoit ou si la qualité baisse. <strong style="color:var(--text)">Agissez sur le feedback de vos clients.</strong></div>
+      <div style="margin-top:16px;display:flex;align-items:center;gap:8px">
+        <div style="height:4px;flex:1;background:var(--surface2);border-radius:99px;overflow:hidden"><div style="height:100%;width:82%;background:var(--accent);border-radius:99px"></div></div>
+        <div style="font-size:12px;font-weight:800;color:var(--accent)">4.1 / 5</div>
+      </div>
+      <div style="font-size:11px;color:var(--muted);margin-top:4px">Note moyenne cuisine — exemple</div>
+    </div>
+
+    <!-- Service -->
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:28px;transition:border-color 0.2s" onmouseover="this.style.borderColor='rgba(200,241,53,0.3)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.08)'">
+      <div style="font-size:36px;margin-bottom:14px">😊</div>
+      <div style="font-size:18px;font-weight:800;margin-bottom:8px;letter-spacing:-0.5px">Service</div>
+      <div style="font-size:14px;color:var(--muted);line-height:1.7">Vos clients évaluent l'accueil, la rapidité et l'amabilité. Identifiez les jours ou les équipes qui performent moins bien. <strong style="color:var(--text)">Formez, ajustez, progressez.</strong></div>
+      <div style="margin-top:16px;display:flex;align-items:center;gap:8px">
+        <div style="height:4px;flex:1;background:var(--surface2);border-radius:99px;overflow:hidden"><div style="height:100%;width:74%;background:var(--accent);border-radius:99px"></div></div>
+        <div style="font-size:12px;font-weight:800;color:var(--accent)">3.7 / 5</div>
+      </div>
+      <div style="font-size:11px;color:var(--muted);margin-top:4px">Note moyenne service — exemple</div>
+    </div>
+  </div>
+
+  <div class="amelio-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+    <!-- Prix -->
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:28px;transition:border-color 0.2s" onmouseover="this.style.borderColor='rgba(200,241,53,0.3)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.08)'">
+      <div style="font-size:36px;margin-bottom:14px">💰</div>
+      <div style="font-size:18px;font-weight:800;margin-bottom:8px;letter-spacing:-0.5px">Rapport qualité/prix</div>
+      <div style="font-size:14px;color:var(--muted);line-height:1.7">Sachez si vos clients trouvent votre offre justifiée. Une note basse ici peut signaler qu'il faut revoir la carte ou mieux communiquer la valeur. <strong style="color:var(--text)">Gardez vos clients fidèles.</strong></div>
+      <div style="margin-top:16px;display:flex;align-items:center;gap:8px">
+        <div style="height:4px;flex:1;background:var(--surface2);border-radius:99px;overflow:hidden"><div style="height:100%;width:90%;background:var(--accent);border-radius:99px"></div></div>
+        <div style="font-size:12px;font-weight:800;color:var(--accent)">4.5 / 5</div>
+      </div>
+      <div style="font-size:11px;color:var(--muted);margin-top:4px">Note qualité/prix — exemple</div>
+    </div>
+
+    <!-- Google -->
+    <div style="background:var(--surface);border:1px solid rgba(200,241,53,0.2);border-radius:20px;padding:28px;position:relative;overflow:hidden">
+      <div style="position:absolute;top:0;right:0;width:120px;height:120px;background:radial-gradient(circle,rgba(200,241,53,0.08),transparent);border-radius:50%;transform:translate(30%,-30%)"></div>
+      <div style="font-size:36px;margin-bottom:14px">⭐</div>
+      <div style="font-size:18px;font-weight:800;margin-bottom:8px;letter-spacing:-0.5px">Gagnez des clients</div>
+      <div style="font-size:14px;color:var(--muted);line-height:1.7">Tous vos clients sont invités à partager leur avis sur Google. Frizz génère le texte automatiquement. <strong style="color:var(--text)">Plus d'avis Google = plus de visibilité = plus de nouveaux clients.</strong></div>
+      <div style="margin-top:16px;background:rgba(200,241,53,0.08);border:1px solid rgba(200,241,53,0.15);border-radius:12px;padding:10px 14px;display:flex;align-items:center;gap:10px">
+        <svg width="16" height="16" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+        <div style="font-size:12px;font-weight:700;color:var(--accent)">Bouton "Laisser un avis Google" intégré</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTTOM STAT BAR -->
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:24px 28px;display:flex;gap:0;flex-wrap:wrap">
+    <div style="flex:1;min-width:140px;text-align:center;padding:12px">
+      <div style="font-size:32px;font-weight:900;color:var(--accent);letter-spacing:-1px">20s</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:4px">Pour laisser un avis</div>
+    </div>
+    <div style="width:1px;background:var(--border);margin:8px 0"></div>
+    <div style="flex:1;min-width:140px;text-align:center;padding:12px">
+      <div style="font-size:32px;font-weight:900;color:var(--accent);letter-spacing:-1px">3</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:4px">Critères évalués</div>
+    </div>
+    <div style="width:1px;background:var(--border);margin:8px 0"></div>
+    <div style="flex:1;min-width:140px;text-align:center;padding:12px">
+      <div style="font-size:32px;font-weight:900;color:var(--accent);letter-spacing:-1px">∞</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:4px">Avis illimités</div>
+    </div>
+    <div style="width:1px;background:var(--border);margin:8px 0"></div>
+    <div style="flex:1;min-width:140px;text-align:center;padding:12px">
+      <div style="font-size:32px;font-weight:900;color:var(--accent);letter-spacing:-1px">2min</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:4px">Pour démarrer</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- HOW IT WORKS -->
+<div class="steps-section reveal">
+  <div class="section-label">Comment ça marche</div>
+  <div class="section-title">3 étapes.<br>2 minutes.</div>
+  <div class="steps-list">
+    <div class="step-row">
+      <div class="step-num-wrap">1</div>
+      <div class="step-content">
+        <div class="step-title">Inscrivez-vous en 2 minutes</div>
+        <div class="step-desc">Remplissez le formulaire. Vous recevez immédiatement votre QR code personnalisé et l'accès à votre dashboard.</div>
+      </div>
+      <div class="step-emoji">⚡</div>
+    </div>
+    <div class="step-row">
+      <div class="step-num-wrap">2</div>
+      <div class="step-content">
+        <div class="step-title">Affichez le QR code</div>
+        <div class="step-desc">Sur les tables, le menu ou le ticket de caisse. Vos clients scannent après leur repas et donnent leur avis en 20 secondes.</div>
+      </div>
+      <div class="step-emoji">📱</div>
+    </div>
+    <div class="step-row">
+      <div class="step-num-wrap">3</div>
+      <div class="step-content">
+        <div class="step-title">Comprenez vos clients</div>
+        <div class="step-desc">Consultez les avis, les notes et les tendances depuis votre dashboard. Les clients satisfaits peuvent publier leur avis sur Google en un clic.</div>
+      </div>
+      <div class="step-emoji">🚀</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- PRICING -->
+<div class="pricing-section reveal">
+  <div class="section-label" style="text-align:center">Tarif</div>
+  <div class="section-title" style="text-align:center">Simple.<br>Tout inclus.</div>
+  <div class="pricing-card">
+    <div class="pricing-top">
+      <div style="font-size:13px;font-weight:700;color:var(--muted)">Plan Restaurant</div>
+      <div class="price-row">
+        <div class="price-currency">€</div>
+        <div class="price-amount">19</div>
+      </div>
+      <div class="price-period">par mois · sans engagement</div>
+      <div style="margin-top:16px">
+        <div class="price-trial">🎁 7 jours gratuits — sans carte</div>
+      </div>
+    </div>
+    <div class="pricing-features">
+      <div class="pf"><div class="pf-check">✓</div> Dashboard temps réel</div>
+      <div class="pf"><div class="pf-check">✓</div> Alertes mauvaises notes instantanées</div>
+      <div class="pf"><div class="pf-check">✓</div> Résumé généré automatiquement pour Google</div>
+      <div class="pf"><div class="pf-check">✓</div> Alerte immédiate pour chaque mauvaise note</div>
+      <div class="pf"><div class="pf-check">✓</div> Statistiques & répartition des notes</div>
+      <div class="pf"><div class="pf-check">✓</div> Avis illimités</div>
+    </div>
+    <div class="pricing-cta-wrap">
+      <a href="inscription.html" class="btn-full">Commencer l'essai gratuit →</a>
+      <div class="no-card">Aucune carte bancaire requise · Annulation en 1 clic</div>
+    </div>
+  </div>
+</div>
+
+<!-- FAQ -->
+<div class="faq-section reveal">
+  <div class="section-label">FAQ</div>
+  <div class="section-title" style="font-size:clamp(24px,3vw,36px)">Questions fréquentes</div>
+  <div class="faq-item">
+    <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
+      Comment fonctionne l'essai gratuit ?
+      <span class="faq-arrow">▼</span>
+    </div>
+    <div class="faq-a">7 jours d'accès complet à toutes les fonctionnalités, sans carte bancaire. À la fin de l'essai, le prélèvement de 19€/mois démarre automatiquement. Vous pouvez annuler à tout moment.</div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
+      Faut-il des compétences techniques ?
+      <span class="faq-arrow">▼</span>
+    </div>
+    <div class="faq-a">Aucune. Vous remplissez un formulaire en 2 minutes, vous obtenez votre QR code, vous l'affichez. C'est tout.</div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
+      Que se passe-t-il avec les mauvaises notes ?
+      <span class="faq-arrow">▼</span>
+    </div>
+    <div class="faq-a">Vous recevez une alerte immédiate. L'avis reste dans votre dashboard privé et vous pouvez agir rapidement. Le client peut toujours choisir de publier sur Google s'il le souhaite.</div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
+      Puis-je annuler à tout moment ?
+      <span class="faq-arrow">▼</span>
+    </div>
+    <div class="faq-a">Oui, sans condition et sans frais. Depuis votre dashboard ou en nous contactant sur Frizz.avis@gmail.com.</div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
+      Ça marche pour quel type de restaurant ?
+      <span class="faq-arrow">▼</span>
+    </div>
+    <div class="faq-a">Oui — restaurant, café, brasserie, bar, take-away. Si vous avez des clients, Frizz peut collecter leurs avis.</div>
+  </div>
+</div>
+
+<!-- CTA FINAL -->
+<div class="cta-final reveal">
+  <h2>Prêt à mieux<br><em>connaître vos clients ?</em></h2>
+  <p>Comprenez l'expérience de vos clients, agissez vite sur les insatisfactions et boostez votre réputation en ligne.</p>
+  <a href="inscription.html" class="btn-big">Commencer gratuitement →</a>
+  <div style="margin-top:14px;font-size:13px;color:var(--muted)">7 jours gratuits · Pas de carte · Annulation en 1 clic</div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Frizz ✦</div>
+  <div class="footer-text">© 2026 Frizz · Suisse · Frizz.avis@gmail.com</div>
+</footer>
 
 <script>
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzJO-jVJ7fHSWZEjvfJoRyFFRGtbxPNuROAk9UvQMj5sxQQGzrfH535La0clwn-k1kj/exec';
+// PARTICLES
+const particlesEl = document.getElementById('particles');
+for (let i = 0; i < 20; i++) {
+  const p = document.createElement('div');
+  p.className = 'particle';
+  p.style.left = Math.random() * 100 + '%';
+  p.style.bottom = Math.random() * 20 + '%';
+  p.style.animationDuration = (8 + Math.random() * 12) + 's';
+  p.style.animationDelay = (Math.random() * 10) + 's';
+  p.style.width = p.style.height = (2 + Math.random() * 4) + 'px';
+  p.style.opacity = 0;
+  particlesEl.appendChild(p);
+}
 
-  const params = new URLSearchParams(window.location.search);
-  const commerceId = params.get('id') || 'demo';
-  let googleUrl = params.get('google') || '#';
-  let commerceName = params.get('name') || 'Mon Commerce';
-  document.getElementById('commerceName').textContent = commerceName;
-
-  // Load commerce info from Sheet (logo, google link, name)
-  (async () => {
-    try {
-      const url = new URL(SCRIPT_URL);
-      url.searchParams.set('action', 'get_commerce_info');
-      url.searchParams.set('commerce_id', commerceId);
-      const res = await fetch(url.toString());
-      const json = await res.json();
-      if (json) {
-        if (json.logo_url) {
-          const avatarEl = document.getElementById('avatarEl');
-          avatarEl.innerHTML = '<img src="' + json.logo_url + '" style="width:100%;height:100%;object-fit:cover;border-radius:18px">';
-        }
-        if (json.nom && commerceName === 'Mon Commerce') {
-          commerceName = json.nom;
-          document.getElementById('commerceName').textContent = json.nom;
-        }
-        if (json.google) {
-          googleUrl = json.google;
-        }
-      }
-    } catch(e) {}
-  })();
-
-  let globalRating = 0;
-  let catRatings = { cuisine: 0, service: 0, prix: 0 };
-  let userComment = '';
-  let generatedText = '';
-
-  function selectGlobal(val) {
-    globalRating = val;
-    document.querySelectorAll('#starsGlobal .star-big').forEach((s, i) => {
-      s.classList.toggle('active', i < val);
-    });
-  }
-
-  function selectCat(cat, val, el) {
-    catRatings[cat] = val;
-    const container = document.getElementById('stars' + cat.charAt(0).toUpperCase() + cat.slice(1));
-    container.querySelectorAll('.cat-star').forEach((s, i) => {
-      s.classList.toggle('active', i < val);
-    });
-  }
-
-  function goToStep(step) {
-    if (step === 2 && !globalRating) return;
-    document.getElementById('step1').style.display = 'none';
-    document.getElementById('step2').style.display = 'block';
-    document.getElementById('progressFill').style.width = '100%';
-    document.getElementById('stepLabel').textContent = '2 / 2';
-  }
-
-  function generateSummary() {
-    const isGood = globalRating >= 4;
-    let parts = [];
-    if (isGood) {
-      parts.push(globalRating === 5 ? "Excellent restaurant !" : "Très bonne expérience !");
-    } else {
-      parts.push("Expérience mitigée.");
-    }
-    const catLabels = { cuisine: "cuisine", service: "service", prix: "rapport qualité/prix" };
-    const goodCats = Object.entries(catRatings).filter(([,v]) => v >= 4).map(([k]) => catLabels[k]);
-    const badCats = Object.entries(catRatings).filter(([,v]) => v > 0 && v <= 3).map(([k]) => catLabels[k]);
-    if (goodCats.length > 0) {
-      const list = goodCats.length === 1 ? goodCats[0] : goodCats.slice(0,-1).join(', ') + ' et ' + goodCats[goodCats.length-1];
-      parts.push("J'ai apprécié " + list + ".");
-    }
-    if (badCats.length > 0) {
-      const list = badCats.length === 1 ? badCats[0] : badCats.slice(0,-1).join(', ') + ' et ' + badCats[badCats.length-1];
-      parts.push("Le " + list + " pourrait être amélioré.");
-    }
-    const comment = document.getElementById('commentField').value.trim();
-    if (comment) parts.push(comment);
-    if (isGood) parts.push("Je recommande !");
-    return parts.join(' ');
-  }
-
-  async function submitFeedback() {
-    const btn = document.getElementById('submitBtn');
-    btn.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" style="animation:spin 0.8s linear infinite"><circle cx="12" cy="12" r="10" stroke="rgba(0,0,0,0.25)" stroke-width="3"/><path d="M12 2a10 10 0 0 1 10 10" stroke="#000" stroke-width="3" stroke-linecap="round"/></svg>';
-    btn.disabled = true;
-    userComment = document.getElementById('commentField').value;
-    generatedText = generateSummary();
-
-    // Sauvegarde locale pour le dashboard
-    const avisData = {
-      date: new Date().toISOString(),
-      note_globale: globalRating,
-      note_cuisine: catRatings.cuisine,
-      note_service: catRatings.service,
-      note_prix: catRatings.prix,
-      commentaire: userComment,
-      resume: generatedText,
-      avis_google: 'non ❌'
-    };
-    try {
-      const existing = JSON.parse(localStorage.getItem('avis_' + commerceId) || '[]');
-      existing.push(avisData);
-      localStorage.setItem('avis_' + commerceId, JSON.stringify(existing));
-    } catch(e) {}
-
-    const url = new URL(SCRIPT_URL);
-    url.searchParams.set('note_globale', globalRating);
-    url.searchParams.set('note_cuisine', catRatings.cuisine);
-    url.searchParams.set('note_service', catRatings.service);
-    url.searchParams.set('note_prix', catRatings.prix);
-    url.searchParams.set('commentaire', userComment);
-    url.searchParams.set('resume', generatedText);
-    url.searchParams.set('commerce_id', commerceId);
-
-    try { await fetch(url.toString(), { method: 'GET', mode: 'no-cors' }); } catch(e) {}
-
-    document.getElementById('formView').style.display = 'none';
-    if (globalRating >= 4) {
-      document.getElementById('successGood').classList.add('visible');
-    } else {
-      document.getElementById('successBad').classList.add('visible');
-    }
-  }
-
-  function copyAndOpenGoogle() {
-    const url = new URL(SCRIPT_URL);
-    url.searchParams.set('type', 'google_click');
-    url.searchParams.set('commerce_id', commerceId);
-    url.searchParams.set('note', globalRating);
-    url.searchParams.set('resume', generatedText);
-    try { fetch(url.toString(), { method: 'GET', mode: 'no-cors' }); } catch(e) {}
-    if (generatedText) navigator.clipboard.writeText(generatedText).then(() => showToast()).catch(() => {});
-    if (googleUrl !== '#') setTimeout(() => window.open(googleUrl, '_blank'), 400);
-  }
-
-  function showPrivateForm() {
-    document.getElementById('successGood').classList.remove('visible');
-    document.getElementById('successBad').classList.remove('visible');
-    document.getElementById('privateSent').classList.add('visible');
-    const url = new URL(SCRIPT_URL);
-    url.searchParams.set('type', 'avis_prive');
-    url.searchParams.set('note', globalRating);
-    url.searchParams.set('resume', generatedText);
-    url.searchParams.set('commentaire', userComment);
-    url.searchParams.set('commerce_id', commerceId);
-    try { fetch(url.toString(), { method: 'GET', mode: 'no-cors' }); } catch(e) {}
-  }
-
-  function showToast() {
-    const t = document.getElementById('toast');
-    t.style.opacity = '1';
-    t.style.transform = 'translateX(-50%) translateY(0)';
-    setTimeout(() => {
-      t.style.opacity = '0';
-      t.style.transform = 'translateX(-50%) translateY(20px)';
-    }, 3000);
-  }
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.08 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 </script>
 </body>
 </html>
