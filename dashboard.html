@@ -267,7 +267,10 @@ html, body { background: var(--bg); font-family: 'Figtree', sans-serif; color: v
       <div class="commerce-name" id="headerName">—</div>
       <div class="live-badge"><div class="live-dot"></div> En direct</div>
     </div>
-    <button class="refresh-btn" onclick="loadData()">⟳ Actualiser</button>
+    <div style="display:flex;gap:8px">
+      <button class="refresh-btn" onclick="loadData()">⟳ Actualiser</button>
+      <button class="refresh-btn" onclick="logout()" style="color:var(--danger);border-color:rgba(255,75,75,0.2)">⎋ Déconnexion</button>
+    </div>
   </div>
 
   <!-- STATS -->
@@ -905,6 +908,12 @@ function closeAlert() {
 // ============================================================
 // UI
 // ============================================================
+function logout() {
+  if (confirm('Voulez-vous vous déconnecter ?')) {
+    window.location.href = 'inscription.html';
+  }
+}
+
 function toggleSection(header) {
   header.parentElement.classList.toggle('collapsed');
 }
