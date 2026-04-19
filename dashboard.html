@@ -454,7 +454,7 @@ html, body { background: var(--bg); font-family: 'Figtree', sans-serif; color: v
 // ============================================================
 // CONFIG — À MODIFIER
 // ============================================================
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzJO-jVJ7fHSWZEjvfJoRyFFRGtbxPNuROAk9UvQMj5sxQQGzrfH535La0clwn-k1kj/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwj7RToCQWdr9EDw1lXBKeSKwhkXcTKPRdURQkdPEQ0vHQiVi32AbXj-lcUs3tuZ9jX/exec';
 const BASE_URL = 'https://emcl22a-creator.github.io/frizz-client/';
 
 // ============================================================
@@ -739,6 +739,14 @@ function saveGoogleLink() {
   ok.style.display = 'block';
   setTimeout(() => ok.style.display = 'none', 2500);
   generateQR();
+  // Save to Sheet
+  try {
+    const url = new URL(SCRIPT_URL);
+    url.searchParams.set('action', 'save_google');
+    url.searchParams.set('commerce_id', commerceId);
+    url.searchParams.set('google_url', val);
+    fetch(url.toString(), { method: 'GET', mode: 'no-cors' });
+  } catch(e) {}
 }
 
 // ============================================================
@@ -770,7 +778,7 @@ function toggleNotif(btn) {
 function generateQR() {
   const googleLink = localStorage.getItem('google_link_' + commerceId) || '';
   const clientUrl = `${BASE_URL}?id=${commerceId}&name=${encodeURIComponent(commerceName)}&google=${encodeURIComponent(googleLink)}`;
-  const shortUrl = `${BASE_URL}landing.html`;
+  const shortUrl = `${BASE_URL}?id=${commerceId}`;
   document.getElementById('qrUrl').textContent = shortUrl;
 
   const qrEl = document.getElementById('qrcode');
