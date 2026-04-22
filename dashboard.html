@@ -103,14 +103,7 @@ html, body { background: var(--bg); font-family: var(--font); color: var(--text)
   transition: transform 0.2s;
   position: relative; overflow: hidden;
 }
-.stat-card::after {
-  content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px;
-  border-radius: 0 0 var(--radius) var(--radius);
-}
-.stat-card.green::after { background: var(--accent); }
-.stat-card.red::after { background: var(--danger); }
-.stat-card.blue::after { background: var(--blue); }
-.stat-card.orange::after { background: var(--warning); }
+
 .stat-card:hover { transform: translateY(-2px); }
 .stat-label { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 10px; }
 .stat-value { font-size: 28px; font-weight: 900; letter-spacing: -1px; line-height: 1; margin-bottom: 6px; }
@@ -127,8 +120,9 @@ html, body { background: var(--bg); font-family: var(--font); color: var(--text)
 /* ===== DESKTOP GRID ===== */
 @media(min-width:900px) {
   .stats-grid { grid-template-columns: repeat(4,1fr); }
-  .desktop-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start; }
+  .desktop-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; align-items: start; }
   .desktop-col-full { grid-column: 1 / -1; }
+  .desktop-col-2 { grid-column: span 2; }
 }
 
 /* ===== CARD / SECTION ===== */
@@ -877,7 +871,7 @@ async function generateAISummary() {
     return;
   }
   var avisText = recentAvis.map(function(a,i){return 'Avis '+(i+1)+': Note '+a.note_globale+'/5, Cuisine '+a.note_cuisine+'/5, Service '+a.note_service+'/5, Prix '+a.note_prix+'/5'+(a.commentaire?', Commentaire: "'+a.commentaire+'"':'');}).join('\n');
-  var prompt = 'Tu es un consultant en restauration. Voici les '+recentAvis.length+' avis clients de cette semaine:\n\n'+avisText+'\n\nFais:\n1. Un resume court et honnete (2-3 phrases)\n2. 3 recommandations concretes (commence chaque ligne par un emoji)\n\nReponds en francais.';
+  var prompt = 'Tu es un assistant pour aider les restaurateurs a comprendre leurs clients. Voici les '+recentAvis.length+' avis de cette semaine:\n\n'+avisText+'\n\nEcris en francais simple et direct, comme si tu parlais a un ami cuisinier.\n\nFais:\n1. Un bilan de la semaine en 2-3 phrases simples (ce qui va bien, ce qui va moins bien)\n2. 3 conseils pratiques et concrets pour la semaine prochaine (commence chaque conseil par un emoji)\n\nPas de jargon, pas de formules complexes. Du concret.';
   try {
     var response = await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-5',max_tokens:1000,messages:[{role:'user',content:prompt}]})});
     var data = await response.json();
