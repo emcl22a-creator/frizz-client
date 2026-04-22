@@ -26,8 +26,8 @@
   --danger-dim: rgba(255,59,48,0.1);
   --warning: #FF9500;
   --warning-dim: rgba(255,149,0,0.1);
-  --blue: #007AFF;
-  --blue-dim: rgba(0,122,255,0.1);
+  --blue: #FFFFFF;
+  --blue-dim: rgba(255,255,255,0.08);
   --font: 'Plus Jakarta Sans', sans-serif;
   --radius-sm: 12px;
   --radius: 18px;
@@ -120,7 +120,7 @@ html, body { background: var(--bg); font-family: var(--font); color: var(--text)
 /* ===== DESKTOP GRID ===== */
 @media(min-width:900px) {
   .stats-grid { grid-template-columns: repeat(4,1fr); }
-  .desktop-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; align-items: start; }
+  .desktop-grid { display: grid !important; grid-template-columns: 1fr 1fr 1fr !important; gap: 16px; align-items: start; }
   .desktop-col-full { grid-column: 1 / -1; }
   .desktop-col-2 { grid-column: span 2; }
 }
@@ -393,7 +393,7 @@ html, body { background: var(--bg); font-family: var(--font); color: var(--text)
 
   <!-- HEADER -->
   <div class="header">
-    <div class="header-logo">F</div>
+    <div style="font-size:18px;font-weight:900;color:var(--accent);letter-spacing:-0.5px">Frizz ✦</div>
     <div class="header-name" id="headerName" onclick="editName(this)">Mon Commerce</div>
     <div class="live-pill"><div class="live-dot"></div><span class="header-label">En direct</span></div>
     <div class="header-btns">
@@ -431,7 +431,7 @@ html, body { background: var(--bg); font-family: var(--font); color: var(--text)
     </div>
   </div>
 
-  <div class="desktop-grid">
+  <div class="desktop-grid" style="display:block">
 
   <!-- AI SUMMARY -->
   <div class="card ai-card">
@@ -445,7 +445,6 @@ html, body { background: var(--bg); font-family: var(--font); color: var(--text)
     <div class="card-body">
       <div id="aiContent">
         <div class="ai-empty">
-          <div class="ai-empty-icon">🤖</div>
           <div class="ai-empty-text">Analysez vos avis de la semaine avec l'IA</div>
         </div>
         <button class="ai-generate-btn" id="aiBtn" onclick="generateAISummary()">
@@ -459,7 +458,7 @@ html, body { background: var(--bg); font-family: var(--font); color: var(--text)
         </div>
         <div class="ai-summary" id="aiText"></div>
         <div id="aiRecos"></div>
-        <button class="ai-regen" onclick="generateAISummary()">↻ Regénérer l'analyse</button>
+
       </div>
     </div>
   </div>
