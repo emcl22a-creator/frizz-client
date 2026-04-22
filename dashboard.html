@@ -6,6 +6,7 @@
 <title>Frizz — Dashboard Gérant</title>
 <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 :root {
@@ -15,357 +16,343 @@
   --danger: #FF4B4B; --danger-dim: rgba(255,75,75,0.12);
   --warning: #FFC800; --radius: 20px;
 }
+
+/* AI GLOW ANIMATION */
+@keyframes aiPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(88,204,2,0); border-color: rgba(88,204,2,0.2); }
+  50% { box-shadow: 0 0 24px 4px rgba(88,204,2,0.15); border-color: rgba(88,204,2,0.5); }
+}
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+.ai-section-unique {
+  animation: aiPulse 3s ease infinite;
+  position: relative;
+  overflow: hidden;
+}
+
+.ai-unique-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: linear-gradient(135deg, rgba(88,204,2,0.15), rgba(88,204,2,0.05));
+  border: 1px solid rgba(88,204,2,0.3);
+  border-radius: 99px;
+  padding: 3px 10px;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
 html, body { background: var(--bg); font-family: 'Figtree', sans-serif; color: var(--text); min-height: 100vh; }
 
-/* LOADER */
-#loader { position: fixed; inset: 0; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 999; gap: 16px; transition: opacity 0.4s; }
-#loader .logo { font-size: 28px; font-weight: 900; color: var(--accent); }
-.spinner { width: 32px; height: 32px; border: 3px solid var(--surface2); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
+/* LOADING */
+#loading { position: fixed; inset: 0; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 999; gap: 16px; }
+.loading-logo { font-size: 28px; font-weight: 900; color: var(--accent); }
+.spinner { width: 32px; height: 32px; border: 3px solid rgba(88,204,2,0.2); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* CGU MODAL */
-#cguModal { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 200; display: flex; align-items: center; justify-content: center; padding: 16px; backdrop-filter: blur(8px); }
-.cgu-box { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); width: 100%; max-width: 520px; max-height: 90vh; overflow-y: auto; }
-.cgu-header { padding: 24px 24px 0; text-align: center; }
-.cgu-header .logo { font-size: 22px; font-weight: 900; color: var(--accent); margin-bottom: 12px; }
-.cgu-header h2 { font-size: 20px; font-weight: 900; margin-bottom: 6px; }
-.cgu-header p { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
-.cgu-body { padding: 20px 24px; }
-.cgu-section { margin-bottom: 16px; }
-.cgu-section h3 { font-size: 13px; font-weight: 800; color: var(--accent); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
-.cgu-section p { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
-.cgu-divider { height: 1px; background: var(--border); margin: 16px 0; }
-.cgu-dl { display: flex; align-items: center; gap: 10px; background: var(--surface2); border-radius: 12px; padding: 12px 16px; margin-bottom: 20px; cursor: pointer; border: 1px solid var(--border); transition: border-color 0.2s; }
-.cgu-dl:hover { border-color: var(--accent); }
-.cgu-dl-icon { font-size: 22px; }
-.cgu-dl-text { flex: 1; }
-.cgu-dl-text .t1 { font-size: 13px; font-weight: 700; }
-.cgu-dl-text .t2 { font-size: 11px; color: var(--text-muted); }
-.cgu-footer { padding: 0 24px 24px; }
-.cgu-check { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 16px; cursor: pointer; }
-.cgu-check input { width: 18px; height: 18px; accent-color: var(--accent); margin-top: 2px; cursor: pointer; }
-.cgu-check label { font-size: 13px; color: var(--text-muted); line-height: 1.5; cursor: pointer; }
-.cgu-check label span { color: var(--text); font-weight: 600; }
-.btn-accept { width: 100%; padding: 16px; background: var(--accent); border: none; border-radius: 14px; font-family: inherit; font-size: 15px; font-weight: 800; color: #000; cursor: pointer; transition: all 0.2s; opacity: 0.4; pointer-events: none; }
-.btn-accept.ready { opacity: 1; pointer-events: all; }
-.btn-accept.ready:hover { background: #65e002; transform: translateY(-1px); }
-
-/* ALERT BANNER */
-#alertBanner { display: none; position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: var(--danger); padding: 14px 24px; text-align: center; font-weight: 800; font-size: 14px; color: white; animation: slideDown 0.4s ease; }
-@keyframes slideDown { from { transform: translateY(-100%); } to { transform: translateY(0); } }
-#alertBanner .close-alert { position: absolute; right: 20px; top: 50%; transform: translateY(-50%); background: none; border: none; color: white; font-size: 20px; cursor: pointer; }
-
-/* LAYOUT */
-.wrap { max-width: 900px; margin: 0 auto; padding: 28px 16px 60px; }
+/* MAIN */
+#app { display: none; max-width: 600px; margin: 0 auto; padding: 0 16px 80px; }
 
 /* HEADER */
-.header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; flex-wrap: wrap; gap: 12px; }
-.header-left { display: flex; align-items: center; gap: 12px; }
-.logo { font-size: 20px; font-weight: 900; color: var(--accent); }
-.commerce-name { font-size: 17px; font-weight: 800; }
-.live-badge { display: flex; align-items: center; gap: 6px; background: var(--accent-dim); border: 1px solid rgba(88,204,2,0.2); border-radius: 99px; padding: 5px 12px; font-size: 11px; font-weight: 700; color: var(--accent); }
-.live-dot { width: 7px; height: 7px; background: var(--accent); border-radius: 50%; animation: pulse 1.5s ease infinite; }
-@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(0.8)} }
-.refresh-btn { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 7px 14px; font-family: inherit; font-size: 12px; font-weight: 700; color: var(--text-muted); cursor: pointer; transition: all 0.2s; }
-.refresh-btn:hover { color: var(--accent); border-color: var(--accent); }
+.header { display: flex; align-items: center; gap: 10px; padding: 16px 0 20px; position: sticky; top: 0; background: var(--bg); z-index: 10; border-bottom: 1px solid var(--border); margin-bottom: 20px; }
+.header-logo { font-size: 18px; font-weight: 900; color: var(--accent); }
+.header-name { font-size: 15px; font-weight: 700; flex: 1; }
+.live-dot { width: 7px; height: 7px; background: var(--accent); border-radius: 50%; animation: blink 1.4s ease infinite; }
+.live-badge { display: flex; align-items: center; gap: 5px; background: var(--accent-dim); border: 1px solid rgba(88,204,2,0.2); border-radius: 99px; padding: 4px 10px; font-size: 11px; font-weight: 700; color: var(--accent); }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+.header-actions { display: flex; gap: 8px; }
+.btn-header { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 7px 12px; font-family: inherit; font-size: 12px; font-weight: 700; color: var(--text-muted); cursor: pointer; }
+.btn-header.danger { color: var(--danger); border-color: var(--danger-dim); }
 
 /* STATS */
-.stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; }
-@media(max-width:600px){ .stats-row { grid-template-columns: repeat(2,1fr); } }
-.stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 18px 16px; }
-.stat-label { font-size: 11px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
-.stat-value { font-size: 28px; font-weight: 900; line-height: 1; }
-.stat-value.green { color: var(--accent); }
-.stat-value.red { color: var(--danger); }
-.stat-sub { font-size: 11px; color: var(--text-muted); margin-top: 4px; font-weight: 500; }
-
-/* CHART */
-.chart-row { display: flex; align-items: flex-end; gap: 6px; height: 70px; margin-top: 12px; }
-.bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; height: 100%; justify-content: flex-end; }
-.bar { width: 100%; background: var(--accent-dim); border: 1px solid rgba(88,204,2,0.25); border-radius: 4px 4px 0 0; transition: height 0.6s cubic-bezier(0.34,1.56,0.64,1); min-height: 4px; }
-.bar.danger { background: var(--danger-dim); border-color: rgba(255,75,75,0.3); }
-.bar-label { font-size: 10px; color: var(--text-muted); font-weight: 700; }
-.bar-count { font-size: 10px; color: var(--text); font-weight: 800; }
+.stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 16px; }
+.stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 14px 12px; }
+.stat-label { font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+.stat-value { font-size: 22px; font-weight: 900; letter-spacing: -1px; line-height: 1; }
+.stat-sub { font-size: 10px; color: var(--text-muted); margin-top: 4px; }
+.stat-bar { height: 3px; border-radius: 99px; margin-top: 8px; background: var(--surface2); overflow: hidden; }
+.stat-bar-fill { height: 100%; border-radius: 99px; background: var(--accent); }
+.stat-bar-fill.danger { background: var(--danger); }
 
 /* SECTION */
-.section { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 14px; overflow: hidden; }
+.section { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 10px; overflow: hidden; }
 .section-header { padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; user-select: none; }
 .section-title { font-size: 14px; font-weight: 800; display: flex; align-items: center; gap: 8px; }
-.chevron { transition: transform 0.3s; font-size: 11px; color: var(--text-muted); }
+.chevron { font-size: 10px; color: var(--text-muted); transition: transform 0.2s; }
 .section.collapsed .chevron { transform: rotate(-90deg); }
+.section-body { padding: 0 20px 20px; }
 .section.collapsed .section-body { display: none; }
-.section-body { padding: 20px; border-top: 1px solid var(--border); }
 
-/* AVIS */
-.avis-item { background: var(--surface2); border-radius: 14px; padding: 14px; margin-bottom: 10px; position: relative; }
-.avis-item:last-child { margin-bottom: 0; }
-.avis-item.bad { border-left: 3px solid var(--danger); }
-.avis-item.good { border-left: 3px solid var(--accent); }
-.avis-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
-.avis-stars { font-size: 13px; }
-.avis-date { font-size: 11px; color: var(--text-muted); font-weight: 600; }
-.avis-cats { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
-.avis-cat { font-size: 11px; background: var(--surface3); border-radius: 6px; padding: 2px 7px; color: var(--text-muted); font-weight: 600; }
-.avis-comment { font-size: 13px; color: rgba(255,255,255,0.7); line-height: 1.5; font-style: italic; }
-.avis-resume { font-size: 11px; color: var(--text-muted); margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--border); }
-.avis-google-tag { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 700; color: var(--accent); background: var(--accent-dim); border-radius: 5px; padding: 2px 7px; margin-top: 5px; }
-.new-badge { position: absolute; top: 10px; right: 10px; background: var(--danger); color: white; font-size: 10px; font-weight: 800; border-radius: 5px; padding: 2px 6px; animation: blink 1s ease infinite; }
-@keyframes blink { 0%,100%{opacity:1}50%{opacity:0.3} }
-.empty { text-align: center; padding: 32px; color: var(--text-muted); font-size: 14px; }
-.load-more { width: 100%; margin-top: 12px; background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 10px; font-family: inherit; font-size: 13px; font-weight: 700; color: var(--text-muted); cursor: pointer; transition: all 0.2s; }
-.load-more:hover { color: var(--accent); border-color: var(--accent); }
-
-/* GOOGLE LINK */
-.input-group { display: flex; gap: 10px; }
-.input-field { flex: 1; background: var(--surface2); border: 1.5px solid var(--border); border-radius: 12px; padding: 12px 16px; font-family: inherit; font-size: 13px; color: var(--text); outline: none; transition: border-color 0.2s; }
+/* INPUTS */
+.input-field { width: 100%; background: var(--surface2); border: 1.5px solid var(--border); border-radius: 12px; padding: 12px 14px; font-family: inherit; font-size: 14px; color: var(--text); outline: none; }
 .input-field:focus { border-color: var(--accent); }
 .input-field::placeholder { color: var(--text-muted); }
-.btn-save { background: var(--accent); border: none; border-radius: 12px; padding: 12px 20px; font-family: inherit; font-size: 13px; font-weight: 800; color: #000; cursor: pointer; white-space: nowrap; transition: all 0.2s; }
-.btn-save:hover { background: #65e002; }
-.field-hint { font-size: 12px; color: var(--text-muted); margin-top: 8px; }
-.saved-ok { font-size: 12px; color: var(--accent); font-weight: 700; margin-top: 8px; display: none; }
+.btn-save { background: var(--accent); border: none; border-radius: 12px; padding: 12px 20px; font-family: inherit; font-size: 14px; font-weight: 700; color: #000; cursor: pointer; white-space: nowrap; }
+.hint { font-size: 11px; color: var(--text-muted); margin-top: 6px; line-height: 1.5; }
+.saved-ok { font-size: 12px; color: var(--accent); font-weight: 700; margin-top: 6px; display: none; }
 
-/* EMAIL */
-.notif-row { display: flex; align-items: center; justify-content: space-between; padding: 14px 0; border-bottom: 1px solid var(--border); }
+/* NOTIF TOGGLE */
+.notif-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border); }
 .notif-row:last-child { border-bottom: none; }
-.notif-label { font-size: 14px; font-weight: 700; }
-.notif-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
-.toggle { width: 44px; height: 24px; background: var(--surface3); border-radius: 99px; position: relative; cursor: pointer; transition: background 0.2s; border: none; flex-shrink: 0; }
-.toggle.on { background: var(--accent); }
-.toggle::after { content:''; position:absolute; width:18px; height:18px; background:white; border-radius:50%; top:3px; left:3px; transition:transform 0.2s; }
-.toggle.on::after { transform: translateX(20px); }
+.notif-label { font-size: 13px; font-weight: 600; }
+.notif-sub { font-size: 11px; color: var(--text-muted); }
+.toggle { width: 44px; height: 26px; background: var(--surface2); border: 1.5px solid var(--border); border-radius: 99px; cursor: pointer; position: relative; transition: all 0.2s; flex-shrink: 0; }
+.toggle.on { background: var(--accent); border-color: var(--accent); }
+.toggle::after { content: ''; position: absolute; width: 18px; height: 18px; background: var(--text-muted); border-radius: 50%; top: 50%; left: 3px; transform: translateY(-50%); transition: all 0.2s; }
+.toggle.on::after { background: #000; left: calc(100% - 21px); }
 
 /* QR */
-.qr-wrap { display: flex; flex-direction: column; align-items: center; gap: 16px; }
-#qrcode { display: none; } #qrCanvas { border-radius: 16px; }
-.qr-url { font-size: 11px; color: var(--text-muted); word-break: break-all; text-align: center; max-width: 300px; }
-.btn-dl { background: var(--surface2); border: 1.5px solid var(--border); border-radius: 12px; padding: 10px 24px; font-family: inherit; font-size: 13px; font-weight: 700; color: var(--text); cursor: pointer; transition: all 0.2s; }
-.btn-dl:hover { border-color: var(--accent); color: var(--accent); }
+.qr-wrap { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+#qrcode { background: white; padding: 14px; border-radius: 14px; display: inline-block; }
+.qr-url { font-size: 11px; color: var(--text-muted); max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.btn-dl { background: var(--surface2); border: 1.5px solid var(--border); border-radius: 12px; padding: 10px 20px; font-family: inherit; font-size: 13px; font-weight: 700; color: var(--text); cursor: pointer; }
 
-.last-refresh { font-size: 11px; color: var(--text-muted); text-align: right; margin-top: 8px; }
+/* AVIS */
+.avis-item { background: var(--surface2); border-radius: 14px; padding: 14px; margin-bottom: 8px; cursor: pointer; transition: border-color 0.2s; border: 1px solid transparent; }
+.avis-item:hover { border-color: var(--border); }
+.avis-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.avis-stars { font-size: 13px; }
+.avis-date { font-size: 11px; color: var(--text-muted); }
+.avis-cats { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+.avis-cat { font-size: 11px; background: var(--surface3); border-radius: 6px; padding: 2px 8px; color: var(--text-muted); }
+.avis-comment { font-size: 13px; color: var(--text-muted); margin-top: 8px; line-height: 1.5; font-style: italic; }
+.avis-detail { display: none; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); }
+.avis-google-tag { font-size: 11px; color: var(--accent); font-weight: 700; margin-top: 6px; }
+.badge { background: var(--accent-dim); color: var(--accent); border-radius: 6px; padding: 2px 8px; font-size: 11px; }
+
+/* CHART */
+.chart-period-btns { display: flex; gap: 8px; margin-bottom: 16px; }
+.period-btn { padding: 6px 14px; border: 1px solid var(--border); border-radius: 8px; font-family: inherit; font-size: 12px; font-weight: 700; cursor: pointer; background: var(--surface2); color: var(--text-muted); }
+.period-btn.active { background: var(--accent); color: #000; border-color: var(--accent); }
+.chart-legend { display: flex; gap: 16px; margin-top: 10px; flex-wrap: wrap; }
+.legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text-muted); }
+.legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+/* BAR CHART */
+.bar-chart { display: flex; align-items: flex-end; gap: 8px; height: 80px; padding: 0 4px; }
+.bar-wrap { display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; }
+.bar { width: 100%; border-radius: 6px 6px 0 0; background: var(--accent); min-height: 4px; transition: height 0.3s; }
+.bar.danger { background: var(--danger); }
+.bar-count { font-size: 11px; font-weight: 700; color: var(--text-muted); }
+.bar-label { font-size: 10px; }
+
+/* AI SECTION */
+.ai-btn { width: 100%; padding: 14px; background: var(--accent); border: none; border-radius: 12px; font-family: inherit; font-size: 14px; font-weight: 700; color: #000; cursor: pointer; }
+.ai-result { background: var(--surface2); border-radius: 12px; padding: 14px; font-size: 13px; line-height: 1.7; color: var(--text-muted); margin: 12px 0; white-space: pre-wrap; }
+.ai-reco { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px; font-size: 13px; line-height: 1.5; margin-bottom: 8px; }
+
+/* LOGO */
+.logo-preview { width: 64px; height: 64px; background: var(--surface2); border: 1.5px solid var(--border); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 28px; overflow: hidden; flex-shrink: 0; }
+
 /* SUBSCRIPTION */
-.sub-banner { border-radius: 16px; padding: 16px 20px; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.sub-banner { border-radius: 14px; padding: 14px 16px; margin-bottom: 16px; display: flex; align-items: center; gap: 12px; }
 .sub-banner.trial { background: var(--accent-dim); border: 1px solid rgba(88,204,2,0.2); }
-.sub-banner.active { background: var(--accent-dim); border: 1px solid rgba(88,204,2,0.2); }
-.sub-banner.expired { background: var(--danger-dim); border: 1px solid rgba(255,75,75,0.3); }
-.sub-banner-left { display: flex; align-items: center; gap: 10px; }
-.sub-banner-icon { font-size: 22px; }
-.sub-banner-title { font-size: 14px; font-weight: 800; }
+.sub-banner.active { background: rgba(88,204,2,0.08); border: 1px solid rgba(88,204,2,0.15); }
+.sub-banner.expired { background: var(--danger-dim); border: 1px solid rgba(255,75,75,0.2); }
+.sub-banner-icon { font-size: 22px; flex-shrink: 0; }
+.sub-banner-title { font-size: 14px; font-weight: 800; color: var(--accent); }
 .sub-banner-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
-.sub-banner-sub.red { color: var(--danger); }
-.btn-subscribe { background: var(--accent); border: none; border-radius: 12px; padding: 10px 20px; font-family: inherit; font-size: 13px; font-weight: 800; color: #000; cursor: pointer; white-space: nowrap; text-decoration: none; display: inline-block; transition: all 0.2s; }
-.btn-subscribe:hover { background: #65e002; transform: translateY(-1px); }
-.btn-manage { background: var(--surface2); border: 1.5px solid var(--border); border-radius: 12px; padding: 10px 20px; font-family: inherit; font-size: 13px; font-weight: 700; color: var(--text-muted); cursor: pointer; white-space: nowrap; text-decoration: none; display: inline-block; transition: all 0.2s; }
-.btn-manage:hover { border-color: var(--accent); color: var(--accent); }
+.btn-subscribe { display: block; width: 100%; padding: 16px; background: var(--accent); border: none; border-radius: 14px; font-family: inherit; font-size: 15px; font-weight: 800; color: #000; cursor: pointer; text-decoration: none; text-align: center; margin-bottom: 8px; }
+.btn-cancel { width: 100%; padding: 10px; background: none; border: 1.5px solid var(--danger-dim); border-radius: 12px; font-family: inherit; font-size: 13px; font-weight: 700; color: var(--danger); cursor: pointer; }
 
 /* PAYWALL */
-#paywall { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 500; flex-direction: column; align-items: center; justify-content: center; padding: 24px; text-align: center; }
-#paywall.visible { display: flex; }
-.paywall-box { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 40px 32px; max-width: 420px; width: 100%; }
-.paywall-icon { font-size: 48px; margin-bottom: 16px; }
-.paywall-title { font-size: 24px; font-weight: 900; margin-bottom: 8px; }
-.paywall-sub { font-size: 14px; color: var(--text-muted); line-height: 1.6; margin-bottom: 24px; }
-.paywall-price { font-size: 36px; font-weight: 900; color: var(--accent); margin-bottom: 4px; }
-.paywall-period { font-size: 13px; color: var(--text-muted); margin-bottom: 24px; }
+#paywall { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 100; align-items: center; justify-content: center; padding: 24px; }
+.paywall-box { background: var(--surface); border: 1px solid var(--border); border-radius: 24px; padding: 32px 24px; max-width: 400px; width: 100%; text-align: center; }
 
+/* ALERT */
+#alertBanner { display: none; position: fixed; top: 16px; left: 50%; transform: translateX(-50%); background: var(--danger); color: #fff; border-radius: 12px; padding: 10px 20px; font-size: 13px; font-weight: 700; z-index: 200; white-space: nowrap; }
+
+/* CGU MODAL */
+#cguModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 300; align-items: center; justify-content: center; padding: 16px; }
+#cguModal.visible { display: flex; }
+.cgu-box { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; width: 100%; max-width: 480px; padding: 28px 24px; }
+
+/* REFRESH */
+.last-refresh { font-size: 10px; color: var(--text-muted); text-align: right; margin-bottom: 12px; }
+.refresh-btn { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 5px 10px; font-family: inherit; font-size: 11px; font-weight: 700; color: var(--text-muted); cursor: pointer; }
+
+/* EMPTY */
+.empty-state { text-align: center; padding: 24px; color: var(--text-muted); font-size: 13px; }
+
+/* FOOTER */
+.footer { text-align: center; font-size: 12px; color: rgba(255,255,255,0.15); margin-top: 32px; }
+.footer a { color: var(--accent); opacity: 0.5; text-decoration: none; }
+
+@media(max-width:400px) {
+  .stats-grid { grid-template-columns: repeat(2,1fr); }
+  .header-actions { gap: 4px; }
+  .btn-header { padding: 7px 8px; }
+}
 </style>
 </head>
 <body>
 
-<!-- LOADER -->
-<div id="loader">
-  <div class="logo">Frizz</div>
+<div id="loading">
+  <div class="loading-logo">Frizz ✦</div>
   <div class="spinner"></div>
 </div>
 
-<!-- CGU MODAL -->
-<div id="cguModal" style="display:none">
-  <div class="cgu-box">
-    <div class="cgu-header">
-      <div class="logo">Frizz ✦</div>
-      <h2>Conditions d'utilisation</h2>
-      <p>Bienvenue sur votre dashboard Frizz. Merci de lire et accepter ces conditions avant de continuer.</p>
-    </div>
-    <div class="cgu-body">
-      <div class="cgu-section">
-        <h3>🎯 Ce que Frizz fait pour vous</h3>
-        <p>Frizz collecte les avis clients de votre établissement via une page dédiée et les centralise dans votre tableau de bord. Vous pouvez consulter vos avis, vos statistiques et gérer votre lien Google en toute autonomie.</p>
-      </div>
-      <div class="cgu-divider"></div>
-      <div class="cgu-section">
-        <h3>📋 Vos obligations</h3>
-        <p>En utilisant Frizz, vous vous engagez à ne pas manipuler les avis clients, à ne pas utiliser le service pour des pratiques trompeuses, et à respecter la vie privée de vos clients. Vous êtes responsable du contenu affiché sur votre page.</p>
-      </div>
-      <div class="cgu-divider"></div>
-      <div class="cgu-section">
-        <h3>🔒 Données & confidentialité</h3>
-        <p>Les avis collectés sont stockés dans votre Google Sheet personnel. Frizz n'accède pas à vos données. Conformément au RGPD, vos clients peuvent demander la suppression de leurs données à tout moment.</p>
-      </div>
-      <div class="cgu-divider"></div>
-      <div class="cgu-section">
-        <h3>💳 Abonnement & résiliation</h3>
-        <p>Le service est facturé mensuellement. Vous pouvez résilier à tout moment depuis votre espace client. En cas de non-paiement, l'accès au dashboard sera suspendu après 7 jours de délai.</p>
-      </div>
-      <div class="cgu-divider"></div>
-      <div class="cgu-section">
-        <h3>⚖️ Responsabilité</h3>
-        <p>Frizz est un outil de collecte d'avis. Nous ne sommes pas responsables de l'impact des avis sur votre activité, ni des contenus rédigés par vos clients. En cas de litige, le droit suisse est applicable.</p>
-      </div>
-    </div>
+<div id="alertBanner"></div>
 
-    <!-- PDF download -->
-    <div style="padding: 0 24px 8px">
-      <div class="cgu-dl" onclick="downloadCGU()">
-        <div class="cgu-dl-icon">📄</div>
-        <div class="cgu-dl-text">
-          <div class="t1">Télécharger les CGU complètes (PDF)</div>
-          <div class="t2">Version juridique — Frizz SAS — v1.0 — Avril 2026</div>
-        </div>
-        <span style="color:var(--text-muted);font-size:18px">↓</span>
-      </div>
-    </div>
-
-    <div class="cgu-footer">
-      <label class="cgu-check">
-        <input type="checkbox" id="cguCheck" onchange="toggleAccept()">
-        <label for="cguCheck">J'ai lu et j'accepte les <span>Conditions Générales d'Utilisation</span> de Frizz, ainsi que la <span>Politique de Confidentialité</span>.</label>
-      </label>
-      <button class="btn-accept" id="btnAccept" onclick="acceptCGU()">Accéder à mon dashboard →</button>
-    </div>
-  </div>
-</div>
-
-<!-- ALERT MAUVAISE NOTE -->
-<div id="alertBanner">
-  <span id="alertMsg">⚠️ Nouvelle mauvaise note reçue !</span>
-  <button class="close-alert" onclick="closeAlert()">✕</button>
-</div>
-
-<!-- DASHBOARD -->
-<div class="wrap" id="mainContent" style="display:none">
-
-
-  <!-- SUBSCRIPTION BANNER -->
-  <div id="subBanner"></div>
-
-  <!-- PAYWALL -->
-  <div id="paywall">
-    <div class="paywall-box">
-      <div class="paywall-icon">⏰</div>
-      <div class="paywall-title">Votre essai gratuit est terminé</div>
-      <div class="paywall-sub">Continuez à collecter vos avis Google et accéder à votre dashboard en souscrivant à Frizz.</div>
-      <div class="paywall-price">19€</div>
-      <div class="paywall-period">par mois · sans engagement</div>
-      <a href="https://buy.stripe.com/test_8x24gAdsSgBU4LbgFrbEA00" target="_blank" class="btn-subscribe" style="width:100%;text-align:center;padding:18px;font-size:16px;border-radius:14px;display:block">S'abonner maintenant →</a>
-      <div style="font-size:11px;color:var(--text-muted);margin-top:10px">Paiement sécurisé par Stripe · Annulation en 1 clic</div>
-    </div>
-  </div>
-
+<div id="app">
   <div class="header">
-    <div class="header-left">
-      <div class="logo">Frizz</div>
-      <div class="commerce-name" id="headerName">—</div>
-      <div class="live-badge"><div class="live-dot"></div> En direct</div>
-    </div>
-    <div style="display:flex;gap:8px">
-      <button class="refresh-btn" onclick="loadData()">⟳ Actualiser</button>
-      <button class="refresh-btn" onclick="logout()" style="color:var(--danger);border-color:rgba(255,75,75,0.2)">⎋ Déconnexion</button>
+    <div class="header-logo">Frizz ✦</div>
+    <div class="header-name" id="headerName">Mon Commerce</div>
+    <div class="live-badge"><div class="live-dot"></div> En direct</div>
+    <div class="header-actions">
+      <button class="btn-header" onclick="loadData()">&#8635; Actualiser</button>
+      <button class="btn-header danger" onclick="logout()">&#8859; Deconnexion</button>
     </div>
   </div>
+
+  <div class="last-refresh">Derniere actualisation : <span id="lastRefreshTime">—</span></div>
 
   <!-- STATS -->
-  <div class="stats-row">
+  <div class="stats-grid">
     <div class="stat-card">
-      <div class="stat-label">Note moyenne</div>
-      <div class="stat-value green" id="statMoyenne">—</div>
-      <div class="stat-sub">sur 5 étoiles</div>
+      <div class="stat-label">Note Moyenne</div>
+      <div class="stat-value" id="statMoyenne">—</div>
+      <div class="stat-sub">sur 5 etoiles</div>
+      <div class="stat-bar"><div class="stat-bar-fill" id="statBar" style="width:0%"></div></div>
     </div>
     <div class="stat-card">
-      <div class="stat-label">Total avis</div>
-      <div class="stat-value" id="statTotal">—</div>
-      <div class="stat-sub" id="statTotalSub">collectés</div>
+      <div class="stat-label">Total Avis</div>
+      <div class="stat-value" id="statTotal">0</div>
+      <div class="stat-sub" id="statTotalSub">collectes</div>
     </div>
     <div class="stat-card">
-      <div class="stat-label">Bons avis</div>
-      <div class="stat-value green" id="statBons">—</div>
-      <div class="stat-sub">note ≥ 4</div>
+      <div class="stat-label">Bons Avis</div>
+      <div class="stat-value" id="statBons">0</div>
+      <div class="stat-sub">note &ge; 4</div>
+      <div class="stat-bar"><div class="stat-bar-fill" id="statBonsBar" style="width:0%"></div></div>
     </div>
     <div class="stat-card">
-      <div class="stat-label">Mauvais avis</div>
-      <div class="stat-value red" id="statMauvais">—</div>
-      <div class="stat-sub">note ≤ 3</div>
+      <div class="stat-label">Mauvais Avis</div>
+      <div class="stat-value" id="statMauvais">0</div>
+      <div class="stat-sub">note &le; 3</div>
+      <div class="stat-bar"><div class="stat-bar-fill danger" id="statMauvaisBar" style="width:0%"></div></div>
     </div>
   </div>
 
-  <!-- DISTRIBUTION CHART -->
-  <div class="section">
+  <!-- AI SUMMARY -->
+  <div class="section ai-section-unique" style="border-color:rgba(88,204,2,0.2)">
     <div class="section-header" onclick="toggleSection(this)">
-      <div class="section-title">📊 Répartition des notes</div>
-      <span class="chevron">▼</span>
+      <div class="section-title">&#10024; Resume IA de la semaine <span class="ai-unique-badge">&#11088; Exclusif IA</span></div>
+      <span class="chevron">&#9660;</span>
     </div>
     <div class="section-body">
-      <div class="chart-row" id="chartBars"></div>
+      <div id="aiContent">
+        <div class="empty-state">
+          <div style="font-size:28px;margin-bottom:8px">&#129302;</div>
+          Cliquez pour analyser vos avis de la semaine
+        </div>
+        <button class="ai-btn" id="aiBtn" onclick="generateAISummary()">&#10024; Generer le resume IA</button>
+      </div>
+      <div id="aiResult" style="display:none">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <div style="font-size:13px;font-weight:700">Analyse de la semaine</div>
+          <div id="aiDate" style="font-size:11px;color:var(--text-muted)"></div>
+        </div>
+        <div class="ai-result" id="aiText"></div>
+        <div id="aiRecos"></div>
+        <button onclick="generateAISummary()" style="width:100%;padding:10px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;font-family:inherit;font-size:12px;font-weight:700;color:var(--text);cursor:pointer">&#8635; Regenerer</button>
+      </div>
     </div>
   </div>
 
-  <!-- AVIS EN TEMPS RÉEL -->
+  <!-- CHART REPARTITION -->
   <div class="section">
     <div class="section-header" onclick="toggleSection(this)">
-      <div class="section-title">💬 Avis clients <span id="avisBadge" style="background:var(--accent-dim);color:var(--accent);border-radius:6px;padding:2px 8px;font-size:11px;margin-left:4px">0</span></div>
-      <span class="chevron">▼</span>
+      <div class="section-title">&#128202; Repartition des notes</div>
+      <span class="chevron">&#9660;</span>
     </div>
     <div class="section-body">
-      <div id="avisList"><div class="empty">Chargement...</div></div>
-      <button class="load-more" id="loadMoreBtn" style="display:none" onclick="showMoreAvis()">Voir plus d'avis</button>
-      <div class="last-refresh">Dernière actualisation : <span id="lastRefreshTime">—</span></div>
+      <div class="bar-chart" id="chartBars"></div>
     </div>
   </div>
 
-  <!-- LIEN GOOGLE -->
-  <div class="section">
+  <!-- PROGRESSION CHART -->
+  <div class="section collapsed">
     <div class="section-header" onclick="toggleSection(this)">
-      <div class="section-title">⭐ Lien Google Avis</div>
-      <span class="chevron">▼</span>
+      <div class="section-title">&#128200; Progression des notes</div>
+      <span class="chevron">&#9660;</span>
     </div>
     <div class="section-body">
-      <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px">Ce lien s'ouvre automatiquement quand un client clique sur "Laisser un avis Google" depuis sa page d'avis.</p>
-      <div class="input-group">
+      <div class="chart-period-btns">
+        <button class="period-btn active" id="btnWeek" onclick="setChartPeriod('week')">Semaine</button>
+        <button class="period-btn" id="btnMonth" onclick="setChartPeriod('month')">Mois</button>
+      </div>
+      <div style="position:relative;height:200px">
+        <canvas id="progressChart"></canvas>
+      </div>
+      <div class="chart-legend">
+        <div class="legend-item"><div class="legend-dot" style="background:#58CC02"></div>Cuisine</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#4A90E2"></div>Service</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#F5A623"></div>Qualite/Prix</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AVIS LIST -->
+  <div class="section">
+    <div class="section-header" onclick="toggleSection(this)">
+      <div class="section-title">&#128172; Avis clients <span class="badge" id="avisBadge">0</span></div>
+      <span class="chevron">&#9660;</span>
+    </div>
+    <div class="section-body">
+      <div id="avisList"><div class="empty-state">Chargement...</div></div>
+    </div>
+  </div>
+
+  <!-- GOOGLE LINK -->
+  <div class="section">
+    <div class="section-header" onclick="toggleSection(this)">
+      <div class="section-title">&#11088; Lien Google Avis</div>
+      <span class="chevron">&#9660;</span>
+    </div>
+    <div class="section-body">
+      <p style="font-size:12px;color:var(--text-muted);margin-bottom:12px">Ce lien s'ouvre quand un client clique sur "Laisser un avis Google" depuis sa page d'avis.</p>
+      <div style="display:flex;gap:8px">
         <input class="input-field" id="googleLinkInput" type="url" placeholder="https://g.page/r/votre-etablissement/review">
         <button class="btn-save" onclick="saveGoogleLink()">Sauvegarder</button>
       </div>
-      <div class="field-hint">Trouvez votre lien sur <strong>Google Maps</strong> → votre établissement → "Demander des avis"</div>
-      <div class="saved-ok" id="savedOk">✅ Lien sauvegardé !</div>
+      <div id="googleSavedOk" class="saved-ok">&#10003; Sauvegarde !</div>
+      <p class="hint">Trouvez votre lien sur <strong>Google Maps</strong> &rarr; votre etablissement &rarr; "Demander des avis"</p>
     </div>
   </div>
 
   <!-- NOTIFICATIONS -->
   <div class="section collapsed">
     <div class="section-header" onclick="toggleSection(this)">
-      <div class="section-title">🔔 Notifications</div>
-      <span class="chevron">▼</span>
+      <div class="section-title">&#128276; Notifications</div>
+      <span class="chevron">&#9660;</span>
     </div>
     <div class="section-body">
       <div class="notif-row">
         <div>
-          <div class="notif-label">Email — Mauvaise note</div>
-          <div class="notif-sub">Reçois un email dès qu'un client donne ≤ 3 étoiles</div>
+          <div class="notif-label">Alerte mauvaise note</div>
+          <div class="notif-sub">Notification quand note &le; 3</div>
         </div>
-        <button class="toggle on" id="toggleBad" onclick="toggleNotif(this)"></button>
+        <div class="toggle on" id="toggleBad" onclick="toggleNotif(this)"></div>
       </div>
       <div class="notif-row">
         <div>
-          <div class="notif-label">Email — Tout nouvel avis</div>
-          <div class="notif-sub">Reçois un email pour chaque avis reçu</div>
+          <div class="notif-label">Nouvel avis</div>
+          <div class="notif-sub">Notification a chaque avis</div>
         </div>
-        <button class="toggle" id="toggleAll" onclick="toggleNotif(this)"></button>
+        <div class="toggle" id="toggleAll" onclick="toggleNotif(this)"></div>
       </div>
       <div style="margin-top:14px">
-        <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px">Email de réception</div>
-        <div class="input-group">
-          <input class="input-field" id="emailInput" type="email" placeholder="gerant@moncommerce.fr">
-          <button class="btn-save" onclick="saveEmail()">Sauvegarder</button>
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px">Email de notification</div>
+        <div style="display:flex;gap:8px">
+          <input class="input-field" id="emailInput" type="email" placeholder="votre@email.com" style="flex:1">
+          <button class="btn-save" onclick="saveEmail()">OK</button>
         </div>
-        <div class="saved-ok" id="emailSavedOk">✅ Email sauvegardé !</div>
+        <div id="emailSavedOk" class="saved-ok">&#10003; Sauvegarde !</div>
       </div>
     </div>
   </div>
@@ -373,199 +360,132 @@ html, body { background: var(--bg); font-family: 'Figtree', sans-serif; color: v
   <!-- QR CODE -->
   <div class="section collapsed">
     <div class="section-header" onclick="toggleSection(this)">
-      <div class="section-title">📱 QR Code client</div>
-      <span class="chevron">▼</span>
+      <div class="section-title">&#128241; QR Code client</div>
+      <span class="chevron">&#9660;</span>
     </div>
     <div class="section-body">
       <div class="qr-wrap">
-        <div style="position:relative;display:inline-block">
-          <canvas id="qrCanvas" width="220" height="220" style="border-radius:20px;display:block"></canvas>
-          <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:44px;height:44px;background:#fff;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:900;color:#000;border:2px solid #000">F</div>
-        </div>
-        <div id="qrcode" style="display:none"></div>
-        <div class="qr-url" id="qrUrl" style="max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px">—</div>
-
-        <button class="btn-dl" onclick="downloadQR()">⬇ Télécharger le QR Code</button>
+        <div id="qrcode"></div>
+        <div class="qr-url" id="qrUrl">—</div>
+        <button class="btn-dl" onclick="downloadQR()">&#11015; Telecharger le QR Code</button>
       </div>
     </div>
   </div>
 
   <!-- MON COMMERCE -->
-  <div class="section collapsed" style="margin-top:14px">
+  <div class="section collapsed">
     <div class="section-header" onclick="toggleSection(this)">
-      <div class="section-title">🏪 Mon commerce</div>
-      <span class="chevron">▼</span>
+      <div class="section-title">&#127978; Mon commerce</div>
+      <span class="chevron">&#9660;</span>
     </div>
     <div class="section-body">
-      <div style="display:flex;flex-direction:column;gap:16px">
-
-        <!-- Logo -->
-        <div>
-          <div style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px">Logo affiché sur la page avis</div>
-          <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px">
-            <div id="logoPreview" style="width:72px;height:72px;background:var(--surface2);border:1.5px solid var(--border);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:32px;overflow:hidden;flex-shrink:0">🏪</div>
-            <div style="flex:1">
-              <div style="font-size:13px;font-weight:700;margin-bottom:4px">Votre logo</div>
-              <div style="font-size:11px;color:var(--text-muted)">Apparaît sur la page avis de vos clients</div>
-            </div>
-          </div>
-          <button onclick="document.getElementById('logoUpload').click()" style="width:100%;padding:14px;background:var(--accent-dim);border:1.5px solid rgba(88,204,2,0.3);border-radius:12px;font-family:inherit;font-size:14px;font-weight:700;color:var(--accent);cursor:pointer;transition:all 0.2s">
-            📷 Choisir mon logo
-          </button>
-          <input type="file" id="logoUpload" accept="image/*" style="display:none" onchange="handleLogoUpload(this)">
-          <button id="removeLogo" onclick="removeLogo()" style="display:none;width:100%;margin-top:8px;padding:10px;background:none;border:1.5px solid var(--danger);border-radius:12px;font-family:inherit;font-size:13px;font-weight:700;color:var(--danger);cursor:pointer">✕ Supprimer le logo</button>
-          <div id="logoSavedOk" style="display:none;font-size:12px;color:var(--accent);font-weight:700;margin-top:8px;text-align:center">✅ Logo sauvegardé !</div>
-          <div id="logoSaving" style="display:none;font-size:12px;color:var(--text-muted);margin-top:8px;text-align:center">⏳ Sauvegarde en cours...</div>
-        </div>
-
+      <div style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px">Logo affiche sur la page avis</div>
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">
+        <div class="logo-preview" id="logoPreview">&#127978;</div>
+        <div style="flex:1;font-size:12px;color:var(--text-muted)">Apercu de votre logo actuel</div>
       </div>
+      <button onclick="document.getElementById('logoUpload').click()" style="width:100%;padding:13px;background:var(--accent-dim);border:1.5px solid rgba(88,204,2,0.3);border-radius:12px;font-family:inherit;font-size:13px;font-weight:700;color:var(--accent);cursor:pointer">
+        &#128247; Choisir mon logo
+      </button>
+      <input type="file" id="logoUpload" accept="image/*" style="display:none" onchange="handleLogoUpload(this)">
+      <button id="removeLogo" onclick="removeLogo()" style="display:none;width:100%;margin-top:8px;padding:10px;background:none;border:1.5px solid var(--danger-dim);border-radius:12px;font-family:inherit;font-size:12px;font-weight:700;color:var(--danger);cursor:pointer">
+        &#10005; Supprimer le logo
+      </button>
+      <div id="logoSavedOk" class="saved-ok">&#10003; Logo sauvegarde !</div>
+      <div id="logoSaving" style="display:none;font-size:12px;color:var(--text-muted);margin-top:6px">Sauvegarde en cours...</div>
     </div>
   </div>
 
   <!-- MON ABONNEMENT -->
-  <div class="section collapsed" style="margin-top:14px">
+  <div class="section collapsed">
     <div class="section-header" onclick="toggleSection(this)">
-      <div class="section-title">💳 Mon abonnement</div>
-      <span class="chevron">▼</span>
+      <div class="section-title">&#128179; Mon abonnement</div>
+      <span class="chevron">&#9660;</span>
     </div>
-    <div class="section-body">
-      <div id="subDetails">
-        <div style="display:flex;flex-direction:column;gap:12px">
-          <div id="subStatusBadge" style="padding:12px;background:var(--accent-dim);border:1px solid rgba(88,204,2,0.2);border-radius:12px;display:flex;align-items:center;gap:10px">
-            <span style="font-size:18px">🎁</span>
-            <div>
-              <div id="subStatusTitle" style="font-size:13px;font-weight:800;color:var(--accent)">Essai gratuit — 7 jours restants</div>
-              <div style="font-size:11px;color:var(--text-muted);margin-top:2px">Après l'essai, 19€/mois</div>
-            </div>
-          </div>
-          <a href="https://buy.stripe.com/test_8x24gAdsSgBU4LbgFrbEA00" target="_blank" class="btn-subscribe" style="text-align:center;width:100%;display:block;padding:14px">💳 S'abonner — 19€/mois →</a>
-          <button id="cancelBtn" onclick="cancelSubscription()" style="display:none;width:100%;padding:14px;background:transparent;border:1.5px solid var(--danger);border-radius:12px;font-family:inherit;font-size:13px;font-weight:700;color:var(--danger);cursor:pointer">🚫 Annuler mon abonnement</button>
-          <div style="font-size:11px;color:var(--text-muted);text-align:center">Paiement sécurisé par Stripe · Annulation effective à la fin de la période</div>
-        </div>
-      </div>
-    </div>
+    <div class="section-body" id="subBody"></div>
   </div>
 
-  <div class="powered">Propulsé par <span style="color:var(--accent);font-weight:800;opacity:1">Frizz</span> · <a href="mailto:Frizz.avis@gmail.com" style="color:var(--accent);opacity:0.6;text-decoration:none;font-weight:600">Frizz.avis@gmail.com</a></div>
+  <div class="footer">
+    Propulse par <a href="#">Frizz</a> &middot; <a href="mailto:Frizz.avis@gmail.com">Frizz.avis@gmail.com</a>
+    &middot; <button onclick="downloadCGU()" style="background:none;border:none;color:var(--accent);opacity:0.5;font-size:12px;cursor:pointer;font-family:inherit">CGU</button>
+  </div>
+</div>
 
-</div><!-- end wrap -->
+<!-- PAYWALL -->
+<div id="paywall">
+  <div class="paywall-box">
+    <div style="font-size:36px;margin-bottom:16px">&#128274;</div>
+    <div style="font-size:20px;font-weight:900;margin-bottom:8px">Essai expire</div>
+    <p style="font-size:14px;color:var(--text-muted);margin-bottom:24px">Abonnez-vous pour continuer a collecter des avis et acceder a votre dashboard.</p>
+    <a id="paywallBtn" href="#" target="_blank" class="btn-subscribe">S'abonner — 14,99€/mois</a>
+  </div>
+</div>
+
+<!-- CGU MODAL -->
+<div id="cguModal">
+  <div class="cgu-box">
+    <div style="font-size:16px;font-weight:800;margin-bottom:16px">Conditions Generales d'Utilisation</div>
+    <div style="font-size:12px;color:var(--text-muted);line-height:1.7;max-height:300px;overflow-y:auto;margin-bottom:20px">
+      <p style="margin-bottom:8px"><strong>1. OBJET</strong><br>Frizz est une plateforme SaaS de collecte d'avis clients pour restaurants.</p>
+      <p style="margin-bottom:8px"><strong>2. ACCES</strong><br>L'acces est reserve aux commerces ayant un abonnement actif ou en periode d'essai.</p>
+      <p style="margin-bottom:8px"><strong>3. FACTURATION</strong><br>Facturation mensuelle. Resiliation effective a la fin de la periode en cours.</p>
+      <p style="margin-bottom:8px"><strong>4. RESPONSABILITE</strong><br>Frizz n'est pas responsable des consequences commerciales des avis publies.</p>
+      <p style="margin-bottom:8px"><strong>5. DROIT APPLICABLE</strong><br>Les presentes CGU sont soumises au droit francais.</p>
+      <p><strong>6. CONTACT</strong><br>Frizz.avis@gmail.com</p>
+    </div>
+    <div style="display:flex;gap:10px">
+      <button onclick="downloadCGU()" style="flex:1;padding:12px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;font-family:inherit;font-size:13px;font-weight:700;color:var(--text);cursor:pointer">Telecharger PDF</button>
+      <button onclick="acceptCGU()" style="flex:1;padding:12px;background:var(--accent);border:none;border-radius:10px;font-family:inherit;font-size:13px;font-weight:700;color:#000;cursor:pointer">Accepter</button>
+    </div>
+  </div>
+</div>
 
 <script>
 // ============================================================
-// CONFIG — À MODIFIER
+// CONFIG
 // ============================================================
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwj7RToCQWdr9EDw1lXBKeSKwhkXcTKPRdURQkdPEQ0vHQiVi32AbXj-lcUs3tuZ9jX/exec';
 const BASE_URL = 'https://emcl22a-creator.github.io/frizz-client/';
+const STRIPE_LINK = 'https://buy.stripe.com/test_8x24gAdsSgBU4LbgFrbEA00';
+const TRIAL_DAYS = 14;
 
-// ============================================================
-// INIT
-// ============================================================
 const params = new URLSearchParams(window.location.search);
 const commerceId = params.get('id') || 'demo';
 const commerceName = params.get('name') || 'Mon Commerce';
 
 let allAvis = [];
-let shownCount = 5;
 let lastKnownCount = 0;
-let refreshInterval;
 let notifBadEnabled = true;
 let notifAllEnabled = false;
+let chartPeriod = 'week';
+let progressChartInstance = null;
 
-window.addEventListener('load', () => {
-  const accepted = localStorage.getItem('cgu_accepted_' + commerceId);
-  if (!accepted) {
-    document.getElementById('loader').style.display = 'none';
-    document.getElementById('cguModal').style.display = 'flex';
-  } else {
-    initDashboard();
-  }
-});
-
-function initDashboard() {
+// ============================================================
+// INIT
+// ============================================================
+window.addEventListener('DOMContentLoaded', function() {
   document.getElementById('headerName').textContent = commerceName;
-  document.getElementById('loader').style.display = 'none';
-  document.getElementById('mainContent').style.display = 'block';
 
-  // Load saved settings
+  // Load saved notif prefs
+  const savedBad = localStorage.getItem('notif_bad_' + commerceId);
+  const savedAll = localStorage.getItem('notif_all_' + commerceId);
+  if (savedBad === 'false') { notifBadEnabled = false; document.getElementById('toggleBad').classList.remove('on'); }
+  if (savedAll === 'true') { notifAllEnabled = true; document.getElementById('toggleAll').classList.add('on'); }
+
+  // Load saved google link
   const savedGoogle = localStorage.getItem('google_link_' + commerceId);
   if (savedGoogle) document.getElementById('googleLinkInput').value = savedGoogle;
+
+  // Load saved email
   const savedEmail = localStorage.getItem('email_notif_' + commerceId);
   if (savedEmail) document.getElementById('emailInput').value = savedEmail;
-  notifBadEnabled = localStorage.getItem('notif_bad_' + commerceId) !== 'false';
-  notifAllEnabled = localStorage.getItem('notif_all_' + commerceId) === 'true';
-  document.getElementById('toggleBad').classList.toggle('on', notifBadEnabled);
-  document.getElementById('toggleAll').classList.toggle('on', notifAllEnabled);
 
+  checkCGU();
+  initSubscription();
   generateQR();
-  setTimeout(loadSavedLogo, 400);
   loadData();
-  setTimeout(initSubscription, 100);
-  refreshInterval = setInterval(loadData, 30000); // auto-refresh 30s
-}
-
-// ============================================================
-// CGU
-// ============================================================
-function toggleAccept() {
-  const checked = document.getElementById('cguCheck').checked;
-  document.getElementById('btnAccept').classList.toggle('ready', checked);
-}
-
-function acceptCGU() {
-  if (!document.getElementById('cguCheck').checked) return;
-  localStorage.setItem('cgu_accepted_' + commerceId, Date.now());
-  document.getElementById('cguModal').style.display = 'none';
-  document.getElementById('loader').style.display = 'flex';
-  setTimeout(initDashboard, 600);
-}
-
-function downloadCGU() {
-  // Génère un PDF texte simple
-  const content = `CONDITIONS GÉNÉRALES D'UTILISATION — FRIZZ
-Version 1.0 — Avril 2026
-================================================
-
-1. OBJET
-Frizz est une plateforme SaaS de collecte et gestion d'avis clients pour les commerces de proximité. Les présentes CGU régissent l'accès et l'utilisation du service.
-
-2. ACCÈS AU SERVICE
-L'accès au dashboard est réservé aux commerces ayant souscrit un abonnement actif. Les identifiants de connexion sont personnels et non cessibles.
-
-3. OBLIGATIONS DE L'UTILISATEUR
-- Ne pas manipuler ou falsifier les avis clients
-- Ne pas utiliser le service à des fins trompeuses ou frauduleuses
-- Respecter la vie privée des clients et la législation RGPD applicable
-- Maintenir la confidentialité de son accès au dashboard
-
-4. DONNÉES PERSONNELLES & RGPD
-Les données collectées (notes, commentaires) sont stockées dans le Google Sheet du gérant. Frizz n'accède pas à ces données. Les clients peuvent exercer leur droit à l'effacement en contactant le gérant directement.
-
-5. ABONNEMENT & FACTURATION
-Le service est facturé mensuellement. La résiliation prend effet à la fin de la période en cours. En cas de non-paiement, l'accès est suspendu après 7 jours.
-
-6. LIMITATION DE RESPONSABILITÉ
-Frizz ne saurait être tenu responsable des conséquences commerciales des avis publiés, ni des contenus rédigés par les clients. Le service est fourni "en l'état".
-
-7. PROPRIÉTÉ INTELLECTUELLE
-L'ensemble des éléments constituant la plateforme Frizz (logo, design, code) sont la propriété exclusive de Frizz. Toute reproduction est interdite.
-
-8. DROIT APPLICABLE
-Les présentes CGU sont soumises au droit suisse. En cas de litige, les tribunaux du canton de Berne sont seuls compétents.
-
-9. CONTACT
-Pour toute question : contact@frizz.app
-
-================================================
-Frizz — Tous droits réservés © 2026`;
-
-  const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'CGU_Frizz_v1.0.txt';
-  a.click();
-  URL.revokeObjectURL(url);
-}
+  setTimeout(loadSavedLogo, 400);
+});
 
 // ============================================================
 // LOAD DATA
@@ -575,55 +495,38 @@ async function loadData() {
     const url = new URL(SCRIPT_URL);
     url.searchParams.set('action', 'get_avis');
     url.searchParams.set('commerce_id', commerceId);
-
-    // Since we can't do cross-origin GET with response, we read from sheet via a public endpoint
-    // For now, we use the stored data in localStorage + append new ones
-    // In production, you'd expose a doGet that returns JSON
-    renderFromStorage();
-    document.getElementById('lastRefreshTime').textContent = new Date().toLocaleTimeString('fr-FR');
-  } catch(e) {
-    renderFromStorage();
-  }
-}
-
-async function renderFromStorage() {
-  try {
-    const url = new URL(SCRIPT_URL);
-    url.searchParams.set('action', 'get_avis');
-    url.searchParams.set('commerce_id', commerceId);
     const response = await fetch(url.toString());
     const json = await response.json();
     if (json && json.avis) {
-      const newAvis = json.avis.map(a => ({
-        date: a.date,
-        note_globale: a.note_globale,
-        note_cuisine: a.note_cuisine,
-        note_service: a.note_service,
-        note_prix: a.note_prix,
-        commentaire: a.commentaire,
-        resume: a.resume,
-        type: a.type,
-        commerce_id: a.commerce_id,
-        avis_google: a.avis_google
-      }));
-      // Check for new bad notes
+      const newAvis = json.avis.map(function(a) {
+        return {
+          date: a.date, note_globale: a.note_globale,
+          note_cuisine: a.note_cuisine, note_service: a.note_service,
+          note_prix: a.note_prix, commentaire: a.commentaire,
+          resume: a.resume, type: a.type,
+          commerce_id: a.commerce_id, avis_google: a.avis_google
+        };
+      });
       if (newAvis.length > lastKnownCount && lastKnownCount > 0) {
         const newOnes = newAvis.slice(lastKnownCount);
-        const hasBad = newOnes.some(a => parseInt(a.note_globale) <= 3);
-        if (hasBad && notifBadEnabled) showAlert('⚠️ Nouvelle mauvaise note reçue ! Consultez vos avis.');
-        if (!hasBad && notifAllEnabled) showAlert('📬 Nouveau avis reçu !');
+        const hasBad = newOnes.some(function(a) { return parseInt(a.note_globale) <= 3; });
+        if (hasBad && notifBadEnabled) showAlert('Nouvelle mauvaise note recue !');
+        else if (notifAllEnabled) showAlert('Nouvel avis recu !');
       }
       allAvis = newAvis;
       lastKnownCount = allAvis.length;
     }
   } catch(e) {
-    // Fallback localStorage
     const stored = localStorage.getItem('avis_' + commerceId);
-    if (stored) { try { allAvis = JSON.parse(stored); } catch(e) { allAvis = []; } }
+    if (stored) { try { allAvis = JSON.parse(stored); } catch(e2) { allAvis = []; } }
   }
   updateStats();
   renderAvis();
   renderChart();
+  setTimeout(renderProgressChart, 300);
+  document.getElementById('lastRefreshTime').textContent = new Date().toLocaleTimeString('fr-FR');
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
 }
 
 // ============================================================
@@ -631,47 +534,50 @@ async function renderFromStorage() {
 // ============================================================
 function updateStats() {
   if (!allAvis.length) {
-    ['statMoyenne','statTotal','statBons','statMauvais'].forEach(id => {
+    ['statMoyenne','statTotal','statBons','statMauvais'].forEach(function(id) {
       document.getElementById(id).textContent = '0';
     });
     document.getElementById('avisBadge').textContent = '0';
     return;
   }
-
-  const notes = allAvis.map(a => parseFloat(a.note_globale)).filter(n => n > 0);
-  const moyenne = notes.length ? (notes.reduce((a,b) => a+b, 0) / notes.length).toFixed(1) : '—';
-  const bons = notes.filter(n => n >= 4).length;
-  const mauvais = notes.filter(n => n <= 3 && n > 0).length;
+  const notes = allAvis.map(function(a) { return parseFloat(a.note_globale); }).filter(function(n) { return n > 0; });
+  const moyenne = notes.length ? (notes.reduce(function(a,b) { return a+b; }, 0) / notes.length).toFixed(1) : '—';
+  const bons = notes.filter(function(n) { return n >= 4; }).length;
+  const mauvais = notes.filter(function(n) { return n <= 3 && n > 0; }).length;
 
   document.getElementById('statMoyenne').textContent = moyenne;
   document.getElementById('statTotal').textContent = allAvis.length;
   document.getElementById('statBons').textContent = bons;
   document.getElementById('statMauvais').textContent = mauvais;
   document.getElementById('avisBadge').textContent = allAvis.length;
-  document.getElementById('statTotalSub').textContent = allAvis.length === 1 ? 'collecté' : 'collectés';
+  document.getElementById('statTotalSub').textContent = allAvis.length === 1 ? 'collecte' : 'collectes';
+
+  if (notes.length) {
+    document.getElementById('statBar').style.width = ((parseFloat(moyenne)/5)*100) + '%';
+    document.getElementById('statBonsBar').style.width = ((bons/allAvis.length)*100) + '%';
+    document.getElementById('statMauvaisBar').style.width = ((mauvais/allAvis.length)*100) + '%';
+  }
 }
 
 // ============================================================
-// CHART
+// BAR CHART
 // ============================================================
 function renderChart() {
   const container = document.getElementById('chartBars');
   container.innerHTML = '';
   const counts = [0,0,0,0,0];
-  allAvis.forEach(a => {
+  allAvis.forEach(function(a) {
     const n = parseInt(a.note_globale);
     if (n >= 1 && n <= 5) counts[n-1]++;
   });
-  const max = Math.max(...counts, 1);
-  counts.forEach((c, i) => {
-    const h = Math.max(8, (c / max) * 60);
+  const max = Math.max.apply(null, counts.concat([1]));
+  counts.forEach(function(c, i) {
+    const h = Math.max(4, Math.round((c / max) * 60));
     const isDanger = (i+1) <= 3;
-    container.innerHTML += `
-      <div class="bar-wrap">
-        <div class="bar-count">${c}</div>
-        <div class="bar ${isDanger ? 'danger' : ''}" style="height:${h}px"></div>
-        <div class="bar-label">${'⭐'.repeat(i+1)}</div>
-      </div>`;
+    const wrap = document.createElement('div');
+    wrap.className = 'bar-wrap';
+    wrap.innerHTML = '<div class="bar-count">' + c + '</div><div class="bar' + (isDanger ? ' danger' : '') + '" style="height:' + h + 'px"></div><div class="bar-label">' + '&#9733;'.repeat(i+1) + '</div>';
+    container.appendChild(wrap);
   });
 }
 
@@ -681,52 +587,168 @@ function renderChart() {
 function renderAvis() {
   const container = document.getElementById('avisList');
   if (!allAvis.length) {
-    container.innerHTML = '<div class="empty">🌟 Aucun avis pour l\'instant.<br>Partagez votre QR code pour en recevoir !</div>';
-    document.getElementById('loadMoreBtn').style.display = 'none';
+    container.innerHTML = '<div class="empty-state">Aucun avis pour l\'instant.<br>Partagez votre QR code pour en recevoir !</div>';
+    return;
+  }
+  const sorted = allAvis.slice().reverse();
+  container.innerHTML = '';
+  sorted.forEach(function(a, idx) {
+    const note = parseInt(a.note_globale) || 0;
+    const stars = '&#9733;'.repeat(note) + '&#9734;'.repeat(5-note);
+    const date = a.date ? new Date(a.date).toLocaleDateString('fr-FR', {day:'numeric',month:'short',year:'numeric'}) : '—';
+    let cats = '';
+    if (parseInt(a.note_cuisine) > 0) cats += '<span class="avis-cat">Cuisine ' + a.note_cuisine + '/5</span>';
+    if (parseInt(a.note_service) > 0) cats += '<span class="avis-cat">Service ' + a.note_service + '/5</span>';
+    if (parseInt(a.note_prix) > 0) cats += '<span class="avis-cat">Prix ' + a.note_prix + '/5</span>';
+
+    const item = document.createElement('div');
+    item.className = 'avis-item';
+    item.innerHTML = '<div class="avis-header"><div class="avis-stars">' + stars + '</div><div class="avis-date">' + date + '</div></div>' +
+      (cats ? '<div class="avis-cats">' + cats + '</div>' : '') +
+      (a.commentaire ? '<div class="avis-comment">"' + a.commentaire + '"</div>' : '') +
+      '<div class="avis-detail" id="detail-' + idx + '">' +
+      (a.resume ? '<div style="font-size:12px;color:var(--text-muted);line-height:1.5;margin-bottom:6px"><strong>Resume IA :</strong> ' + a.resume + '</div>' : '') +
+      (a.avis_google === 'oui ✅' ? '<div class="avis-google-tag">Publie sur Google</div>' : '') +
+      '</div>';
+    item.onclick = function() {
+      const detail = document.getElementById('detail-' + idx);
+      detail.style.display = detail.style.display === 'block' ? 'none' : 'block';
+    };
+    container.appendChild(item);
+  });
+}
+
+// ============================================================
+// PROGRESSION CHART
+// ============================================================
+function setChartPeriod(period) {
+  chartPeriod = period;
+  document.getElementById('btnWeek').className = 'period-btn' + (period === 'week' ? ' active' : '');
+  document.getElementById('btnMonth').className = 'period-btn' + (period === 'month' ? ' active' : '');
+  renderProgressChart();
+}
+
+function renderProgressChart() {
+  const canvas = document.getElementById('progressChart');
+  if (!canvas || !allAvis.length) return;
+  const days = chartPeriod === 'week' ? 7 : 30;
+  const now = new Date();
+  const labels = [];
+  const cuisineData = [];
+  const serviceData = [];
+  const prixData = [];
+
+  for (var i = days - 1; i >= 0; i--) {
+    const d = new Date(now);
+    d.setDate(d.getDate() - i);
+    labels.push(chartPeriod === 'week' ? d.toLocaleDateString('fr-FR', {weekday:'short'}) : d.getDate() + '/' + (d.getMonth()+1));
+    const dayAvis = allAvis.filter(function(a) { return new Date(a.date).toDateString() === d.toDateString(); });
+    cuisineData.push(dayAvis.length ? parseFloat((dayAvis.reduce(function(s,a) { return s + Number(a.note_cuisine||0); }, 0) / dayAvis.length).toFixed(1)) : null);
+    serviceData.push(dayAvis.length ? parseFloat((dayAvis.reduce(function(s,a) { return s + Number(a.note_service||0); }, 0) / dayAvis.length).toFixed(1)) : null);
+    prixData.push(dayAvis.length ? parseFloat((dayAvis.reduce(function(s,a) { return s + Number(a.note_prix||0); }, 0) / dayAvis.length).toFixed(1)) : null);
+  }
+
+  if (progressChartInstance) progressChartInstance.destroy();
+  progressChartInstance = new Chart(canvas, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [
+        { label: 'Cuisine', data: cuisineData, borderColor: '#58CC02', backgroundColor: 'rgba(88,204,2,0.1)', tension: 0.4, spanGaps: true, pointRadius: 4 },
+        { label: 'Service', data: serviceData, borderColor: '#4A90E2', backgroundColor: 'rgba(74,144,226,0.1)', tension: 0.4, spanGaps: true, pointRadius: 4 },
+        { label: 'Prix', data: prixData, borderColor: '#F5A623', backgroundColor: 'rgba(245,166,35,0.1)', tension: 0.4, spanGaps: true, pointRadius: 4 }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { min: 0, max: 5, ticks: { color: 'rgba(255,255,255,0.4)', stepSize: 1 }, grid: { color: 'rgba(255,255,255,0.06)' }, border: { display: false } },
+        x: { ticks: { color: 'rgba(255,255,255,0.4)', font: { size: 10 } }, grid: { display: false }, border: { display: false } }
+      }
+    }
+  });
+}
+
+// ============================================================
+// AI SUMMARY
+// ============================================================
+async function generateAISummary() {
+  const btn = document.getElementById('aiBtn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Analyse en cours...'; }
+
+  const oneWeekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+  const recentAvis = allAvis.filter(function(a) { return new Date(a.date).getTime() > oneWeekAgo; });
+
+  if (!recentAvis.length) {
+    document.getElementById('aiContent').innerHTML = '<div class="empty-state">Aucun avis cette semaine.<br>Revenez apres avoir collecte des avis !</div>';
     return;
   }
 
-  const sorted = [...allAvis].reverse();
-  const visible = sorted.slice(0, shownCount);
-  container.innerHTML = visible.map((a, i) => {
-    const note = parseInt(a.note_globale) || 0;
-    const isGood = note >= 4;
-    const isBad = note <= 3 && note > 0;
-    const isNew = i === 0;
-    const stars = '⭐'.repeat(note) + '☆'.repeat(5 - note);
-    const date = a.date ? new Date(a.date).toLocaleDateString('fr-FR', {day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}) : '—';
+  const avisText = recentAvis.map(function(a, i) {
+    return 'Avis ' + (i+1) + ': Note globale ' + a.note_globale + '/5, Cuisine ' + a.note_cuisine + '/5, Service ' + a.note_service + '/5, Prix ' + a.note_prix + '/5' + (a.commentaire ? ', Commentaire: "' + a.commentaire + '"' : '');
+  }).join('\n');
 
-    let cats = '';
-    if (parseInt(a.note_cuisine) > 0) cats += `<span class="avis-cat">🍽️ ${a.note_cuisine}/5</span>`;
-    if (parseInt(a.note_service) > 0) cats += `<span class="avis-cat">😊 ${a.note_service}/5</span>`;
-    if (parseInt(a.note_prix) > 0) cats += `<span class="avis-cat">💰 ${a.note_prix}/5</span>`;
+  const prompt = 'Tu es un consultant en restauration. Voici les ' + recentAvis.length + ' avis clients de cette semaine :\n\n' + avisText + '\n\nFais :\n1. Un resume court et honnete de la semaine (2-3 phrases)\n2. 3 recommandations concretes pour ameliorer le restaurant (commence chaque ligne par un emoji)\n\nSois direct et concret. Reponds en francais.';
 
-    const hasDetail = !!(cats || a.commentaire || a.resume || a.avis_google === 'oui ✅');
-    return `
-      <div class="avis-item ${isGood ? 'good' : isBad ? 'bad' : ''}" ${hasDetail ? 'onclick="toggleAvis(this)" style="cursor:pointer"' : ''}>
-        ${isNew ? '<div class="new-badge">NOUVEAU</div>' : ''}
-        <div class="avis-top">
-          <div class="avis-stars">${stars} <strong>${note}/5</strong></div>
-          <div style="display:flex;align-items:center;gap:8px">
-            <div class="avis-date">${date}</div>
-            ${hasDetail ? '<div class="avis-expand" style="font-size:10px;color:var(--text-muted);transition:transform 0.3s">▼</div>' : ''}
-          </div>
-        </div>
-        <div class="avis-detail" style="display:none;margin-top:10px;padding-top:10px;border-top:1px solid var(--border)">
-          ${cats ? `<div class="avis-cats">${cats}</div>` : ''}
-          ${a.commentaire ? `<div class="avis-comment">"${a.commentaire}"</div>` : ''}
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const data = await response.json();
+    const text = data.content[0].text;
+    const lines = text.split('\n').filter(function(l) { return l.trim(); });
+    const recoLines = lines.filter(function(l) { return /^\p{Emoji}/u.test(l.trim()); });
+    const summaryLines = lines.filter(function(l) { return !/^\p{Emoji}/u.test(l.trim()) && l.length > 20; });
 
-          ${a.avis_google === 'oui ✅' ? '<div class="avis-google-tag">✅ Publié sur Google</div>' : ''}
-        </div>
-      </div>`;
-  }).join('');
+    document.getElementById('aiText').textContent = summaryLines.join('\n');
+    document.getElementById('aiDate').textContent = new Date().toLocaleDateString('fr-FR');
 
-  document.getElementById('loadMoreBtn').style.display = sorted.length > shownCount ? 'block' : 'none';
+    const recosContainer = document.getElementById('aiRecos');
+    recosContainer.innerHTML = recoLines.map(function(r) {
+      return '<div class="ai-reco">' + r + '</div>';
+    }).join('');
+
+    document.getElementById('aiContent').style.display = 'none';
+    document.getElementById('aiResult').style.display = 'block';
+  } catch(e) {
+    if (btn) { btn.disabled = false; btn.textContent = 'Generer le resume IA'; }
+    alert('Erreur. Reessayez.');
+  }
 }
 
-function showMoreAvis() {
-  shownCount += 5;
-  renderAvis();
+// ============================================================
+// QR CODE
+// ============================================================
+function generateQR() {
+  const googleLink = localStorage.getItem('google_link_' + commerceId) || '';
+  const clientUrl = BASE_URL + 'landing.html?id=' + commerceId + '&name=' + encodeURIComponent(commerceName) + '&google=' + encodeURIComponent(googleLink);
+  document.getElementById('qrUrl').textContent = BASE_URL + '?id=' + commerceId;
+  const qrEl = document.getElementById('qrcode');
+  qrEl.innerHTML = '';
+  new QRCode(qrEl, {
+    text: clientUrl,
+    width: 200, height: 200,
+    colorDark: '#000000', colorLight: '#ffffff',
+    correctLevel: QRCode.CorrectLevel.L
+  });
+}
+
+function downloadQR() {
+  setTimeout(function() {
+    const canvas = document.querySelector('#qrcode canvas');
+    if (!canvas) return;
+    const a = document.createElement('a');
+    a.download = 'QRCode_Frizz_' + commerceId + '.png';
+    a.href = canvas.toDataURL();
+    a.click();
+  }, 200);
 }
 
 // ============================================================
@@ -735,11 +757,10 @@ function showMoreAvis() {
 function saveGoogleLink() {
   const val = document.getElementById('googleLinkInput').value.trim();
   localStorage.setItem('google_link_' + commerceId, val);
-  const ok = document.getElementById('savedOk');
+  const ok = document.getElementById('googleSavedOk');
   ok.style.display = 'block';
-  setTimeout(() => ok.style.display = 'none', 2500);
+  setTimeout(function() { ok.style.display = 'none'; }, 2500);
   generateQR();
-  // Save to Sheet
   try {
     const url = new URL(SCRIPT_URL);
     url.searchParams.set('action', 'save_google');
@@ -750,16 +771,8 @@ function saveGoogleLink() {
 }
 
 // ============================================================
-// EMAIL
+// NOTIFICATIONS
 // ============================================================
-function saveEmail() {
-  const val = document.getElementById('emailInput').value.trim();
-  localStorage.setItem('email_notif_' + commerceId, val);
-  const ok = document.getElementById('emailSavedOk');
-  ok.style.display = 'block';
-  setTimeout(() => ok.style.display = 'none', 2500);
-}
-
 function toggleNotif(btn) {
   btn.classList.toggle('on');
   const isOn = btn.classList.contains('on');
@@ -772,444 +785,195 @@ function toggleNotif(btn) {
   }
 }
 
-// ============================================================
-// QR CODE
-// ============================================================
-function generateQR() {
-  const googleLink = localStorage.getItem('google_link_' + commerceId) || '';
-  const clientUrl = `${BASE_URL}landing.html?id=${commerceId}&name=${encodeURIComponent(commerceName)}`;
-  const fullClientUrl = `${BASE_URL}landing.html?id=${commerceId}&name=${encodeURIComponent(commerceName)}&google=${encodeURIComponent(googleLink)}`;
-  document.getElementById('qrUrl').textContent = `${BASE_URL}?id=${commerceId}`;
-
-  const qrEl = document.getElementById('qrcode');
-  qrEl.innerHTML = '';
-  new QRCode(qrEl, {
-    text: clientUrl,
-    width: 200, height: 200,
-    colorDark: '#000000', colorLight: '#ffffff',
-    correctLevel: QRCode.CorrectLevel.L
-  });
-
-  setTimeout(() => {
-    const src = qrEl.querySelector('canvas');
-    if (!src) { setTimeout(generateQR, 300); return; }
-    const dst = document.getElementById('qrCanvas');
-    if (!dst) return;
-    dst.width = 220; dst.height = 220;
-    const ctx = dst.getContext('2d');
-    ctx.fillStyle = '#FFFFFF';
-    ctx.roundRect(0, 0, 220, 220, 20);
-    ctx.fill();
-    ctx.drawImage(src, 10, 10, 200, 200);
-    const imgData = ctx.getImageData(0, 0, 220, 220);
-    ctx.putImageData(imgData, 0, 0);
-  }, 300);
+function saveEmail() {
+  const val = document.getElementById('emailInput').value.trim();
+  localStorage.setItem('email_notif_' + commerceId, val);
+  const ok = document.getElementById('emailSavedOk');
+  ok.style.display = 'block';
+  setTimeout(function() { ok.style.display = 'none'; }, 2500);
 }
 
-function downloadQR() {
-  const canvas = document.getElementById('qrCanvas');
-  if (!canvas) return;
-  const a = document.createElement('a');
-  a.download = `QRCode_Frizz_${commerceId}.png`;
-  a.href = canvas.toDataURL('image/png');
-  a.click();
-}
-
-// ============================================================
-// ALERT
-// ============================================================
 function showAlert(msg) {
-  const banner = document.getElementById('alertBanner');
-  document.getElementById('alertMsg').textContent = msg;
-  banner.style.display = 'block';
-  setTimeout(closeAlert, 8000);
-}
-
-function closeAlert() {
-  document.getElementById('alertBanner').style.display = 'none';
+  const el = document.getElementById('alertBanner');
+  el.textContent = msg;
+  el.style.display = 'block';
+  setTimeout(function() { el.style.display = 'none'; }, 4000);
 }
 
 // ============================================================
-// UI
+// LOGO
 // ============================================================
-function logout() {
-  if (confirm('Voulez-vous vous déconnecter ?')) {
-    window.location.href = 'inscription.html';
+function handleLogoUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const saving = document.getElementById('logoSaving');
+  if (saving) saving.style.display = 'block';
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const img = new Image();
+    img.onload = function() {
+      const canvas = document.createElement('canvas');
+      const max = 120;
+      let w = img.width, h = img.height;
+      if (w > h) { if (w > max) { h = Math.round(h * max / w); w = max; } }
+      else { if (h > max) { w = Math.round(w * max / h); h = max; } }
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      const compressed = canvas.toDataURL('image/jpeg', 0.7);
+      const preview = document.getElementById('logoPreview');
+      if (preview) preview.innerHTML = '<img src="' + compressed + '" style="width:100%;height:100%;object-fit:cover;border-radius:12px">';
+      document.getElementById('removeLogo').style.display = 'block';
+      localStorage.setItem('logo_' + commerceId, compressed);
+      if (saving) saving.style.display = 'none';
+      const ok = document.getElementById('logoSavedOk');
+      if (ok) { ok.style.display = 'block'; setTimeout(function() { ok.style.display = 'none'; }, 2500); }
+      try {
+        const url = new URL(SCRIPT_URL);
+        url.searchParams.set('action', 'save_logo');
+        url.searchParams.set('commerce_id', commerceId);
+        url.searchParams.set('logo_url', compressed);
+        fetch(url.toString(), { method: 'GET', mode: 'no-cors' });
+      } catch(err) {}
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function removeLogo() {
+  const preview = document.getElementById('logoPreview');
+  if (preview) preview.innerHTML = '&#127978;';
+  document.getElementById('removeLogo').style.display = 'none';
+  localStorage.removeItem('logo_' + commerceId);
+  try {
+    const url = new URL(SCRIPT_URL);
+    url.searchParams.set('action', 'save_logo');
+    url.searchParams.set('commerce_id', commerceId);
+    url.searchParams.set('logo_url', '');
+    fetch(url.toString(), { method: 'GET', mode: 'no-cors' });
+  } catch(e) {}
+}
+
+async function loadSavedLogo() {
+  let saved = localStorage.getItem('logo_' + commerceId);
+  if (!saved) {
+    try {
+      const url = new URL(SCRIPT_URL);
+      url.searchParams.set('action', 'get_logo');
+      url.searchParams.set('commerce_id', commerceId);
+      const res = await fetch(url.toString());
+      const json = await res.json();
+      if (json && json.logo_url) saved = json.logo_url;
+    } catch(e) {}
+  }
+  if (saved) {
+    const preview = document.getElementById('logoPreview');
+    if (preview) preview.innerHTML = '<img src="' + saved + '" style="width:100%;height:100%;object-fit:cover;border-radius:12px">';
+    document.getElementById('removeLogo').style.display = 'block';
+    localStorage.setItem('logo_' + commerceId, saved);
   }
 }
 
+// ============================================================
+// SUBSCRIPTION
+// ============================================================
+function initSubscription() {
+  const subBody = document.getElementById('subBody');
+  const key = 'frizz_start_' + commerceId;
+  let startDate = localStorage.getItem(key);
+  if (!startDate) {
+    startDate = new Date().toISOString();
+    localStorage.setItem(key, startDate);
+  }
+  const elapsed = (Date.now() - new Date(startDate).getTime()) / (1000 * 60 * 60 * 24);
+  const daysLeft = Math.max(0, Math.ceil(TRIAL_DAYS - elapsed));
+  const isSubscribed = localStorage.getItem('frizz_subscribed_' + commerceId) === 'true';
+  const isExpired = daysLeft === 0 && !isSubscribed;
+
+  if (isSubscribed) {
+    subBody.innerHTML = '<div class="sub-banner active"><div class="sub-banner-icon">&#10003;</div><div><div class="sub-banner-title">Abonnement actif</div><div class="sub-banner-sub">14,99 €/mois</div></div></div><button class="btn-cancel" onclick="cancelSubscription()">Annuler l\'abonnement</button>';
+  } else if (!isExpired) {
+    subBody.innerHTML = '<div class="sub-banner trial"><div class="sub-banner-icon">&#127873;</div><div><div class="sub-banner-title">Essai gratuit — ' + daysLeft + ' jours restants</div><div class="sub-banner-sub">Apres l\'essai, 14,99€/mois</div></div></div><a href="' + STRIPE_LINK + '" target="_blank" class="btn-subscribe">S\'abonner — 14,99€/mois</a><p style="text-align:center;font-size:11px;color:var(--text-muted);margin-top:8px">Paiement securise par Stripe · Annulation a tout moment</p>';
+    document.getElementById('paywallBtn').href = STRIPE_LINK;
+  } else {
+    subBody.innerHTML = '<div class="sub-banner expired"><div class="sub-banner-icon">&#9888;</div><div><div class="sub-banner-title" style="color:var(--danger)">Essai expire</div></div></div><a href="' + STRIPE_LINK + '" target="_blank" class="btn-subscribe">S\'abonner — 14,99€/mois</a>';
+    document.getElementById('paywall').style.display = 'flex';
+    document.getElementById('paywallBtn').href = STRIPE_LINK;
+  }
+}
+
+function cancelSubscription() {
+  if (confirm('Annuler l\'abonnement ? Envoyez un email a Frizz.avis@gmail.com')) {
+    window.location.href = 'mailto:Frizz.avis@gmail.com?subject=Annulation abonnement Frizz&body=Commerce ID: ' + commerceId;
+  }
+}
+
+// ============================================================
+// SECTION TOGGLE
+// ============================================================
 function toggleSection(header) {
   header.parentElement.classList.toggle('collapsed');
 }
 
-
 // ============================================================
-// SUBSCRIPTION
+// LOGOUT
 // ============================================================
-const STRIPE_LINK = 'https://buy.stripe.com/test_8x24gAdsSgBU4LbgFrbEA00';
-const TRIAL_DAYS = 7;
-
-function initSubscription() {
-  const registeredAt = localStorage.getItem('registered_at_' + commerceId);
-  const now = Date.now();
-
-  if (!registeredAt) {
-    localStorage.setItem('registered_at_' + commerceId, now);
-    renderSubBanner('trial', TRIAL_DAYS);
-  renderSubDetails('trial', TRIAL_DAYS);
-    return;
-  }
-
-  const daysPassed = Math.floor((now - parseInt(registeredAt)) / (1000 * 60 * 60 * 24));
-  const daysLeft = TRIAL_DAYS - daysPassed;
-  const isPaid = localStorage.getItem('paid_' + commerceId) === 'true';
-  const cancelBtn = document.getElementById('cancelBtn');
-  if (isPaid && cancelBtn) cancelBtn.style.display = 'block';
-
-  if (isPaid) {
-    renderSubBanner('active', 0);
-    renderSubDetails('active', 0);
-  } else if (daysLeft > 0) {
-    renderSubBanner('trial', daysLeft);
-  } else {
-    renderSubBanner('expired', 0);
-    renderSubDetails('expired', 0);
-    document.getElementById('paywall').classList.add('visible');
-  }
-}
-
-function renderSubDetails(status, daysLeft) {
-  const el = document.getElementById('subDetails');
-  if (!el) return;
-  if (status === 'active') {
-    el.innerHTML = `
-      <div style="display:flex;flex-direction:column;gap:12px">
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border)">
-          <div>
-            <div style="font-size:14px;font-weight:700">Statut</div>
-            <div style="font-size:12px;color:var(--accent);margin-top:2px">✅ Abonnement actif</div>
-          </div>
-        </div>
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border)">
-          <div>
-            <div style="font-size:14px;font-weight:700">Montant</div>
-            <div style="font-size:12px;color:var(--text-muted);margin-top:2px">19€ / mois · prélevé automatiquement</div>
-          </div>
-        </div>
-        <a href="${STRIPE_LINK}" target="_blank" class="btn-subscribe" style="text-align:center;width:100%;display:block;padding:14px">💳 Gérer mon abonnement</a>
-        <button onclick="cancelSubscription()" style="width:100%;margin-top:0;padding:14px;background:transparent;border:1.5px solid var(--danger);border-radius:12px;font-family:inherit;font-size:13px;font-weight:700;color:var(--danger);cursor:pointer">🚫 Annuler mon abonnement</button>
-        <div style="font-size:11px;color:var(--text-muted);text-align:center">Annulation effective à la fin de la période en cours</div>
-      </div>`;
-  } else if (status === 'trial') {
-    el.innerHTML = `
-      <div style="display:flex;flex-direction:column;gap:12px">
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border)">
-          <div>
-            <div style="font-size:14px;font-weight:700">Statut</div>
-            <div style="font-size:12px;color:var(--accent);margin-top:2px">🎁 Essai gratuit — ${daysLeft} jour${daysLeft > 1 ? 's' : ''} restant${daysLeft > 1 ? 's' : ''}</div>
-          </div>
-        </div>
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border)">
-          <div>
-            <div style="font-size:14px;font-weight:700">Après l'essai</div>
-            <div style="font-size:12px;color:var(--text-muted);margin-top:2px">19€ / mois</div>
-          </div>
-        </div>
-        <a href="${STRIPE_LINK}" target="_blank" class="btn-subscribe" style="text-align:center;width:100%">S'abonner maintenant — 19€/mois →</a>
-        <div style="font-size:11px;color:var(--text-muted);text-align:center">Paiement sécurisé par Stripe</div>
-      </div>`;
-  } else {
-    el.innerHTML = `
-      <div style="display:flex;flex-direction:column;gap:12px">
-        <div style="padding:12px;background:var(--danger-dim);border:1px solid rgba(255,75,75,0.2);border-radius:12px;font-size:13px;color:var(--danger)">
-          ⚠️ Votre essai est expiré. Abonnez-vous pour continuer.
-        </div>
-        <a href="${STRIPE_LINK}" target="_blank" class="btn-subscribe" style="text-align:center;width:100%">S'abonner — 19€/mois →</a>
-      </div>`;
-  }
-}
-
-function renderSubBanner(status, daysLeft) {
-  const banner = document.getElementById('subBanner');
-  if (status === 'active') {
-    banner.innerHTML = `
-      <div class="sub-banner active">
-        <div class="sub-banner-left">
-          <div class="sub-banner-icon">✅</div>
-          <div>
-            <div class="sub-banner-title">Abonnement actif</div>
-            <div class="sub-banner-sub">19€/mois · Prochain prélèvement automatique</div>
-          </div>
-        </div>
-        <a href="${STRIPE_LINK}" target="_blank" class="btn-manage">Gérer mon abonnement</a>
-      </div>`;
-  } else if (status === 'trial') {
-    banner.innerHTML = `
-      <div class="sub-banner trial">
-        <div class="sub-banner-left">
-          <div class="sub-banner-icon">🎁</div>
-          <div>
-            <div class="sub-banner-title">Essai gratuit — ${daysLeft} jour${daysLeft > 1 ? 's' : ''} restant${daysLeft > 1 ? 's' : ''}</div>
-            <div class="sub-banner-sub">Après l'essai, 19€/mois</div>
-          </div>
-        </div>
-        <a href="${STRIPE_LINK}" target="_blank" class="btn-subscribe">S'abonner maintenant →</a>
-      </div>`;
-  } else {
-    banner.innerHTML = `
-      <div class="sub-banner expired">
-        <div class="sub-banner-left">
-          <div class="sub-banner-icon">⚠️</div>
-          <div>
-            <div class="sub-banner-title">Essai expiré</div>
-            <div class="sub-banner-sub red">Abonnez-vous pour continuer à utiliser Frizz</div>
-          </div>
-        </div>
-        <a href="${STRIPE_LINK}" target="_blank" class="btn-subscribe">S'abonner — 19€/mois →</a>
-      </div>`;
-  }
-}
-
-
-// ============================================================
-// LOGO
-// ============================================================
-function saveLogoUrl() {
-  var logoUrl = document.getElementById("logoUrlInput").value.trim();
-  if (!logoUrl) return;
-  var preview = document.getElementById("logoPreview");
-  if (preview) preview.innerHTML = "<img src='" + logoUrl + "' style='width:100%;height:100%;object-fit:cover;border-radius:14px'>";
-  localStorage.setItem("logo_" + commerceId, logoUrl);
-  try {
-    var url = new URL(SCRIPT_URL);
-    url.searchParams.set("action", "save_logo");
-    url.searchParams.set("commerce_id", commerceId);
-    url.searchParams.set("logo_url", logoUrl);
-    fetch(url.toString(), { method: "GET", mode: "no-cors" });
-  } catch(e) {}
-  var ok = document.getElementById("logoSavedOk");
-  if (ok) { ok.style.display = "block"; setTimeout(function(){ ok.style.display = "none"; }, 2500); }
-}
-
-function handleLogoUpload(input) {
-  const file = input.files[0];
-  if (!file) return;
-  const saving = document.getElementById('logoSaving');
-  if (saving) saving.style.display = 'block';
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    // Compress image to max 100x100px
-    const img = new Image();
-    img.onload = async () => {
-      const canvas = document.createElement('canvas');
-      const max = 120;
-      let w = img.width, h = img.height;
-      if (w > h) { if (w > max) { h = h * max / w; w = max; } }
-      else { if (h > max) { w = w * max / h; h = max; } }
-      canvas.width = w; canvas.height = h;
-      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-      const compressed = canvas.toDataURL('image/jpeg', 0.7);
-      const preview = document.getElementById('logoPreview');
-      if (preview) preview.innerHTML = "<img src='" + compressed + "' style='width:100%;height:100%;object-fit:cover;border-radius:14px'>";
-      const removeBtn = document.getElementById('removeLogo');
-      if (removeBtn) removeBtn.style.display = 'block';
-      localStorage.setItem('logo_' + commerceId, compressed);
-      try {
-        const url = new URL(SCRIPT_URL);
-        url.searchParams.set('action', 'save_logo');
-        url.searchParams.set('commerce_id', commerceId);
-        url.searchParams.set('logo_url', compressed);
-        await fetch(url.toString(), { method: 'GET', mode: 'no-cors' });
-      } catch(e) {}
-      if (saving) saving.style.display = 'none';
-      const ok = document.getElementById('logoSavedOk');
-      if (ok) { ok.style.display = 'block'; setTimeout(() => ok.style.display = 'none', 2500); }
-    };
-    img.src = e.target.result;
-  };
-  reader.readAsDataURL(file);
-}
-
-function removeLogo() {
-  const preview = document.getElementById('logoPreview');
-  if (preview) preview.innerHTML = '🏪';
-  const removeBtn = document.getElementById('removeLogo');
-  if (removeBtn) removeBtn.style.display = 'none';
-  localStorage.removeItem('logo_' + commerceId);
-  try {
-    const url = new URL(SCRIPT_URL);
-    url.searchParams.set('action', 'save_logo');
-    url.searchParams.set('commerce_id', commerceId);
-    url.searchParams.set('logo_url', '');
-    fetch(url.toString(), { method: 'GET', mode: 'no-cors' });
-  } catch(e) {}
-}
-
-async function loadSavedLogo() {
-  let saved = localStorage.getItem('logo_' + commerceId);
-  if (!saved) {
-    try {
-      const url = new URL(SCRIPT_URL);
-      url.searchParams.set('action', 'get_logo');
-      url.searchParams.set('commerce_id', commerceId);
-      const res = await fetch(url.toString());
-      const json = await res.json();
-      if (json && json.logo_url) saved = json.logo_url;
-    } catch(e) {}
-  }
-  if (saved) {
-    const preview = document.getElementById('logoPreview');
-    if (preview) preview.innerHTML = '<img src="' + saved + '" style="width:100%;height:100%;object-fit:cover;border-radius:14px">';
-    const input = document.getElementById('logoUrlInput');
-    if (input) input.value = saved;
-    localStorage.setItem('logo_' + commerceId, saved);
+function logout() {
+  if (confirm('Voulez-vous vous deconnecter ?')) {
+    window.location.href = 'inscription.html';
   }
 }
 
 // ============================================================
-// TOGGLE AVIS DETAIL
+// CGU
 // ============================================================
-function toggleAvis(el) {
-  const detail = el.querySelector('.avis-detail');
-  const arrow = el.querySelector('.avis-expand');
-  const isOpen = detail.style.display !== 'none';
-  detail.style.display = isOpen ? 'none' : 'block';
-  if (arrow) arrow.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
-}
-
-
-// ============================================================
-// SUBSCRIPTION
-// ============================================================
-
-
-
-
-
-
-
-
-// ============================================================
-// LOGO
-// ============================================================
-function saveLogoUrl() {
-  var logoUrl = document.getElementById("logoUrlInput").value.trim();
-  if (!logoUrl) return;
-  var preview = document.getElementById("logoPreview");
-  if (preview) preview.innerHTML = "<img src='" + logoUrl + "' style='width:100%;height:100%;object-fit:cover;border-radius:14px'>";
-  localStorage.setItem("logo_" + commerceId, logoUrl);
-  try {
-    var url = new URL(SCRIPT_URL);
-    url.searchParams.set("action", "save_logo");
-    url.searchParams.set("commerce_id", commerceId);
-    url.searchParams.set("logo_url", logoUrl);
-    fetch(url.toString(), { method: "GET", mode: "no-cors" });
-  } catch(e) {}
-  var ok = document.getElementById("logoSavedOk");
-  if (ok) { ok.style.display = "block"; setTimeout(function(){ ok.style.display = "none"; }, 2500); }
-}
-
-function handleLogoUpload(input) {
-  const file = input.files[0];
-  if (!file) return;
-  const saving = document.getElementById('logoSaving');
-  if (saving) saving.style.display = 'block';
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    // Compress image to max 100x100px
-    const img = new Image();
-    img.onload = async () => {
-      const canvas = document.createElement('canvas');
-      const max = 120;
-      let w = img.width, h = img.height;
-      if (w > h) { if (w > max) { h = h * max / w; w = max; } }
-      else { if (h > max) { w = w * max / h; h = max; } }
-      canvas.width = w; canvas.height = h;
-      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-      const compressed = canvas.toDataURL('image/jpeg', 0.7);
-      const preview = document.getElementById('logoPreview');
-      if (preview) preview.innerHTML = "<img src='" + compressed + "' style='width:100%;height:100%;object-fit:cover;border-radius:14px'>";
-      const removeBtn = document.getElementById('removeLogo');
-      if (removeBtn) removeBtn.style.display = 'block';
-      localStorage.setItem('logo_' + commerceId, compressed);
-      try {
-        const url = new URL(SCRIPT_URL);
-        url.searchParams.set('action', 'save_logo');
-        url.searchParams.set('commerce_id', commerceId);
-        url.searchParams.set('logo_url', compressed);
-        await fetch(url.toString(), { method: 'GET', mode: 'no-cors' });
-      } catch(e) {}
-      if (saving) saving.style.display = 'none';
-      const ok = document.getElementById('logoSavedOk');
-      if (ok) { ok.style.display = 'block'; setTimeout(() => ok.style.display = 'none', 2500); }
-    };
-    img.src = e.target.result;
-  };
-  reader.readAsDataURL(file);
-}
-
-function removeLogo() {
-  const preview = document.getElementById('logoPreview');
-  if (preview) preview.innerHTML = '🏪';
-  const removeBtn = document.getElementById('removeLogo');
-  if (removeBtn) removeBtn.style.display = 'none';
-  localStorage.removeItem('logo_' + commerceId);
-  try {
-    const url = new URL(SCRIPT_URL);
-    url.searchParams.set('action', 'save_logo');
-    url.searchParams.set('commerce_id', commerceId);
-    url.searchParams.set('logo_url', '');
-    fetch(url.toString(), { method: 'GET', mode: 'no-cors' });
-  } catch(e) {}
-}
-
-async function loadSavedLogo() {
-  let saved = localStorage.getItem('logo_' + commerceId);
-  if (!saved) {
-    try {
-      const url = new URL(SCRIPT_URL);
-      url.searchParams.set('action', 'get_logo');
-      url.searchParams.set('commerce_id', commerceId);
-      const res = await fetch(url.toString());
-      const json = await res.json();
-      if (json && json.logo_url) saved = json.logo_url;
-    } catch(e) {}
-  }
-  if (saved) {
-    const preview = document.getElementById('logoPreview');
-    if (preview) preview.innerHTML = '<img src="' + saved + '" style="width:100%;height:100%;object-fit:cover;border-radius:14px">';
-    const input = document.getElementById('logoUrlInput');
-    if (input) input.value = saved;
-    localStorage.setItem('logo_' + commerceId, saved);
+function checkCGU() {
+  if (!localStorage.getItem('cgu_accepted_' + commerceId)) {
+    document.getElementById('cguModal').classList.add('visible');
   }
 }
 
-// ============================================================
-// TOGGLE AVIS DETAIL
-// ============================================================
-function toggleAvis(el) {
-  const detail = el.querySelector('.avis-detail');
-  const arrow = el.querySelector('.avis-expand');
-  const isOpen = detail.style.display !== 'none';
-  detail.style.display = isOpen ? 'none' : 'block';
-  if (arrow) arrow.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
+function acceptCGU() {
+  localStorage.setItem('cgu_accepted_' + commerceId, 'true');
+  document.getElementById('cguModal').classList.remove('visible');
 }
 
-// ============================================================
-// RECEIVE AVIS FROM index.html (same origin localStorage)
-// index.html doit appeler: storeAvis(data) avant d'envoyer au sheet
-// ============================================================
-
-function cancelSubscription() {
-  if (confirm('Annuler votre abonnement Frizz ?')) {
-    window.open('mailto:Frizz.avis@gmail.com?subject=Annulation Frizz&body=ID: ' + commerceId, '_blank');
-  }
+function downloadCGU() {
+  const lines = [
+    "CONDITIONS GENERALES D'UTILISATION - FRIZZ",
+    "Version 1.0 - Avril 2026",
+    "================================================",
+    "",
+    "1. OBJET",
+    "Frizz est une plateforme SaaS de collecte d'avis clients pour restaurants et commerces.",
+    "",
+    "2. ACCES AU SERVICE",
+    "L'acces au dashboard est reserve aux commerces ayant souscrit un abonnement actif ou en periode d'essai.",
+    "",
+    "3. FACTURATION",
+    "Le service est facture mensuellement a 14,99 euros. La resiliation prend effet a la fin de la periode en cours.",
+    "",
+    "4. LIMITATION DE RESPONSABILITE",
+    "Frizz ne saurait etre tenu responsable des consequences commerciales des avis publies.",
+    "",
+    "5. DROIT APPLICABLE",
+    "Les presentes CGU sont soumises au droit francais.",
+    "",
+    "6. CONTACT",
+    "Pour toute question : Frizz.avis@gmail.com",
+    "",
+    "================================================",
+    "Frizz - Tous droits reserves 2026"
+  ];
+  const content = lines.join('\n');
+  const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'CGU_Frizz_v1.0.txt';
+  a.click();
+  URL.revokeObjectURL(url);
 }
-window.addEventListener('storage', (e) => {
-  if (e.key === 'avis_' + commerceId) {
-    renderFromStorage();
-  }
-});
 </script>
 </body>
 </html>
