@@ -100,13 +100,21 @@ html, body { background: var(--bg); font-family: var(--font); color: var(--text)
 .stat-card {
   background: var(--card); border-radius: var(--radius);
   padding: 20px 18px; box-shadow: var(--shadow);
-  transition: transform 0.2s;
+  transition: transform 0.25s, box-shadow 0.25s, background 0.25s;
   position: relative; overflow: hidden;
+  cursor: default;
+}
+.stat-card::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.04) 0%, transparent 60%);
+  pointer-events: none;
 }
 
-.stat-card:hover { transform: translateY(-2px); }
+.stat-card:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(0,0,0,0.5); background: #1A1A1A; }
 .stat-label { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 10px; }
-.stat-value { font-size: 28px; font-weight: 900; letter-spacing: -1px; line-height: 1; margin-bottom: 6px; }
+.stat-value { font-size: 28px; font-weight: 900; letter-spacing: -1px; line-height: 1; margin-bottom: 6px; animation: statReveal 0.6s ease both; }
+@keyframes statReveal { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
 .stat-value.green { color: var(--accent); }
 .stat-value.red { color: var(--danger); }
 .stat-value.blue { color: var(--blue); }
@@ -120,7 +128,7 @@ html, body { background: var(--bg); font-family: var(--font); color: var(--text)
 /* ===== DESKTOP GRID ===== */
 @media(min-width:900px) {
   .stats-grid { grid-template-columns: repeat(4,1fr); }
-  .desktop-grid { display: grid !important; grid-template-columns: 1fr 1fr 1fr !important; gap: 16px; align-items: start; }
+  .desktop-grid { display: block !important; }
   .desktop-col-full { grid-column: 1 / -1; }
   .desktop-col-2 { grid-column: span 2; }
 }
@@ -395,11 +403,8 @@ html, body { background: var(--bg); font-family: var(--font); color: var(--text)
   <div class="header">
     <div style="font-size:18px;font-weight:900;color:var(--accent);letter-spacing:-0.5px">Frizz ✦</div>
     <div class="header-name" id="headerName" onclick="editName(this)">Mon Commerce</div>
-    <div class="live-pill"><div class="live-dot"></div><span class="header-label">En direct</span></div>
-    <div class="header-btns">
-      <button class="btn-icon" onclick="loadData()" title="Actualiser">&#8635;</button>
-      <button class="btn-icon danger" onclick="logout()" title="Déconnexion">&#8859;</button>
-    </div>
+    <div class="live-pill"><div class="live-dot"></div>En direct</div>
+
   </div>
 
   <div class="last-refresh">Mise à jour : <span id="lastRefreshTime">—</span></div>
@@ -431,7 +436,7 @@ html, body { background: var(--bg); font-family: var(--font); color: var(--text)
     </div>
   </div>
 
-  <div class="desktop-grid" style="display:block">
+  <div class="desktop-grid">
 
   <!-- AI SUMMARY -->
   <div class="card ai-card">
@@ -482,7 +487,7 @@ html, body { background: var(--bg); font-family: var(--font); color: var(--text)
       </div>
       <div class="chart-legend">
         <div class="legend-item"><div class="legend-dot" style="background:#58CC02"></div>Cuisine</div>
-        <div class="legend-item"><div class="legend-dot" style="background:#007AFF"></div>Service</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#FFFFFF"></div>Service</div>
         <div class="legend-item"><div class="legend-dot" style="background:#FF9500"></div>Qualité/Prix</div>
       </div>
     </div>
@@ -633,6 +638,11 @@ html, body { background: var(--bg); font-family: var(--font); color: var(--text)
 
   </div><!-- end desktop-grid -->
 
+  <div style="text-align:center;margin-top:32px;margin-bottom:16px">
+    <button onclick="logout()" style="background:none;border:1.5px solid rgba(255,59,48,0.3);border-radius:12px;padding:12px 32px;font-family:var(--font);font-size:14px;font-weight:700;color:var(--danger);cursor:pointer;transition:all 0.2s" onmouseover="this.style.background='rgba(255,59,48,0.08)'" onmouseout="this.style.background='none'">
+      Se déconnecter
+    </button>
+  </div>
   <div class="footer">
     Propulsé par <a href="#">Frizz</a> ·
     <a href="mailto:Frizz.avis@gmail.com">Frizz.avis@gmail.com</a> ·
@@ -850,9 +860,9 @@ function renderProgressChart() {
   if (progressChartInstance) progressChartInstance.destroy();
   progressChartInstance = new Chart(canvas, {
     type:'line', data:{labels:labels,datasets:[
-      {label:'Cuisine',data:cuisineData,borderColor:'#58CC02',backgroundColor:'rgba(88,204,2,0.08)',tension:0.4,spanGaps:true,pointRadius:5,borderWidth:2.5},
-      {label:'Service',data:serviceData,borderColor:'#007AFF',backgroundColor:'rgba(0,122,255,0.08)',tension:0.4,spanGaps:true,pointRadius:5,borderWidth:2.5},
-      {label:'Prix',data:prixData,borderColor:'#FF9500',backgroundColor:'rgba(255,149,0,0.08)',tension:0.4,spanGaps:true,pointRadius:5,borderWidth:2.5}
+      {label:'Cuisine',data:cuisineData,borderColor:'#58CC02',backgroundColor:'rgba(88,204,2,0.08)',tension:0.4,spanGaps:true,pointRadius:5,pointStyle:'circle',borderWidth:2.5},
+      {label:'Service',data:serviceData,borderColor:'#FFFFFF',backgroundColor:'rgba(255,255,255,0.05)',tension:0.4,spanGaps:true,pointRadius:5,pointStyle:'rectRot',borderWidth:2.5},
+      {label:'Prix',data:prixData,borderColor:'#FF9500',backgroundColor:'rgba(255,149,0,0.08)',tension:0.4,spanGaps:true,pointRadius:5,pointStyle:'triangle',borderWidth:2.5,borderDash:[5,3]}
     ]},
     options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
       plugins:{legend:{display:false},tooltip:{backgroundColor:'#1E1E1E',borderColor:'rgba(255,255,255,0.1)',borderWidth:1,titleColor:'#F5F5F5',bodyColor:'rgba(255,255,255,0.5)',padding:12,boxShadow:'0 4px 16px rgba(0,0,0,0.1)'}},
