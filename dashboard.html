@@ -491,7 +491,7 @@ html, body { background: var(--bg); font-family: var(--font); color: var(--text)
     <div class="card-header" onclick="toggleCard(this)">
       <div class="card-title">
         <div class="card-title-icon blue">📈</div>
-        Progression des notes
+        Évolution de la semaine
       </div>
       <div class="card-chevron">&#9660;</div>
     </div>
@@ -532,22 +532,18 @@ html, body { background: var(--bg); font-family: var(--font); color: var(--text)
     </div>
   </div>
 
-  <!-- RÉPARTITION -->
+  <!-- PARAMÈTRES -->
   <div class="card collapsed">
     <div class="card-header" onclick="toggleCard(this)">
       <div class="card-title">
-        <div class="card-title-icon orange">📊</div>
-        Répartition des notes
+        <div class="card-title-icon" style="background:rgba(255,255,255,0.06)">⚙️</div>
+        Paramètres
       </div>
       <div class="card-chevron">&#9660;</div>
     </div>
-    <div class="card-body">
-      <div class="bar-chart" id="chartBars"></div>
-    </div>
-  </div>
+    <div class="card-body" style="padding:0">
 
-  <!-- GOOGLE LINK -->
-  <div class="card collapsed">
+  <div class="card collapsed" style="border-radius:0;box-shadow:none;border-left:none;border-right:none;border-top:none;margin-bottom:0">
     <div class="card-header" onclick="toggleCard(this)">
       <div class="card-title">
         <div class="card-title-icon yellow">⭐</div>
@@ -566,7 +562,7 @@ html, body { background: var(--bg); font-family: var(--font); color: var(--text)
     </div>
   </div>
 
-  <!-- NOTIFICATIONS -->
+
   <div class="card collapsed">
     <div class="card-header" onclick="toggleCard(this)">
       <div class="card-title">
@@ -601,7 +597,7 @@ html, body { background: var(--bg); font-family: var(--font); color: var(--text)
     </div>
   </div>
 
-  <!-- QR CODE -->
+
   <div class="card collapsed">
     <div class="card-header" onclick="toggleCard(this)">
       <div class="card-title">
@@ -623,7 +619,7 @@ html, body { background: var(--bg); font-family: var(--font); color: var(--text)
     </div>
   </div>
 
-  <!-- MON COMMERCE -->
+
   <div class="card collapsed">
     <div class="card-header" onclick="toggleCard(this)">
       <div class="card-title">
@@ -648,7 +644,7 @@ html, body { background: var(--bg); font-family: var(--font); color: var(--text)
     </div>
   </div>
 
-  <!-- ABONNEMENT -->
+
   <div class="card collapsed">
     <div class="card-header" onclick="toggleCard(this)">
       <div class="card-title">
@@ -660,13 +656,19 @@ html, body { background: var(--bg); font-family: var(--font); color: var(--text)
     <div class="card-body" id="subBody"></div>
   </div>
 
+
+      <!-- DECONNEXION -->
+      <div style="padding:0 22px 22px">
+        <button onclick="logout()" style="width:100%;background:none;border:1.5px solid rgba(255,59,48,0.3);border-radius:12px;padding:12px;font-family:var(--font);font-size:14px;font-weight:700;color:var(--danger);cursor:pointer;transition:all 0.2s" onmouseover="this.style.background='rgba(255,59,48,0.08)'" onmouseout="this.style.background='none'">
+          Se déconnecter
+        </button>
+      </div>
+    </div>
+  </div>
+
   </div><!-- end desktop-grid -->
 
-  <div style="text-align:center;margin-top:32px;margin-bottom:16px">
-    <button onclick="logout()" style="background:none;border:1.5px solid rgba(255,59,48,0.3);border-radius:12px;padding:12px 32px;font-family:var(--font);font-size:14px;font-weight:700;color:var(--danger);cursor:pointer;transition:all 0.2s" onmouseover="this.style.background='rgba(255,59,48,0.08)'" onmouseout="this.style.background='none'">
-      Se déconnecter
-    </button>
-  </div>
+
   <div class="footer">
     Propulsé par <a href="#">Frizz</a> ·
     <a href="mailto:Frizz.avis@gmail.com">Frizz.avis@gmail.com</a> ·
@@ -742,6 +744,8 @@ window.addEventListener('DOMContentLoaded', function() {
   generateQR();
   loadData();
   setTimeout(loadSavedLogo, 500);
+  // Safety fallback - always show app after 5s
+  setTimeout(hideLoading, 5000);
 });
 
 function editName(el) {
@@ -790,6 +794,10 @@ async function loadData() {
   updateStats(); renderAvis(); renderChart();
   setTimeout(renderProgressChart, 400);
   document.getElementById('lastRefreshTime').textContent = new Date().toLocaleTimeString('fr-FR');
+  hideLoading();
+}
+
+function hideLoading() {
   document.getElementById('loading').style.display = 'none';
   document.getElementById('app').style.display = 'block';
 }
@@ -841,10 +849,6 @@ function setAvisFilter(filter, btn) {
 
 function renderAvis() {
   var container = document.getElementById('avisList');
-  if (!filtered.length) {
-    var msg = currentAvisFilter === 'today' ? 'Aucun avis aujourd\'hui.' : currentAvisFilter === 'good' ? 'Aucune bonne note.' : currentAvisFilter === 'bad' ? 'Aucune mauvaise note.' : 'Aucun avis pour l\'instant.';
-    container.innerHTML = '<div class="empty-state">' + msg + '</div>'; return;
-  }
   var today = new Date(); today.setHours(0,0,0,0);
   var filtered = allAvis.filter(function(a) {
     if (currentAvisFilter === 'good') return parseInt(a.note_globale) >= 4;
@@ -855,6 +859,10 @@ function renderAvis() {
     }
     return true;
   });
+  if (!filtered.length) {
+    var msg = currentAvisFilter === 'today' ? 'Aucun avis aujourd\'hui.' : currentAvisFilter === 'good' ? 'Aucune bonne note.' : currentAvisFilter === 'bad' ? 'Aucune mauvaise note.' : 'Aucun avis pour l\'instant. Partagez votre QR code !';
+    container.innerHTML = '<div class="empty-state">' + msg + '</div>'; return;
+  }
   var sorted = filtered.slice().reverse();
   container.innerHTML = '';
   sorted.forEach(function(a, idx) {
