@@ -428,25 +428,25 @@ html, body { background: var(--bg); font-family: var(--font); color: var(--text)
 
   <!-- STATS -->
   <div class="stats-grid desktop-col-full" style="margin-bottom:16px">
-    <div class="stat-card green">
+    <div class="stat-card green" onclick="showStatModal('moyenne')" style="cursor:pointer">
       <div class="stat-label">Note Moyenne</div>
       <div class="stat-value green" id="statMoyenne">—</div>
       <div class="stat-sub">sur 5 étoiles</div>
       <div class="stat-bar"><div class="stat-bar-fill green" id="statBar" style="width:0%"></div></div>
     </div>
-    <div class="stat-card blue">
+    <div class="stat-card blue" onclick="showStatModal('total')" style="cursor:pointer">
       <div class="stat-label">Total Avis</div>
       <div class="stat-value blue" id="statTotal">0</div>
       <div class="stat-sub" id="statTotalSub">collectés</div>
     </div>
-    <div class="stat-card green">
+    <div class="stat-card green" onclick="showStatModal('bons')" style="cursor:pointer">
       <div class="stat-label">Bons Avis</div>
       <div class="stat-value green" id="statBons">0</div>
       <div class="stat-sub">note ≥ 4</div>
       <div class="stat-bar"><div class="stat-bar-fill green" id="statBonsBar" style="width:0%"></div></div>
     </div>
-    <div class="stat-card red">
-      <div class="stat-label">Notes faibles</div>
+    <div class="stat-card red" onclick="showStatModal('mauvais')" style="cursor:pointer">
+      <div class="stat-label">Mauvaises notes</div>
       <div class="stat-value red" id="statMauvais">0</div>
       <div class="stat-sub">note ≤ 3</div>
       <div class="stat-bar"><div class="stat-bar-fill red" id="statMauvaisBar" style="width:0%"></div></div>
@@ -543,7 +543,7 @@ html, body { background: var(--bg); font-family: var(--font); color: var(--text)
     </div>
     <div class="card-body" style="padding:0">
 
-  <div class="card collapsed" style="border-radius:0;box-shadow:none;border-left:none;border-right:none;border-top:none;margin-bottom:0">
+  <div class="card collapsed">
     <div class="card-header" onclick="toggleCard(this)">
       <div class="card-title">
         <div class="card-title-icon yellow">⭐</div>
@@ -705,6 +705,19 @@ html, body { background: var(--bg); font-family: var(--font); color: var(--text)
   </div>
 </div>
 
+<!-- STAT MODAL -->
+<div id="statModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(8px);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#141414;border:1px solid rgba(255,255,255,0.1);border-radius:24px;width:100%;max-width:520px;max-height:85vh;overflow-y:auto">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid rgba(255,255,255,0.07)">
+      <div style="font-size:16px;font-weight:800" id="modalTitle">Détail</div>
+      <button onclick="closeStatModal()" style="background:rgba(255,255,255,0.08);border:none;width:32px;height:32px;border-radius:50%;font-size:16px;cursor:pointer;color:#fff;display:flex;align-items:center;justify-content:center">✕</button>
+    </div>
+    <div style="padding:20px 24px">
+      <div id="modalContent"></div>
+    </div>
+  </div>
+</div>
+
 <script>
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwj7RToCQWdr9EDw1lXBKeSKwhkXcTKPRdURQkdPEQ0vHQiVi32AbXj-lcUs3tuZ9jX/exec';
 const BASE_URL = 'https://emcl22a-creator.github.io/frizz-client/';
@@ -795,6 +808,104 @@ async function loadData() {
   setTimeout(renderProgressChart, 400);
   document.getElementById('lastRefreshTime').textContent = new Date().toLocaleTimeString('fr-FR');
   hideLoading();
+}
+
+function closeStatModal() {
+  document.getElementById('statModal').style.display = 'none';
+}
+
+function showStatModal(type) {
+  var modal = document.getElementById('statModal');
+  var title = document.getElementById('modalTitle');
+  var body = document.getElementById('modalContent');
+  modal.style.display = 'flex';
+
+  if (type === 'total') {
+    title.textContent = 'Avis par semaine';
+    body.innerHTML = '<canvas id="modalChart" style="width:100%;height:160px"></canvas><div style="display:flex;gap:16px;margin-top:12px"><div style="display:flex;align-items:center;gap:6px;font-size:11px;color:rgba(255,255,255,0.5)"><div style="width:10px;height:10px;border-radius:3px;background:#58CC02"></div>Total avis</div><div style="display:flex;align-items:center;gap:6px;font-size:11px;color:rgba(255,255,255,0.5)"><div style="width:10px;height:10px;border-radius:3px;background:#FF9500"></div>Publiés sur Google</div></div>';
+    setTimeout(function() {
+      var canvas = document.getElementById('modalChart');
+      if (!canvas || !allAvis.length) return;
+      // Group by week
+      var weeks = {};
+      allAvis.forEach(function(a) {
+        var d = new Date(a.date);
+        var start = new Date(d); start.setDate(d.getDate() - d.getDay() + 1); start.setHours(0,0,0,0);
+        var key = start.toLocaleDateString('fr-FR',{day:'numeric',month:'short'});
+        if (!weeks[key]) weeks[key] = {total:0, google:0};
+        weeks[key].total++;
+        if (a.avis_google === 'oui ✅') weeks[key].google++;
+      });
+      var labels = Object.keys(weeks);
+      var totalData = labels.map(function(k){return weeks[k].total;});
+      var googleData = labels.map(function(k){return weeks[k].google;});
+      canvas.style.height = '160px';
+      canvas.style.maxHeight = '160px';
+      new Chart(canvas, {
+        type:'bar',
+        data:{labels:labels,datasets:[
+          {label:'Total avis',data:totalData,backgroundColor:'rgba(88,204,2,0.7)',borderRadius:6,borderSkipped:false},
+          {label:'Publiés Google',data:googleData,backgroundColor:'rgba(255,149,0,0.7)',borderRadius:6,borderSkipped:false}
+        ]},
+        options:{responsive:false,maintainAspectRatio:false,animation:{duration:400},plugins:{legend:{display:false}},scales:{x:{ticks:{color:'rgba(255,255,255,0.4)',font:{size:10}},grid:{display:false},border:{display:false}},y:{ticks:{color:'rgba(255,255,255,0.4)',stepSize:1},grid:{color:'rgba(255,255,255,0.05)'},border:{display:false}}}}
+      });
+    }, 100);
+
+  } else if (type === 'moyenne') {
+    title.textContent = 'Évolution de la note moyenne';
+    // Build chart
+    body.innerHTML = '<canvas id="modalChart" style="width:100%;height:220px"></canvas>';
+    setTimeout(function() {
+      var canvas = document.getElementById('modalChart');
+      if (!canvas) return;
+      var sorted = allAvis.slice().sort(function(a,b){return new Date(a.date)-new Date(b.date);});
+      var labels = sorted.map(function(a){return new Date(a.date).toLocaleDateString('fr-FR',{day:'numeric',month:'short'});});
+      var data = sorted.map(function(a){return parseFloat(a.note_globale)||null;});
+      // Running average
+      var avg = [];
+      var sum = 0;
+      data.forEach(function(v,i){sum+=v;avg.push(parseFloat((sum/(i+1)).toFixed(1)));});
+      // Group by day for bar chart
+      var dayGroups = {};
+      sorted.forEach(function(a) {
+        var key = new Date(a.date).toLocaleDateString('fr-FR',{day:'numeric',month:'short'});
+        if (!dayGroups[key]) dayGroups[key] = [];
+        dayGroups[key].push(parseFloat(a.note_globale)||0);
+      });
+      var dayLabels = Object.keys(dayGroups);
+      var dayAvgs = dayLabels.map(function(k){
+        var vals = dayGroups[k];
+        return parseFloat((vals.reduce(function(a,b){return a+b;},0)/vals.length).toFixed(1));
+      });
+      new Chart(canvas, {
+        type:'bar',
+        data:{labels:dayLabels,datasets:[
+          {label:'Note moyenne',data:dayAvgs,backgroundColor:dayAvgs.map(function(v){return v>=4?'rgba(88,204,2,0.7)':v>=3?'rgba(255,149,0,0.7)':'rgba(255,59,48,0.7)';}),borderRadius:6,borderSkipped:false}
+        ]},
+        options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{min:0,max:5,ticks:{color:'rgba(255,255,255,0.4)',stepSize:1},grid:{color:'rgba(255,255,255,0.05)'},border:{display:false}},x:{ticks:{color:'rgba(255,255,255,0.4)',font:{size:10},maxRotation:45},grid:{display:false},border:{display:false}}}}
+      });
+    }, 100);
+  } else if (type === 'bons' || type === 'mauvais') {
+    var isBons = type === 'bons';
+    title.textContent = isBons ? 'Tous les bons avis (note ≥ 4)' : 'Toutes les mauvaises notes (note ≤ 3)';
+    var filtered = allAvis.filter(function(a){
+      var n = parseInt(a.note_globale);
+      return isBons ? n >= 4 : (n <= 3 && n > 0);
+    }).slice().reverse();
+    if (!filtered.length) { body.innerHTML = '<div style="text-align:center;padding:32px;color:rgba(255,255,255,0.4);font-size:14px">'+(isBons?'Aucun bon avis':'Aucune mauvaise note')+'</div>'; return; }
+    body.innerHTML = filtered.map(function(a) {
+      var note = parseInt(a.note_globale)||0;
+      var stars = '★'.repeat(note)+'☆'.repeat(5-note);
+      var date = new Date(a.date).toLocaleDateString('fr-FR',{day:'numeric',month:'short',year:'numeric'});
+      return '<div style="background:rgba(255,255,255,0.03);border-radius:12px;padding:14px;margin-bottom:8px">'
+        +'<div style="display:flex;justify-content:space-between;margin-bottom:6px">'
+        +'<span style="color:'+(isBons?'#58CC02':'#FF3B30')+';font-size:14px">'+stars+'</span>'
+        +'<span style="font-size:11px;color:rgba(255,255,255,0.4)">'+date+'</span>'
+        +'</div>'
+        +(a.commentaire?'<div style="font-size:13px;color:rgba(255,255,255,0.6);font-style:italic">"'+a.commentaire+'"</div>':'')
+        +'</div>';
+    }).join('');
+  }
 }
 
 function hideLoading() {
@@ -937,7 +1048,7 @@ function updateAICounter() {
   var remaining = Math.max(0, 3 - uses);
   var el = document.getElementById('aiCounter');
   if (el) {
-    el.textContent = remaining + '/3 pour cette semaine';
+    el.textContent = remaining === 0 ? 'Utilisé cette semaine' : '1 analyse disponible';
     el.style.color = remaining === 0 ? 'var(--danger)' : remaining === 1 ? 'var(--warning)' : 'var(--accent)';
     el.style.background = remaining === 0 ? 'rgba(255,59,48,0.1)' : remaining === 1 ? 'rgba(255,149,0,0.1)' : 'var(--accent-dim)';
     el.style.borderColor = remaining === 0 ? 'rgba(255,59,48,0.2)' : remaining === 1 ? 'rgba(255,149,0,0.2)' : 'rgba(88,204,2,0.2)';
@@ -948,9 +1059,9 @@ async function generateAISummary() {
   // Check weekly limit (3 per week)
   var weekKey = 'ai_uses_' + commerceId + '_' + getWeekId();
   var uses = parseInt(localStorage.getItem(weekKey) || '0');
-  var MAX_USES = 3;
+  var MAX_USES = 1;
   if (uses >= MAX_USES) {
-    document.getElementById('aiContent').innerHTML = '<div class="ai-empty"><div style="font-size:32px;margin-bottom:10px">✨</div><div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px">3 analyses utilisées cette semaine</div><div style="font-size:12px;color:var(--muted)">Revenez lundi pour de nouvelles analyses.</div></div>';
+    document.getElementById('aiContent').innerHTML = '<div class="ai-empty"><div style="font-size:32px;margin-bottom:10px">✨</div><div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px">Analyse déjà générée cette semaine</div><div style="font-size:12px;color:var(--muted)">Revenez lundi pour une nouvelle analyse.</div></div>';
     return;
   }
 
