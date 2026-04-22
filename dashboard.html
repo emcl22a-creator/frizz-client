@@ -182,10 +182,16 @@ html, body { background: var(--bg); font-family: 'Figtree', sans-serif; color: v
 .footer { text-align: center; font-size: 12px; color: rgba(255,255,255,0.15); margin-top: 32px; }
 .footer a { color: var(--accent); opacity: 0.5; text-decoration: none; }
 
-@media(max-width:400px) {
+@media(max-width:600px) {
+  .hide-mobile { display: none; }
+  .show-mobile { display: inline; }
   .stats-grid { grid-template-columns: repeat(2,1fr); }
   .header-actions { gap: 4px; }
   .btn-header { padding: 7px 8px; }
+}
+@media(min-width:601px) {
+  .hide-mobile { display: inline; }
+  .show-mobile { display: none; }
 }
 </style>
 </head>
@@ -201,11 +207,14 @@ html, body { background: var(--bg); font-family: 'Figtree', sans-serif; color: v
 <div id="app">
   <div class="header">
     <div class="header-logo">Frizz ✦</div>
-    <div class="header-name" id="headerName">Mon Commerce</div>
+    <div class="header-name" id="headerName" onclick="editName(this)" title="Cliquez pour modifier" style="cursor:pointer">Mon Commerce</div>
     <div class="live-badge"><div class="live-dot"></div> En direct</div>
     <div class="header-actions">
       <button class="btn-header" onclick="loadData()">&#8635; Actualiser</button>
-      <button class="btn-header danger" onclick="logout()">&#8859; Deconnexion</button>
+      <button class="btn-header danger" onclick="logout()" title="Deconnexion">
+        <span class="hide-mobile">Deconnexion</span>
+        <span class="show-mobile">&#8859;</span>
+      </button>
     </div>
   </div>
 
@@ -265,7 +274,7 @@ html, body { background: var(--bg); font-family: 'Figtree', sans-serif; color: v
   </div>
 
   <!-- CHART REPARTITION -->
-  <div class="section">
+  <div class="section collapsed">
     <div class="section-header" onclick="toggleSection(this)">
       <div class="section-title">&#128202; Repartition des notes</div>
       <span class="chevron">&#9660;</span>
@@ -298,7 +307,7 @@ html, body { background: var(--bg); font-family: 'Figtree', sans-serif; color: v
   </div>
 
   <!-- AVIS LIST -->
-  <div class="section">
+  <div class="section collapsed">
     <div class="section-header" onclick="toggleSection(this)">
       <div class="section-title">&#128172; Avis clients <span class="badge" id="avisBadge">0</span></div>
       <span class="chevron">&#9660;</span>
@@ -309,7 +318,7 @@ html, body { background: var(--bg); font-family: 'Figtree', sans-serif; color: v
   </div>
 
   <!-- GOOGLE LINK -->
-  <div class="section">
+  <div class="section collapsed">
     <div class="section-header" onclick="toggleSection(this)">
       <div class="section-title">&#11088; Lien Google Avis</div>
       <span class="chevron">&#9660;</span>
@@ -365,7 +374,11 @@ html, body { background: var(--bg); font-family: 'Figtree', sans-serif; color: v
     </div>
     <div class="section-body">
       <div class="qr-wrap">
-        <div id="qrcode"></div>
+        <div style="position:relative;display:inline-block">
+          <canvas id="qrCanvas" width="220" height="220" style="border-radius:20px;display:block"></canvas>
+          <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:46px;height:46px;background:#fff;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:#000;border:2px solid rgba(0,0,0,0.1);box-shadow:0 2px 8px rgba(0,0,0,0.15)">F</div>
+        </div>
+        <div id="qrcode" style="display:none"></div>
         <div class="qr-url" id="qrUrl">—</div>
         <button class="btn-dl" onclick="downloadQR()">&#11015; Telecharger le QR Code</button>
       </div>
@@ -464,7 +477,8 @@ let progressChartInstance = null;
 // INIT
 // ============================================================
 window.addEventListener('DOMContentLoaded', function() {
-  document.getElementById('headerName').textContent = commerceName;
+  const savedName = localStorage.getItem('commerce_name_' + commerceId);
+  document.getElementById('headerName').textContent = savedName || commerceName;
 
   // Load saved notif prefs
   const savedBad = localStorage.getItem('notif_bad_' + commerceId);
@@ -486,6 +500,33 @@ window.addEventListener('DOMContentLoaded', function() {
   loadData();
   setTimeout(loadSavedLogo, 400);
 });
+
+// ============================================================
+// EDIT NAME
+// ============================================================
+function editName(el) {
+  const current = el.textContent;
+  const input = document.createElement('input');
+  input.value = current;
+  input.style.cssText = 'background:var(--surface2);border:1.5px solid var(--accent);border-radius:8px;padding:4px 8px;font-family:inherit;font-size:15px;font-weight:700;color:var(--text);outline:none;width:140px;max-width:160px';
+  el.replaceWith(input);
+  input.focus();
+  input.select();
+  function save() {
+    const newName = input.value.trim() || current;
+    const div = document.createElement('div');
+    div.className = 'header-name';
+    div.id = 'headerName';
+    div.textContent = newName;
+    div.onclick = function() { editName(div); };
+    div.title = 'Cliquez pour modifier';
+    div.style.cssText = 'cursor:pointer';
+    input.replaceWith(div);
+    localStorage.setItem('commerce_name_' + commerceId, newName);
+  }
+  input.addEventListener('blur', save);
+  input.addEventListener('keydown', function(e) { if (e.key === 'Enter') input.blur(); if (e.key === 'Escape') { input.value = current; input.blur(); } });
+}
 
 // ============================================================
 // LOAD DATA
@@ -729,7 +770,7 @@ async function generateAISummary() {
 function generateQR() {
   const googleLink = localStorage.getItem('google_link_' + commerceId) || '';
   const clientUrl = BASE_URL + 'landing.html?id=' + commerceId + '&name=' + encodeURIComponent(commerceName) + '&google=' + encodeURIComponent(googleLink);
-  document.getElementById('qrUrl').textContent = BASE_URL + '?id=' + commerceId;
+  document.getElementById('qrUrl').textContent = BASE_URL + '?id=' + commerceId + '...';
   const qrEl = document.getElementById('qrcode');
   qrEl.innerHTML = '';
   new QRCode(qrEl, {
@@ -738,17 +779,30 @@ function generateQR() {
     colorDark: '#000000', colorLight: '#ffffff',
     correctLevel: QRCode.CorrectLevel.L
   });
+  setTimeout(function() {
+    const src = qrEl.querySelector('canvas');
+    if (!src) { setTimeout(generateQR, 300); return; }
+    const dst = document.getElementById('qrCanvas');
+    if (!dst) return;
+    dst.width = 220; dst.height = 220;
+    const ctx = dst.getContext('2d');
+    // White rounded background
+    ctx.fillStyle = '#FFFFFF';
+    ctx.beginPath();
+    ctx.roundRect(0, 0, 220, 220, 20);
+    ctx.fill();
+    // Draw QR centered
+    ctx.drawImage(src, 10, 10, 200, 200);
+  }, 300);
 }
 
 function downloadQR() {
-  setTimeout(function() {
-    const canvas = document.querySelector('#qrcode canvas');
-    if (!canvas) return;
-    const a = document.createElement('a');
-    a.download = 'QRCode_Frizz_' + commerceId + '.png';
-    a.href = canvas.toDataURL();
-    a.click();
-  }, 200);
+  const canvas = document.getElementById('qrCanvas');
+  if (!canvas) return;
+  const a = document.createElement('a');
+  a.download = 'QRCode_Frizz_' + commerceId + '.png';
+  a.href = canvas.toDataURL('image/png');
+  a.click();
 }
 
 // ============================================================
