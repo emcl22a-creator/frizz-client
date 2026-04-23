@@ -418,11 +418,13 @@ html, body { background: var(--bg); font-family: var(--font); color: var(--text)
 <body>
 
 <div id="loading">
-  <div class="loading-logo">Frizz ✦</div>
-  <div class="loading-dots">
-    <div class="loading-dot"></div>
-    <div class="loading-dot"></div>
-    <div class="loading-dot"></div>
+  <div style="display:flex;flex-direction:column;align-items:center;gap:20px;padding-left:40px">
+    <div class="loading-logo">Frizz ✦</div>
+    <div class="loading-dots">
+      <div class="loading-dot"></div>
+      <div class="loading-dot"></div>
+      <div class="loading-dot"></div>
+    </div>
   </div>
 </div>
 
@@ -1091,9 +1093,17 @@ function renderProgressChart() {
   if (!canvas || !allAvis.length) return;
   var maxDays = chartPeriod === 'week' ? 7 : chartPeriod === 'month' ? 30 : 360;
   var now = new Date(); now.setHours(23,59,59,0);
-  var cutoff = new Date(now.getTime() - maxDays * 86400000);
   
-  // Group by day or week depending on period
+  // Find first avis date
+  var dates = allAvis.map(function(a){return new Date(a.date);}).filter(function(d){return !isNaN(d);});
+  if (!dates.length) return;
+  var firstDate = new Date(Math.min.apply(null, dates));
+  firstDate.setHours(0,0,0,0);
+  
+  // Cutoff = max(first avis date, now - maxDays)
+  var cutoffByPeriod = new Date(now.getTime() - maxDays * 86400000);
+  var cutoff = firstDate > cutoffByPeriod ? firstDate : cutoffByPeriod;
+
   var groupByWeek = maxDays >= 60;
   var groups = {};
   allAvis.forEach(function(a) {
@@ -1195,7 +1205,7 @@ async function generateAISummary() {
     document.getElementById('aiDate').textContent = new Date().toLocaleDateString('fr-FR');
     var recosEl = document.getElementById('aiRecos');
     recosEl.innerHTML = recoLines.map(function(r){return '<div class="ai-reco"><span class="ai-reco-arrow">&#8594;</span><span>'+r+'</span></div>';}).join('');
-    localStorage.setItem(weekKey, uses + 1);
+    localStorage.setItem('ai_uses_' + commerceId + '_' + getWeekId(), uses + 1);
     updateAICounter();
     document.getElementById('aiContent').style.display='none';
     document.getElementById('aiResult').style.display='block';
@@ -1345,7 +1355,14 @@ function toggleCard(header) {
   var isOpen = !header.parentElement.classList.contains('collapsed');
   if (isOpen) {
     var body = header.parentElement.querySelector('#progressBody');
-    if (body) setTimeout(renderProgressChart, 200);
+    if (body) {
+      setTimeout(function() {
+        if (progressChartInstance) { progressChartInstance.destroy(); progressChartInstance = null; }
+        var canvas = document.getElementById('progressChart');
+        if (canvas) { canvas.width = canvas.offsetWidth || 400; canvas.height = 200; }
+        renderProgressChart();
+      }, 250);
+    }
     var gList = header.parentElement.querySelector('#googleAvisList');
     if (gList) setTimeout(renderGoogleAvis, 200);
   }
@@ -1406,23 +1423,28 @@ function showStatModal(type) {
   var body = document.getElementById('modalContent');
   modal.style.display = 'flex';
   if (type === 'total') {
-    title.textContent = 'Avis par semaine';
-    body.innerHTML = '<canvas id="modalChart" style="width:100%;height:160px"></canvas>';
+    title.textContent = 'Avis collectés par mois';
+    body.innerHTML = '<canvas id="modalChart" style="width:100%;height:220px"></canvas><div style="display:flex;gap:16px;margin-top:10px"><div style="display:flex;align-items:center;gap:6px;font-size:11px;color:rgba(255,255,255,0.5)"><div style="width:10px;height:10px;border-radius:3px;background:#58CC02"></div>Total avis</div><div style="display:flex;align-items:center;gap:6px;font-size:11px;color:rgba(255,255,255,0.5)"><div style="width:10px;height:10px;border-radius:3px;background:#FF9500"></div>Publiés sur Google</div></div>';
     setTimeout(function() {
       var canvas = document.getElementById('modalChart');
       if (!canvas || !allAvis.length) return;
-      var weeks = {};
+      var months = {};
       allAvis.forEach(function(a) {
         var d = new Date(a.date);
-        var start = new Date(d); start.setDate(d.getDate() - d.getDay() + 1); start.setHours(0,0,0,0);
-        var key = start.toLocaleDateString('fr-FR',{day:'numeric',month:'short'});
-        if (!weeks[key]) weeks[key] = {total:0,google:0};
-        weeks[key].total++;
-        if (a.avis_google && a.avis_google.indexOf('oui') === 0) weeks[key].google++;
+        var key = d.toLocaleDateString('fr-FR',{month:'long',year:'numeric'});
+        if (!months[key]) months[key] = {total:0,google:0};
+        months[key].total++;
+        if (a.avis_google && a.avis_google.indexOf('oui') === 0) months[key].google++;
       });
-      var labels = Object.keys(weeks);
-      canvas.style.height = '160px'; canvas.style.maxHeight = '160px';
-      new Chart(canvas, {type:'bar',data:{labels:labels,datasets:[{label:'Total',data:labels.map(function(k){return weeks[k].total;}),backgroundColor:'rgba(88,204,2,0.7)',borderRadius:6},{label:'Google',data:labels.map(function(k){return weeks[k].google;}),backgroundColor:'rgba(255,149,0,0.7)',borderRadius:6}]},options:{responsive:false,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'rgba(255,255,255,0.4)',font:{size:10}},grid:{display:false},border:{display:false}},y:{ticks:{color:'rgba(255,255,255,0.4)',stepSize:1},grid:{color:'rgba(255,255,255,0.05)'},border:{display:false}}}}});
+      var labels = Object.keys(months);
+      new Chart(canvas, {
+        type:'bar',
+        data:{labels:labels,datasets:[
+          {label:'Total',data:labels.map(function(k){return months[k].total;}),backgroundColor:'rgba(88,204,2,0.7)',borderRadius:6,borderSkipped:false},
+          {label:'Google',data:labels.map(function(k){return months[k].google;}),backgroundColor:'rgba(255,149,0,0.7)',borderRadius:6,borderSkipped:false}
+        ]},
+        options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'rgba(255,255,255,0.4)',font:{size:11}},grid:{display:false},border:{display:false}},y:{ticks:{color:'rgba(255,255,255,0.4)',stepSize:1},grid:{color:'rgba(255,255,255,0.05)'},border:{display:false}}}}
+      });
     }, 100);
   } else if (type === 'moyenne') {
     title.textContent = 'Note moyenne par jour';
