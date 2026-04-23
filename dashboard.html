@@ -826,11 +826,11 @@ async function loadData() {
     var stored = localStorage.getItem('avis_' + commerceId);
     if (stored) { try { allAvis = JSON.parse(stored); } catch(e2) { allAvis = []; } }
   }
-  updateStats(); renderAvis(); renderChart();
-  // Update google badge count without full render
-  var googleCount = allAvis.filter(function(a){ return String(a.avis_google||'').split(' ')[0]==='oui'; }).length;
-  var badge = document.getElementById('googleBadge');
-  if (badge) badge.textContent = googleCount;
+  updateStats(); renderAvis();
+  // Update google badge
+  var googleCount = allAvis.filter(function(a){ return String(a.avis_google||'').indexOf('oui') === 0; }).length;
+  var gbadge = document.getElementById('googleBadge');
+  if (gbadge) gbadge.textContent = googleCount;
   setTimeout(renderProgressChart, 400);
   document.getElementById('lastRefreshTime').textContent = new Date().toLocaleTimeString('fr-FR');
   hideLoading();
@@ -964,6 +964,7 @@ function updateStats() {
 
 function renderChart() {
   var container = document.getElementById('chartBars');
+  if (!container) return;
   container.innerHTML = '';
   var counts = [0,0,0,0,0];
   allAvis.forEach(function(a) { var n=parseInt(a.note_globale); if(n>=1&&n<=5)counts[n-1]++; });
