@@ -510,13 +510,14 @@ html, body { background: var(--bg); font-family: var(--font); color: var(--text)
     </div>
     <div class="card-body" id="progressBody">
       <div class="chart-period-btns">
-        <button class="period-btn active" id="btnWeek" onclick="setChartPeriod('week')">Semaine</button>
-        <button class="period-btn" id="btnMonth" onclick="setChartPeriod('month')">Mois</button>
+        <button class="period-btn active" id="btnWeek" onclick="setChartPeriod('week')">7 jours</button>
+        <button class="period-btn" id="btnMonth" onclick="setChartPeriod('month')">30 jours</button>
+        <button class="period-btn" id="btnYear" onclick="setChartPeriod('year')">360 jours</button>
       </div>
-      <div class="chart-wrap" style="position:relative;height:200px">
-        <canvas id="progressChart" style="width:100%;height:200px"></canvas>
+      <div style="position:relative;height:200px;margin-top:8px">
+        <canvas id="progressChart"></canvas>
       </div>
-      <div class="chart-legend">
+      <div class="chart-legend" style="margin-top:12px">
         <div class="legend-item"><div class="legend-dot" style="background:#58CC02"></div>Cuisine</div>
         <div class="legend-item"><div class="legend-dot" style="background:#FFFFFF"></div>Service</div>
         <div class="legend-item"><div class="legend-dot" style="background:#FF9500"></div>Qualité/Prix</div>
@@ -769,7 +770,6 @@ var currentAvisFilter = 'all';
 var notifBadEnabled = true;
 var notifAllEnabled = false;
 var chartPeriod = 'week';
-var progressChartInstance = null;
 
 window.addEventListener('DOMContentLoaded', function() {
   var savedName = localStorage.getItem('commerce_name_' + commerceId);
@@ -940,7 +940,7 @@ function showStatModal(type) {
         +'<span style="color:'+(isBons?'#58CC02':'#FF3B30')+';font-size:14px">'+stars+'</span>'
         +'<span style="font-size:11px;color:rgba(255,255,255,0.4)">'+date+'</span>'
         +'</div>'
-        +(a.commentaire?'<div style="font-size:13px;color:rgba(255,255,255,0.6);font-style:italic">"'+a.commentaire+'"</div>':'')
+        +(a.commentaire?'<div style="font-size:13px;color:rgba(255,255,255,0.6);font-style:italic">'+a.commentaire+'</div>':'')
         +'</div>';
     }).join('');
   }
@@ -1079,42 +1079,70 @@ function setChartPeriod(period) {
   chartPeriod = period;
   document.getElementById('btnWeek').className = 'period-btn'+(period==='week'?' active':'');
   document.getElementById('btnMonth').className = 'period-btn'+(period==='month'?' active':'');
+  var btnYear = document.getElementById('btnYear');
+  if (btnYear) btnYear.className = 'period-btn'+(period==='year'?' active':'');
   renderProgressChart();
 }
 
+var progressChartInstance = null;
+
 function renderProgressChart() {
-  var container = document.getElementById('progressBars');
-  if (!container || !allAvis.length) return;
-  var dates = allAvis.map(function(a){return new Date(a.date);}).filter(function(d){return !isNaN(d);});
-  if (!dates.length) return;
-  var firstDate = new Date(Math.min.apply(null,dates));
-  var now = new Date();
-  var maxDays = chartPeriod==='week'?7:30;
-  var startFrom = new Date(now); startFrom.setDate(startFrom.getDate()-(maxDays-1)); startFrom.setHours(0,0,0,0);
-  if (firstDate > startFrom) { startFrom = new Date(firstDate); startFrom.setHours(0,0,0,0); }
-  var today = new Date(now); today.setHours(0,0,0,0);
-  var dayRange = []; var d = new Date(startFrom);
-  while(d<=today){dayRange.push(new Date(d));d.setDate(d.getDate()+1);}
-  var labels = dayRange.map(function(dd){ return chartPeriod==='week'?dd.toLocaleDateString('fr-FR',{weekday:'short',day:'numeric'}):dd.getDate()+'/'+(dd.getMonth()+1); });
-  var cuisineData=[],serviceData=[],prixData=[];
-  dayRange.forEach(function(dd){
-    var da=allAvis.filter(function(a){var ad=new Date(a.date);return ad.getFullYear()===dd.getFullYear()&&ad.getMonth()===dd.getMonth()&&ad.getDate()===dd.getDate();});
-    var ca=da.filter(function(a){return Number(a.note_cuisine)>0;}); var sa=da.filter(function(a){return Number(a.note_service)>0;}); var pa=da.filter(function(a){return Number(a.note_prix)>0;});
-    cuisineData.push(ca.length?parseFloat((ca.reduce(function(s,a){return s+Number(a.note_cuisine);},0)/ca.length).toFixed(1)):null);
-    serviceData.push(sa.length?parseFloat((sa.reduce(function(s,a){return s+Number(a.note_service);},0)/sa.length).toFixed(1)):null);
-    prixData.push(pa.length?parseFloat((pa.reduce(function(s,a){return s+Number(a.note_prix);},0)/pa.length).toFixed(1)):null);
+  var canvas = document.getElementById('progressChart');
+  if (!canvas || !allAvis.length) return;
+  var maxDays = chartPeriod === 'week' ? 7 : chartPeriod === 'month' ? 30 : 360;
+  var now = new Date(); now.setHours(23,59,59,0);
+  var cutoff = new Date(now.getTime() - maxDays * 86400000);
+  
+  // Group by day or week depending on period
+  var groupByWeek = maxDays >= 60;
+  var groups = {};
+  allAvis.forEach(function(a) {
+    var d = new Date(a.date);
+    if (d < cutoff) return;
+    var key;
+    if (groupByWeek) {
+      var weekStart = new Date(d);
+      weekStart.setDate(d.getDate() - d.getDay() + 1);
+      weekStart.setHours(0,0,0,0);
+      key = weekStart.toLocaleDateString('fr-FR',{day:'numeric',month:'short'});
+    } else {
+      key = d.toLocaleDateString('fr-FR',{weekday:'short',day:'numeric'});
+    }
+    if (!groups[key]) groups[key] = {cuisine:[],service:[],prix:[]};
+    if (Number(a.note_cuisine)>0) groups[key].cuisine.push(Number(a.note_cuisine));
+    if (Number(a.note_service)>0) groups[key].service.push(Number(a.note_service));
+    if (Number(a.note_prix)>0) groups[key].prix.push(Number(a.note_prix));
   });
+  
+  var labels = Object.keys(groups);
+  function avg(arr) { return arr.length ? parseFloat((arr.reduce(function(a,b){return a+b;},0)/arr.length).toFixed(1)) : null; }
+  
+  if (progressChartInstance) { progressChartInstance.destroy(); progressChartInstance = null; }
+  
   progressChartInstance = new Chart(canvas, {
-    type:'line', data:{labels:labels,datasets:[
-      {label:'Cuisine',data:cuisineData,borderColor:'#58CC02',backgroundColor:'rgba(88,204,2,0.08)',tension:0.4,spanGaps:true,pointRadius:5,pointStyle:'circle',borderWidth:2.5},
-      {label:'Service',data:serviceData,borderColor:'#FFFFFF',backgroundColor:'rgba(255,255,255,0.05)',tension:0.4,spanGaps:true,pointRadius:5,pointStyle:'rectRot',borderWidth:2.5},
-      {label:'Prix',data:prixData,borderColor:'#FF9500',backgroundColor:'rgba(255,149,0,0.08)',tension:0.4,spanGaps:true,pointRadius:5,pointStyle:'triangle',borderWidth:2.5,borderDash:[5,3]}
-    ]},
-    options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
-      plugins:{legend:{display:false},tooltip:{backgroundColor:'#1E1E1E',borderColor:'rgba(255,255,255,0.1)',borderWidth:1,titleColor:'#F5F5F5',bodyColor:'rgba(255,255,255,0.5)',padding:12,boxShadow:'0 4px 16px rgba(0,0,0,0.1)'}},
-      scales:{y:{min:0,max:5,ticks:{color:'#8E8E93',stepSize:1},grid:{color:'rgba(255,255,255,0.05)'},border:{display:false}},x:{ticks:{color:'#8E8E93',font:{size:10},maxRotation:0},grid:{display:false},border:{display:false}}}}
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [
+        {label:'Cuisine', data:labels.map(function(k){return avg(groups[k].cuisine);}), borderColor:'#58CC02', backgroundColor:'rgba(88,204,2,0.08)', tension:0.4, spanGaps:true, pointRadius:4, borderWidth:2.5},
+        {label:'Service', data:labels.map(function(k){return avg(groups[k].service);}), borderColor:'#FFFFFF', backgroundColor:'rgba(255,255,255,0.04)', tension:0.4, spanGaps:true, pointRadius:4, borderWidth:2.5},
+        {label:'Prix', data:labels.map(function(k){return avg(groups[k].prix);}), borderColor:'#FF9500', backgroundColor:'rgba(255,149,0,0.08)', tension:0.4, spanGaps:true, pointRadius:4, borderWidth:2.5, borderDash:[5,3]}
+      ]
+    },
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      interaction:{mode:'index',intersect:false},
+      plugins:{legend:{display:false},tooltip:{backgroundColor:'#1E1E1E',borderColor:'rgba(255,255,255,0.1)',borderWidth:1,titleColor:'#fff',bodyColor:'rgba(255,255,255,0.6)',padding:10}},
+      scales:{
+        y:{min:0,max:5,ticks:{color:'rgba(255,255,255,0.4)',stepSize:1},grid:{color:'rgba(255,255,255,0.05)'},border:{display:false}},
+        x:{ticks:{color:'rgba(255,255,255,0.4)',font:{size:10},maxRotation:0,maxTicksLimit:8},grid:{display:false},border:{display:false}}
+      }
+    }
   });
 }
+
+
+
 
 function getWeekId() {
   var now = new Date();
@@ -1126,70 +1154,68 @@ function getWeekId() {
 function updateAICounter() {
   var weekKey = 'ai_uses_' + commerceId + '_' + getWeekId();
   var uses = parseInt(localStorage.getItem(weekKey) || '0');
-  var remaining = Math.max(0, 3 - uses);
+  var remaining = Math.max(0, 1 - uses);
   var el = document.getElementById('aiCounter');
   if (el) {
-    el.textContent = remaining === 0 ? 'Utilisé cette semaine' : '1 analyse dispo / sem';
-    el.style.color = remaining === 0 ? 'var(--danger)' : remaining === 1 ? 'var(--warning)' : 'var(--accent)';
-    el.style.background = remaining === 0 ? 'rgba(255,59,48,0.1)' : remaining === 1 ? 'rgba(255,149,0,0.1)' : 'var(--accent-dim)';
-    el.style.borderColor = remaining === 0 ? 'rgba(255,59,48,0.2)' : remaining === 1 ? 'rgba(255,149,0,0.2)' : 'rgba(88,204,2,0.2)';
+    el.textContent = remaining === 0 ? 'Utilise cette semaine' : '1 analyse dispo / sem';
+    el.style.color = remaining === 0 ? 'var(--danger)' : 'var(--accent)';
+    el.style.background = remaining === 0 ? 'rgba(255,59,48,0.1)' : 'var(--accent-dim)';
+    el.style.borderColor = remaining === 0 ? 'rgba(255,59,48,0.2)' : 'rgba(88,204,2,0.2)';
   }
 }
 
 async function generateAISummary() {
-  // Check weekly limit (3 per week)
   var weekKey = 'ai_uses_' + commerceId + '_' + getWeekId();
   var uses = parseInt(localStorage.getItem(weekKey) || '0');
-  var MAX_USES = 1;
-  if (uses >= MAX_USES) {
-    document.getElementById('aiContent').innerHTML = '<div class="ai-empty"><div style="font-size:32px;margin-bottom:10px">✨</div><div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px">Analyse déjà générée cette semaine</div><div style="font-size:12px;color:var(--muted)">Revenez lundi pour une nouvelle analyse.</div></div>';
+  if (uses >= 1) {
+    document.getElementById('aiContent').innerHTML = '<div class="ai-empty"><div style="font-size:32px;margin-bottom:10px">&#10024;</div><div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px">Analyse deja generee cette semaine</div><div style="font-size:12px;color:var(--muted)">Revenez lundi pour une nouvelle analyse.</div></div>';
     return;
   }
-
   var btn = document.getElementById('aiBtn');
-  if (btn) { btn.disabled=true; btn.innerHTML='⏳ L\'IA analyse vos avis...'; }
+  if (btn) { btn.disabled=true; btn.innerHTML="&#9203; L'IA analyse vos avis..."; }
   var oneWeekAgo = Date.now()-7*24*60*60*1000;
   var recentAvis = allAvis.filter(function(a){return new Date(a.date).getTime()>oneWeekAgo;});
   if (!recentAvis.length) {
-    document.getElementById('aiContent').innerHTML='<div class="ai-empty"><div class="ai-empty-icon">📭</div><div class="ai-empty-text">Aucun avis cette semaine.</div></div>';
+    document.getElementById('aiContent').innerHTML='<div class="ai-empty"><div class="ai-empty-text">Aucun avis cette semaine.</div></div>';
+    if(btn){btn.disabled=false;btn.innerHTML='&#10024; Lancer l analyse IA';}
     return;
   }
   var avisText = recentAvis.map(function(a,i){return 'Avis '+(i+1)+': Note '+a.note_globale+'/5, Cuisine '+a.note_cuisine+'/5, Service '+a.note_service+'/5, Prix '+a.note_prix+'/5'+(a.commentaire?', Commentaire: "'+a.commentaire+'"':'');}).join('\n');
-  var prompt = 'Tu es un assistant pour aider les restaurateurs a comprendre leurs clients. Voici les '+recentAvis.length+' avis de cette semaine:\n\n'+avisText+'\n\nEcris en francais simple et direct, comme si tu parlais a un ami cuisinier.\n\nFais:\n1. Un bilan de la semaine en 2-3 phrases simples (ce qui va bien, ce qui va moins bien)\n2. 3 conseils pratiques et concrets pour la semaine prochaine (commence chaque conseil par un emoji)\n\nPas de jargon, pas de formules complexes. Du concret.';
+  var prompt = 'Tu es un assistant pour aider les restaurateurs a comprendre leurs clients. Voici les '+recentAvis.length+' avis de cette semaine:\n\n'+avisText+'\n\nEcris en francais simple et direct, comme si tu parlais a un ami cuisinier.\n\nFais:\n1. Un bilan de la semaine en 2-3 phrases simples\n2. 3 conseils pratiques (commence chaque conseil par un emoji)\n\nPas de jargon. Du concret.';
   try {
     var aiUrl = SCRIPT_URL + '?action=ai_summary';
-    var response = await fetch(aiUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: 'prompt=' + encodeURIComponent(prompt)
-    });
+    var response = await fetch(aiUrl, {method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:'prompt='+encodeURIComponent(prompt)});
     var data = await response.json();
     if (!data.ok) throw new Error(data.error || 'Erreur IA');
     var text = data.text;
     var lines = text.split('\n').filter(function(l){return l.trim();});
-    var recoLines = lines.filter(function(l){return /^\p{Emoji}/u.test(l.trim());});
-    var summaryLines = lines.filter(function(l){return !/^\p{Emoji}/u.test(l.trim())&&l.length>20;});
+    var recoLines = lines.filter(function(l){var c=l.trim().charCodeAt(0);return c>127&&c<65536;});
+    var summaryLines = lines.filter(function(l){var c=l.trim().charCodeAt(0);return (c<=127||c>=65536)&&l.length>20;});
     document.getElementById('aiText').textContent = summaryLines.join('\n');
     document.getElementById('aiDate').textContent = new Date().toLocaleDateString('fr-FR');
     var recosEl = document.getElementById('aiRecos');
-    recosEl.innerHTML = recoLines.map(function(r){return '<div class="ai-reco"><span class="ai-reco-arrow">→</span><span>'+r+'</span></div>';}).join('');
-    // Increment weekly counter
-    var weekKey2 = 'ai_uses_' + commerceId + '_' + getWeekId();
-    var uses2 = parseInt(localStorage.getItem(weekKey2) || '0');
-    localStorage.setItem(weekKey2, uses2 + 1);
+    recosEl.innerHTML = recoLines.map(function(r){return '<div class="ai-reco"><span class="ai-reco-arrow">&#8594;</span><span>'+r+'</span></div>';}).join('');
+    localStorage.setItem(weekKey, uses + 1);
     updateAICounter();
     document.getElementById('aiContent').style.display='none';
     document.getElementById('aiResult').style.display='block';
   } catch(e) {
-    if(btn){btn.disabled=false;btn.innerHTML='✨ Analyse IA';}
-    console.error('AI Error:', e);
+    if(btn){btn.disabled=false;btn.innerHTML='&#10024; Lancer l analyse IA';}
     alert('Erreur: ' + e.message);
   }
 }
 
+function setChartPeriod(period) {
+  chartPeriod = period;
+  document.getElementById('btnWeek').className = 'period-btn'+(period==='week'?' active':'');
+  document.getElementById('btnMonth').className = 'period-btn'+(period==='month'?' active':'');
+  var btnYear = document.getElementById('btnYear');
+  if (btnYear) btnYear.className = 'period-btn'+(period==='year'?' active':'');
+  renderProgressChart();
+}
+
 function generateQR() {
-  var googleLink = localStorage.getItem('google_link_'+commerceId)||'';
-  var clientUrl = BASE_URL+'landing.html?id='+commerceId;
+  var clientUrl = BASE_URL + 'landing.html?id=' + commerceId;
   document.getElementById('qrUrl').textContent = clientUrl;
   var qrEl = document.getElementById('qrcode');
   qrEl.innerHTML='';
@@ -1273,7 +1299,7 @@ function handleLogoUpload(input) {
 }
 
 function removeLogo() {
-  var preview=document.getElementById('logoPreview'); if(preview)preview.innerHTML='🏪';
+  var preview=document.getElementById('logoPreview'); if(preview)preview.innerHTML='&#127978;';
   document.getElementById('removeLogo').style.display='none';
   localStorage.removeItem('logo_'+commerceId);
   try{var url=new URL(SCRIPT_URL);url.searchParams.set('action','save_logo');url.searchParams.set('commerce_id',commerceId);url.searchParams.set('logo_url','');fetch(url.toString(),{method:'GET',mode:'no-cors'});}catch(e){}
@@ -1296,22 +1322,22 @@ function initSubscription() {
   var startDate=localStorage.getItem(key);
   if(!startDate){startDate=new Date().toISOString();localStorage.setItem(key,startDate);}
   var elapsed=(Date.now()-new Date(startDate).getTime())/(1000*60*60*24);
-  var daysLeft=Math.max(0,Math.ceil(TRIAL_DAYS-elapsed));
+  var daysLeft=Math.max(0,Math.ceil(14-elapsed));
   var isSubscribed=localStorage.getItem('frizz_subscribed_'+commerceId)==='true';
   var isExpired=daysLeft===0&&!isSubscribed;
   document.getElementById('paywallBtn').href=STRIPE_LINK;
   if(isSubscribed){
-    subBody.innerHTML='<div class="sub-banner active"><div class="sub-icon">✅</div><div><div class="sub-title" style="color:var(--blue)">Abonnement actif</div><div class="sub-sub">14,99 €/mois</div></div></div><button class="btn-cancel" onclick="cancelSubscription()">Annuler l\'abonnement</button>';
+    subBody.innerHTML='<div class="sub-banner active"><div class="sub-icon">&#9989;</div><div><div class="sub-title" style="color:var(--accent)">Abonnement actif</div><div class="sub-sub">14,99 &#8364;/mois</div></div></div><button class="btn-cancel" onclick="cancelSubscription()">Annuler</button>';
   } else if(!isExpired){
-    subBody.innerHTML='<div class="sub-banner trial"><div class="sub-icon">🎁</div><div><div class="sub-title" style="color:var(--accent)">Essai gratuit — '+daysLeft+' jours restants</div><div class="sub-sub">Après l\'essai, 14,99€/mois</div></div></div><a href="'+STRIPE_LINK+'" target="_blank" class="btn-subscribe">S\'abonner — 14,99€/mois</a><p style="text-align:center;font-size:11px;color:var(--muted);margin-top:8px">Paiement sécurisé par Stripe · Annulation en 1 clic</p>';
+    subBody.innerHTML='<div class="sub-banner trial"><div class="sub-icon">&#127873;</div><div><div class="sub-title" style="color:var(--accent)">Essai gratuit - '+daysLeft+' jours restants</div><div class="sub-sub">Apres l essai, 14,99&#8364;/mois</div></div></div><a href="'+STRIPE_LINK+'" target="_blank" class="btn-subscribe">S abonner - 14,99&#8364;/mois</a>';
   } else {
-    subBody.innerHTML='<div class="sub-banner expired"><div class="sub-icon">⚠️</div><div><div class="sub-title" style="color:var(--danger)">Essai expiré</div></div></div><a href="'+STRIPE_LINK+'" target="_blank" class="btn-subscribe">S\'abonner — 14,99€/mois</a>';
+    subBody.innerHTML='<div class="sub-banner expired"><div class="sub-icon">&#9888;&#65039;</div><div><div class="sub-title" style="color:var(--danger)">Essai expire</div></div></div><a href="'+STRIPE_LINK+'" target="_blank" class="btn-subscribe">S abonner - 14,99&#8364;/mois</a>';
     document.getElementById('paywall').style.display='flex';
   }
 }
 
 function cancelSubscription() {
-  if(confirm('Annuler l\'abonnement ?')){window.location.href='mailto:Frizz.avis@gmail.com?subject=Annulation abonnement Frizz&body=Commerce ID: '+commerceId;}
+  if(confirm('Annuler votre abonnement ?')){window.location.href='mailto:Frizz.avis@gmail.com?subject=Annulation abonnement Frizz&body=Commerce ID: '+commerceId;}
 }
 
 function toggleCard(header) {
@@ -1319,34 +1345,145 @@ function toggleCard(header) {
   var isOpen = !header.parentElement.classList.contains('collapsed');
   if (isOpen) {
     var body = header.parentElement.querySelector('#progressBody');
-    if (body) {
-      setTimeout(function() {
-        if (progressChartInstance) { progressChartInstance.destroy(); progressChartInstance = null; }
-        renderProgressChart();
-      }, 200);
-    }
+    if (body) setTimeout(renderProgressChart, 200);
     var gList = header.parentElement.querySelector('#googleAvisList');
     if (gList) setTimeout(renderGoogleAvis, 200);
   }
 }
 
+function hideLoading() {
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+}
+
 function logout() {
-  if(confirm('Vous déconnecter ?')){window.location.href='inscription.html';}
+  if(confirm('Vous deconnecter ?')){window.location.href='inscription.html';}
 }
 
 function checkCGU() {
   if(!localStorage.getItem('cgu_accepted_'+commerceId)){document.getElementById('cguModal').classList.add('visible');}
 }
+
 function acceptCGU() {
   localStorage.setItem('cgu_accepted_'+commerceId,'true');
   document.getElementById('cguModal').classList.remove('visible');
 }
+
 function downloadCGU() {
-  var lines=["CONDITIONS GENERALES D'UTILISATION - FRIZZ","Version 1.0 - Avril 2026","","1. Frizz est une plateforme SaaS de collecte d'avis clients pour restaurants.","2. Facturation mensuelle a 14,99 euros. Resiliation en fin de periode.","3. Droit francais applicable.","4. Contact: Frizz.avis@gmail.com"];
+  var lines=["CONDITIONS GENERALES D'UTILISATION - FRIZZ","Version 1.0","","1. Frizz est une plateforme SaaS de collecte d avis clients pour restaurants.","2. Facturation 14,99 euros/mois. Resiliation en fin de periode.","3. Droit francais applicable.","4. Contact: Frizz.avis@gmail.com"];
   var blob=new Blob([lines.join('\n')],{type:'text/plain;charset=utf-8'});
   var url=URL.createObjectURL(blob); var a=document.createElement('a');
   a.href=url;a.download='CGU_Frizz.txt';a.click();URL.revokeObjectURL(url);
 }
+
+function editName(el) {
+  var current = el.textContent;
+  var input = document.createElement('input');
+  input.value = current;
+  input.style.cssText = 'background:#2A2A2A;border:2px solid var(--accent);border-radius:8px;padding:4px 10px;font-family:var(--font);font-size:17px;font-weight:700;color:var(--text);outline:none;width:160px';
+  el.replaceWith(input);
+  input.focus(); input.select();
+  function save() {
+    var newName = input.value.trim() || current;
+    var div = document.createElement('div');
+    div.className = 'header-name'; div.id = 'headerName';
+    div.textContent = newName; div.onclick = function() { editName(div); };
+    div.style.cursor = 'pointer';
+    input.replaceWith(div);
+    localStorage.setItem('commerce_name_' + commerceId, newName);
+  }
+  input.addEventListener('blur', save);
+  input.addEventListener('keydown', function(e) { if (e.key === 'Enter') input.blur(); if (e.key === 'Escape') { input.value = current; input.blur(); } });
+}
+
+function closeStatModal() {
+  document.getElementById('statModal').style.display = 'none';
+}
+
+function showStatModal(type) {
+  var modal = document.getElementById('statModal');
+  var title = document.getElementById('modalTitle');
+  var body = document.getElementById('modalContent');
+  modal.style.display = 'flex';
+  if (type === 'total') {
+    title.textContent = 'Avis par semaine';
+    body.innerHTML = '<canvas id="modalChart" style="width:100%;height:160px"></canvas>';
+    setTimeout(function() {
+      var canvas = document.getElementById('modalChart');
+      if (!canvas || !allAvis.length) return;
+      var weeks = {};
+      allAvis.forEach(function(a) {
+        var d = new Date(a.date);
+        var start = new Date(d); start.setDate(d.getDate() - d.getDay() + 1); start.setHours(0,0,0,0);
+        var key = start.toLocaleDateString('fr-FR',{day:'numeric',month:'short'});
+        if (!weeks[key]) weeks[key] = {total:0,google:0};
+        weeks[key].total++;
+        if (a.avis_google && a.avis_google.indexOf('oui') === 0) weeks[key].google++;
+      });
+      var labels = Object.keys(weeks);
+      canvas.style.height = '160px'; canvas.style.maxHeight = '160px';
+      new Chart(canvas, {type:'bar',data:{labels:labels,datasets:[{label:'Total',data:labels.map(function(k){return weeks[k].total;}),backgroundColor:'rgba(88,204,2,0.7)',borderRadius:6},{label:'Google',data:labels.map(function(k){return weeks[k].google;}),backgroundColor:'rgba(255,149,0,0.7)',borderRadius:6}]},options:{responsive:false,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'rgba(255,255,255,0.4)',font:{size:10}},grid:{display:false},border:{display:false}},y:{ticks:{color:'rgba(255,255,255,0.4)',stepSize:1},grid:{color:'rgba(255,255,255,0.05)'},border:{display:false}}}}});
+    }, 100);
+  } else if (type === 'moyenne') {
+    title.textContent = 'Note moyenne par jour';
+    body.innerHTML = '<canvas id="modalChart" style="width:100%;height:220px"></canvas>';
+    setTimeout(function() {
+      var canvas = document.getElementById('modalChart');
+      if (!canvas) return;
+      var groups = {};
+      allAvis.forEach(function(a) {
+        var key = new Date(a.date).toLocaleDateString('fr-FR',{day:'numeric',month:'short'});
+        if (!groups[key]) groups[key] = [];
+        groups[key].push(parseFloat(a.note_globale)||0);
+      });
+      var labels = Object.keys(groups);
+      var avgs = labels.map(function(k){var v=groups[k];return parseFloat((v.reduce(function(a,b){return a+b;},0)/v.length).toFixed(1));});
+      new Chart(canvas, {type:'bar',data:{labels:labels,datasets:[{data:avgs,backgroundColor:avgs.map(function(v){return v>=4?'rgba(88,204,2,0.7)':v>=3?'rgba(255,149,0,0.7)':'rgba(255,59,48,0.7)';}),borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{min:0,max:5,ticks:{color:'rgba(255,255,255,0.4)',stepSize:1},grid:{color:'rgba(255,255,255,0.05)'},border:{display:false}},x:{ticks:{color:'rgba(255,255,255,0.4)',font:{size:10},maxRotation:45},grid:{display:false},border:{display:false}}}}});
+    }, 100);
+  } else if (type === 'bons' || type === 'mauvais') {
+    var isBons = type === 'bons';
+    title.textContent = isBons ? 'Bons avis (note >= 4)' : 'Mauvaises notes (note <= 3)';
+    var filtered = allAvis.filter(function(a){var n=parseInt(a.note_globale);return isBons?n>=4:(n<=3&&n>0);}).slice().reverse();
+    if (!filtered.length) { body.innerHTML = '<div style="text-align:center;padding:32px;color:rgba(255,255,255,0.4)">Aucun</div>'; return; }
+    body.innerHTML = filtered.map(function(a) {
+      var note = parseInt(a.note_globale)||0;
+      var stars = ''; for(var i=0;i<5;i++) stars+=(i<note?'&#9733;':'&#9734;');
+      var date = new Date(a.date).toLocaleDateString('fr-FR',{day:'numeric',month:'short',year:'numeric'});
+      return '<div style="background:rgba(255,255,255,0.03);border-radius:12px;padding:14px;margin-bottom:8px"><div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="color:'+(isBons?'#58CC02':'#FF3B30')+';font-size:14px">'+stars+'</span><span style="font-size:11px;color:rgba(255,255,255,0.4)">'+date+'</span></div>'+(a.commentaire?'<div style="font-size:13px;color:rgba(255,255,255,0.6);font-style:italic">'+a.commentaire+'</div>':'')+'</div>';
+    }).join('');
+  }
+}
+
+var currentGoogleFilter = 'all';
+
+function setGoogleFilter(filter, btn) {
+  currentGoogleFilter = filter;
+  document.querySelectorAll('.g-filter-btn').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+  renderGoogleAvis();
+}
+
+function renderGoogleAvis() {
+  var container = document.getElementById('googleAvisList');
+  var badge = document.getElementById('googleBadge');
+  if (!container) return;
+  var all = allAvis.filter(function(a){ return String(a.avis_google||'').indexOf('oui') === 0; });
+  if (badge) badge.textContent = all.length;
+  var filtered = all.filter(function(a) {
+    var n = Number(a.note_globale);
+    if (currentGoogleFilter === 'good') return n >= 4;
+    if (currentGoogleFilter === 'bad') return n > 0 && n <= 3;
+    return true;
+  }).slice().reverse();
+  if (!filtered.length) { container.innerHTML = '<div class="empty-state">Aucun avis Google.</div>'; return; }
+  container.innerHTML = filtered.map(function(a) {
+    var note = parseInt(a.note_globale)||0;
+    var stars = ''; for(var i=0;i<5;i++) stars+='<div class="star '+(i<note?'filled':'empty')+'"></div>';
+    var date = a.date ? new Date(a.date).toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'}) : '';
+    return '<div class="avis-item"><div class="avis-header"><div class="avis-stars">'+stars+'</div><div class="avis-date">'+date+'</div></div><div class="avis-google-tag" style="margin-top:8px">&#10003; Publie sur Google</div></div>';
+  }).join('');
+}
+
 </script>
 </body>
 </html>
