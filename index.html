@@ -131,14 +131,16 @@ nav {
 @keyframes ping { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(1.4)} }
 
 .hero-title {
-  font-size: clamp(52px, 8.5vw, 96px);
+  font-size: clamp(36px, 6vw, 88px);
   font-weight: 700;
-  line-height: 1.03;
-  letter-spacing: -3px;
+  line-height: 1.05;
+  letter-spacing: clamp(-1px, -0.03em, -3px);
   color: var(--text);
-  max-width: 900px;
+  width: 100%;
+  max-width: 100%;
   margin-bottom: 24px;
   opacity: 0; animation: fadeUp 0.8s 0.35s ease forwards;
+  word-break: keep-all;
 }
 .hero-title .line2 { color: var(--accent); display: block; }
 
@@ -356,8 +358,8 @@ footer { position: relative; z-index: 1; border-top: 1px solid var(--border); pa
 <section class="hero" style="position:relative">
   <div class="grid-overlay"></div>
   <h1 class="hero-title">
-    Améliorez votre restaurant.
-    <span class="line2">Gagnez plus de clients.</span>
+    Vos clients parlent.<br>
+    <span class="line2">Êtes-vous à l'écoute ?</span>
   </h1>
 
   <p class="hero-sub">
