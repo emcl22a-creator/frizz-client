@@ -314,7 +314,7 @@
     display:flex;align-items:baseline;justify-content:center;gap:6px;
     margin-bottom:8px;position:relative;
   }
-  .price-num{font-size:72px;font-weight:800;letter-spacing:-0.04em;}
+  .price-num{font-size:56px;font-weight:800;letter-spacing:-0.04em;}
   .price-unit{font-size:18px;color:var(--text-2);font-weight:500;}
   .price-sub{color:var(--text-3);font-size:14px;margin-bottom:28px;position:relative;}
   .price-features{
@@ -336,10 +336,23 @@
 
   /* FOOTER */
   footer{
-    padding:40px 0;border-top:1px solid var(--border);
-    text-align:center;color:var(--text-3);font-size:13px;
+    padding:48px 0 32px;border-top:1px solid var(--border);
+    color:var(--text-3);font-size:13px;
   }
-  footer .logo{font-size:16px;margin-bottom:10px;}
+  .footer-inner{max-width:1200px;margin:0 auto;padding:0 24px;}
+  .footer-top{
+    display:flex;justify-content:space-between;align-items:center;
+    padding-bottom:28px;border-bottom:1px solid var(--border);
+    margin-bottom:20px;flex-wrap:wrap;gap:20px;
+  }
+  .footer-nav{display:flex;gap:28px;flex-wrap:wrap;}
+  .footer-nav a{
+    color:var(--text-2);text-decoration:none;font-size:14px;
+    transition:color .2s ease;
+  }
+  .footer-nav a:hover{color:var(--accent);}
+  .footer-bottom{text-align:center;color:var(--text-3);font-size:13px;}
+  footer .logo{font-size:18px;}
 
   /* RESPONSIVE */
   @media(max-width:900px){
@@ -365,6 +378,8 @@
     .phone{width:240px;}
     .stat-num{font-size:26px;}
     .credibility-stats{gap:24px;}
+    .footer-top{flex-direction:column;text-align:center;align-items:center;}
+    .footer-nav{justify-content:center;gap:18px;}
   }
 
   /* Reveal on scroll */
@@ -393,7 +408,7 @@
       <h1>Améliorez votre restaurant <em>grâce à vos clients.</em></h1>
       <p class="hero-sub">Collectez les retours après chaque repas, identifiez ce qui doit changer, suivez votre progression en temps réel. Vos clients publient ensuite sur Google en un clic.</p>
       <div class="cta-row">
-        <a href="#pricing" class="btn-primary">Commencer →</a>
+        <a href="inscription.html" class="btn-primary">Commencer →</a>
         <a href="#how" class="btn-secondary">Voir comment ça marche</a>
       </div>
       <div class="hero-trust">
@@ -556,7 +571,7 @@
         <li><span class="check">✓</span> Réponse privée aux clients mécontents</li>
         <li><span class="check">✓</span> Publication Google en un clic pour tous (bonus)</li>
       </ul>
-      <a href="#" class="btn-primary">Démarrer mes 14 jours gratuits →</a>
+      <a href="inscription.html" class="btn-primary">Démarrer mes 14 jours gratuits →</a>
     </div>
   </div>
 </section>
@@ -566,14 +581,26 @@
   <div class="container">
     <h2>Un meilleur restaurant <em>chaque semaine.</em><br>Grâce à vos propres clients.</h2>
     <p class="section-sub">Collectez les retours après chaque repas, identifiez ce qui doit changer, suivez votre progression. Et récoltez des avis Google au passage.</p>
-    <a href="#pricing" class="btn-primary">Commencer →</a>
+    <a href="inscription.html" class="btn-primary">Commencer →</a>
   </div>
 </section>
 
 <!-- FOOTER -->
 <footer>
-  <div class="logo"><span class="logo-name">Frizz</span><span class="logo-spark">✦</span></div>
-  © 2026 Frizz — Progressez grâce à vos clients.
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="logo"><span class="logo-name">Frizz</span><span class="logo-spark">✦</span></div>
+      <nav class="footer-nav">
+        <a href="#how">Comment ça marche</a>
+        <a href="#pricing">Tarif</a>
+        <a href="inscription.html">Inscription</a>
+        <a href="inscription.html#connexion">Connexion</a>
+      </nav>
+    </div>
+    <div class="footer-bottom">
+      © 2026 Frizz — Progressez grâce à vos clients.
+    </div>
+  </div>
 </footer>
 
 <script>
