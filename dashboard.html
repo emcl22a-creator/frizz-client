@@ -40,13 +40,14 @@ html, body { background: var(--bg); font-family: var(--font); color: var(--text)
 
 /* ===== LOADING ===== */
 #loading {
-  position: fixed; inset: 0;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
   background: var(--bg);
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
   z-index: 999; gap: 20px;
-  width: 100vw; height: 100vh;
   text-align: center;
-  margin: 0; padding: 0;
 }
 .loading-logo { font-size: 32px; font-weight: 900; color: var(--accent); letter-spacing: -1px; }
 .loading-dots { display: flex; gap: 8px; }
@@ -424,7 +425,6 @@ html, body { background: var(--bg); font-family: var(--font); color: var(--text)
 
   </div>
 
-  <div class="last-refresh">Mise à jour : <span id="lastRefreshTime">—</span></div>
 
   <!-- STATS -->
   <div class="stats-grid desktop-col-full" style="margin-bottom:16px">
@@ -721,7 +721,7 @@ html, body { background: var(--bg); font-family: var(--font); color: var(--text)
 <script>
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwj7RToCQWdr9EDw1lXBKeSKwhkXcTKPRdURQkdPEQ0vHQiVi32AbXj-lcUs3tuZ9jX/exec';
 const BASE_URL = 'https://emcl22a-creator.github.io/frizz-client/';
-const STRIPE_LINK = 'https://buy.stripe.com/test_8x24gAdsSgBU4LbgFrbEA00';
+const STRIPE_LINK = 'https://buy.stripe.com/test_8x26oIcoO1H07Xn9cZbEA01';
 const TRIAL_DAYS = 14;
 
 const params = new URLSearchParams(window.location.search);
