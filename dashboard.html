@@ -754,7 +754,7 @@ html, body { background: var(--bg); font-family: var(--font); color: var(--text)
 </div>
 
 <script>
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzSLzJOexAs3lfKOlIhD7-zaA0BbpyF4DfZ1T6fU_rPV1CWa-eVuY_zjHyZSySLO_k/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbydemJ-6ge6ophbRD6g_9HQpi0lDQtHpD5-R4f6slfHOowqJuPp1EhTDvLvQLULHyLO/exec';
 const BASE_URL = 'https://emcl22a-creator.github.io/frizz-client/';
 const STRIPE_LINK = 'https://buy.stripe.com/test_8x26oIcoO1H07Xn9cZbEA01';
 const TRIAL_DAYS = 14;
@@ -1085,8 +1085,8 @@ function setChartPeriod(period) {
 }
 
 function renderProgressChart() {
-  var canvas = document.getElementById('progressChart');
-  if (!canvas || !allAvis.length) return;
+  var container = document.getElementById('progressBars');
+  if (!container || !allAvis.length) return;
   var dates = allAvis.map(function(a){return new Date(a.date);}).filter(function(d){return !isNaN(d);});
   if (!dates.length) return;
   var firstDate = new Date(Math.min.apply(null,dates));
