@@ -832,7 +832,6 @@ async function loadData() {
   var gbadge = document.getElementById('googleBadge');
   if (gbadge) gbadge.textContent = googleCount;
   setTimeout(renderProgressChart, 400);
-  document.getElementById('lastRefreshTime').textContent = new Date().toLocaleTimeString('fr-FR');
   hideLoading();
 }
 
