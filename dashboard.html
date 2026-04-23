@@ -545,6 +545,11 @@ html, body { background: var(--bg); font-family: var(--font); color: var(--text)
       <div class="card-chevron">&#9660;</div>
     </div>
     <div class="card-body">
+      <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+        <button class="filter-btn active" id="gFilterAll" onclick="setGoogleFilter('all',this)">Tous</button>
+        <button class="filter-btn" id="gFilterGood" onclick="setGoogleFilter('good',this)">⭐ Bonnes notes</button>
+        <button class="filter-btn" id="gFilterBad" onclick="setGoogleFilter('bad',this)">⚠️ Mauvaises notes</button>
+      </div>
       <div id="googleAvisList"><div class="empty-state">Aucun avis Google.</div></div>
     </div>
   </div>
@@ -736,7 +741,7 @@ html, body { background: var(--bg); font-family: var(--font); color: var(--text)
 </div>
 
 <script>
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwj7RToCQWdr9EDw1lXBKeSKwhkXcTKPRdURQkdPEQ0vHQiVi32AbXj-lcUs3tuZ9jX/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz8zD7eMEOxUIvmLk_ixKUTp-VmkDeITGnEMSEmc15p1wb_4h66L1jaxXnFE59IWI3I/exec';
 const BASE_URL = 'https://emcl22a-creator.github.io/frizz-client/';
 const STRIPE_LINK = 'https://buy.stripe.com/test_8x26oIcoO1H07Xn9cZbEA01';
 const TRIAL_DAYS = 14;
@@ -851,7 +856,7 @@ function showStatModal(type) {
         var key = start.toLocaleDateString('fr-FR',{day:'numeric',month:'short'});
         if (!weeks[key]) weeks[key] = {total:0, google:0};
         weeks[key].total++;
-        if (a.avis_google === 'oui ✅') weeks[key].google++;
+        if (a.avis_google && a.avis_google.indexOf('oui') !== -1) weeks[key].google++;
       });
       var labels = Object.keys(weeks);
       var totalData = labels.map(function(k){return weeks[k].total;});
@@ -968,11 +973,25 @@ function renderChart() {
   });
 }
 
+var currentGoogleFilter = 'all';
+
+function setGoogleFilter(filter, btn) {
+  currentGoogleFilter = filter;
+  document.querySelectorAll('#gFilterAll,#gFilterGood,#gFilterBad').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+  renderGoogleAvis();
+}
+
 function renderGoogleAvis() {
   var container = document.getElementById('googleAvisList');
   var badge = document.getElementById('googleBadge');
   if (!container) return;
-  var googleAvis = allAvis.filter(function(a) { return a.avis_google === 'oui ✅'; }).slice().reverse();
+  var googleAvis = allAvis.filter(function(a) {
+    if (!a.avis_google || a.avis_google.indexOf('oui') === -1) return false;
+    if (currentGoogleFilter === 'good') return parseInt(a.note_globale) >= 4;
+    if (currentGoogleFilter === 'bad') return parseInt(a.note_globale) <= 3;
+    return true;
+  }).slice().reverse();
   if (badge) badge.textContent = googleAvis.length;
   if (!googleAvis.length) {
     container.innerHTML = "<div class=\"empty-state\">Aucun avis Google.</div>";
@@ -1031,7 +1050,7 @@ function renderAvis() {
     if(parseInt(a.note_prix)>0) cats += '<span class="avis-cat">Prix '+a.note_prix+'/5</span>';
     var item = document.createElement('div');
     item.className = 'avis-item';
-    item.innerHTML = '<div class="avis-header"><div class="avis-stars">'+starsHtml+'</div><div class="avis-date">'+date+'</div></div>'+(cats?'<div class="avis-cats">'+cats+'</div>':'')+(a.commentaire?'<div class="avis-comment">"'+a.commentaire+'"</div>':'')+'<div class="avis-detail" id="detail-'+idx+'">'+(a.resume?'<div style="font-size:12px;color:var(--muted);margin-bottom:6px"><b>Résumé IA :</b> '+a.resume+'</div>':'')+(a.avis_google==='oui ✅'?'<span class="avis-google-tag">✓ Publié sur Google</span>':'')+'</div>';
+    item.innerHTML = '<div class="avis-header"><div class="avis-stars">'+starsHtml+'</div><div class="avis-date">'+date+'</div></div>'+(cats?'<div class="avis-cats">'+cats+'</div>':'')+(a.commentaire?'<div class="avis-comment">"'+a.commentaire+'"</div>':'')+'<div class="avis-detail" id="detail-'+idx+'">'+(a.resume?'<div style="font-size:12px;color:var(--muted);margin-bottom:6px"><b>Résumé IA :</b> '+a.resume+'</div>':'')+(a.avis_google&&a.avis_google.indexOf('oui')!==-1?'<span class="avis-google-tag">✓ Publié sur Google</span>':'')+'</div>';
     item.onclick = function() { var d=document.getElementById('detail-'+idx); d.style.display=d.style.display==='block'?'none':'block'; };
     container.appendChild(item);
   });
@@ -1120,9 +1139,13 @@ async function generateAISummary() {
   var avisText = recentAvis.map(function(a,i){return 'Avis '+(i+1)+': Note '+a.note_globale+'/5, Cuisine '+a.note_cuisine+'/5, Service '+a.note_service+'/5, Prix '+a.note_prix+'/5'+(a.commentaire?', Commentaire: "'+a.commentaire+'"':'');}).join('\n');
   var prompt = 'Tu es un assistant pour aider les restaurateurs a comprendre leurs clients. Voici les '+recentAvis.length+' avis de cette semaine:\n\n'+avisText+'\n\nEcris en francais simple et direct, comme si tu parlais a un ami cuisinier.\n\nFais:\n1. Un bilan de la semaine en 2-3 phrases simples (ce qui va bien, ce qui va moins bien)\n2. 3 conseils pratiques et concrets pour la semaine prochaine (commence chaque conseil par un emoji)\n\nPas de jargon, pas de formules complexes. Du concret.';
   try {
-    var response = await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-5',max_tokens:1000,messages:[{role:'user',content:prompt}]})});
+    var aiUrl = new URL(SCRIPT_URL);
+    aiUrl.searchParams.set('action', 'ai_summary');
+    aiUrl.searchParams.set('prompt', prompt);
+    var response = await fetch(aiUrl.toString());
     var data = await response.json();
-    var text = data.content[0].text;
+    if (!data.ok) throw new Error(data.error || 'Erreur IA');
+    var text = data.text;
     var lines = text.split('\n').filter(function(l){return l.trim();});
     var recoLines = lines.filter(function(l){return /^\p{Emoji}/u.test(l.trim());});
     var summaryLines = lines.filter(function(l){return !/^\p{Emoji}/u.test(l.trim())&&l.length>20;});
