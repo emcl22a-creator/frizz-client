@@ -352,6 +352,11 @@
   }
   .footer-nav a:hover{color:var(--accent);}
   .footer-bottom{text-align:center;color:var(--text-3);font-size:13px;}
+  .footer-email{
+    color:var(--accent);text-decoration:none;font-weight:600;
+    transition:opacity .2s ease;
+  }
+  .footer-email:hover{opacity:0.8;}
   footer .logo{font-size:18px;}
 
   /* RESPONSIVE */
@@ -595,10 +600,12 @@
         <a href="#pricing">Tarif</a>
         <a href="inscription.html">Inscription</a>
         <a href="inscription.html#connexion">Connexion</a>
+        <a href="mailto:Frizz.avis@gmail.com">Contact</a>
       </nav>
     </div>
     <div class="footer-bottom">
-      © 2026 Frizz — Progressez grâce à vos clients.
+      <div>Une question ? <a href="mailto:Frizz.avis@gmail.com" class="footer-email">Frizz.avis@gmail.com</a></div>
+      <div style="margin-top:8px">© 2026 Frizz — Progressez grâce à vos clients.</div>
     </div>
   </div>
 </footer>
