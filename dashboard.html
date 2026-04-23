@@ -175,15 +175,15 @@ html, body { background: var(--bg); font-family: var(--font); color: var(--text)
 .card.collapsed .card-chevron { transform: rotate(-90deg); }
 .card-body { padding: 0 22px 22px; }
 .card.collapsed .card-body { display: none; }
-.filter-btn {
+.filter-btn, .g-filter-btn {
   padding: 6px 14px; border-radius: 99px;
   border: 1.5px solid var(--border);
   font-family: var(--font); font-size: 12px; font-weight: 700;
   cursor: pointer; transition: all 0.2s;
   background: rgba(255,255,255,0.04); color: var(--muted);
 }
-.filter-btn:hover { border-color: var(--accent); color: var(--accent); }
-.filter-btn.active { background: var(--accent); color: #000; border-color: var(--accent); }
+.filter-btn:hover, .g-filter-btn:hover { border-color: var(--accent); color: var(--accent); }
+.filter-btn.active, .g-filter-btn.active { background: var(--accent); color: #000; border-color: var(--accent); }
 
 .badge {
   background: var(--accent); color: #fff;
@@ -546,9 +546,9 @@ html, body { background: var(--bg); font-family: var(--font); color: var(--text)
     </div>
     <div class="card-body">
       <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
-        <button class="filter-btn active" id="gFilterAll" onclick="setGoogleFilter('all',this)">Tous</button>
-        <button class="filter-btn" id="gFilterGood" onclick="setGoogleFilter('good',this)">⭐ Bonnes notes</button>
-        <button class="filter-btn" id="gFilterBad" onclick="setGoogleFilter('bad',this)">⚠️ Mauvaises notes</button>
+        <button class="g-filter-btn active" id="gFilterAll" onclick="setGoogleFilter('all',this)">Tous</button>
+        <button class="g-filter-btn" id="gFilterGood" onclick="setGoogleFilter('good',this)">⭐ Bonnes notes</button>
+        <button class="g-filter-btn" id="gFilterBad" onclick="setGoogleFilter('bad',this)">⚠️ Mauvaises notes</button>
       </div>
       <div id="googleAvisList"><div class="empty-state">Aucun avis Google.</div></div>
     </div>
@@ -741,7 +741,7 @@ html, body { background: var(--bg); font-family: var(--font); color: var(--text)
 </div>
 
 <script>
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz8zD7eMEOxUIvmLk_ixKUTp-VmkDeITGnEMSEmc15p1wb_4h66L1jaxXnFE59IWI3I/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx5vh-x3XhXCTktKi5uJ_93qkVPlQ261ZLBgUf7hjGyQMfP_l229jLlBilajWVquxtk/exec';
 const BASE_URL = 'https://emcl22a-creator.github.io/frizz-client/';
 const STRIPE_LINK = 'https://buy.stripe.com/test_8x26oIcoO1H07Xn9cZbEA01';
 const TRIAL_DAYS = 14;
@@ -826,7 +826,11 @@ async function loadData() {
     var stored = localStorage.getItem('avis_' + commerceId);
     if (stored) { try { allAvis = JSON.parse(stored); } catch(e2) { allAvis = []; } }
   }
-  updateStats(); renderAvis(); renderChart(); renderGoogleAvis();
+  updateStats(); renderAvis(); renderChart();
+  // Update google badge count without full render
+  var googleCount = allAvis.filter(function(a){ return String(a.avis_google||'').split(' ')[0]==='oui'; }).length;
+  var badge = document.getElementById('googleBadge');
+  if (badge) badge.textContent = googleCount;
   setTimeout(renderProgressChart, 400);
   document.getElementById('lastRefreshTime').textContent = new Date().toLocaleTimeString('fr-FR');
   hideLoading();
@@ -977,7 +981,7 @@ var currentGoogleFilter = 'all';
 
 function setGoogleFilter(filter, btn) {
   currentGoogleFilter = filter;
-  document.querySelectorAll('#gFilterAll,#gFilterGood,#gFilterBad').forEach(function(b){b.classList.remove('active');});
+  document.querySelectorAll('.g-filter-btn').forEach(function(b){b.classList.remove('active');});
   btn.classList.add('active');
   renderGoogleAvis();
 }
@@ -986,10 +990,13 @@ function renderGoogleAvis() {
   var container = document.getElementById('googleAvisList');
   var badge = document.getElementById('googleBadge');
   if (!container) return;
+  // Debug: log all avis_google values
   var googleAvis = allAvis.filter(function(a) {
-    if (!a.avis_google || a.avis_google.indexOf('oui') === -1) return false;
-    if (currentGoogleFilter === 'good') return parseInt(a.note_globale) >= 4;
-    if (currentGoogleFilter === 'bad') return parseInt(a.note_globale) <= 3;
+    var val = String(a.avis_google || '');
+    if (val.split(' ')[0] !== 'oui') return false;
+    var n = Number(a.note_globale);
+    if (currentGoogleFilter === 'good') return n >= 4;
+    if (currentGoogleFilter === 'bad') return n > 0 && n <= 3;
     return true;
   }).slice().reverse();
   if (badge) badge.textContent = googleAvis.length;
@@ -997,7 +1004,7 @@ function renderGoogleAvis() {
     container.innerHTML = "<div class=\"empty-state\">Aucun avis Google.</div>";
     return;
   }
-  container.innerHTML = googleAvis.map(function(a) {
+  var html = googleAvis.map(function(a) {
     var note = parseInt(a.note_globale) || 0;
     var stars = '';
     for (var i = 0; i < 5; i++) stars += '<div class="star ' + (i < note ? 'filled' : 'empty') + '"></div>';
@@ -1012,11 +1019,12 @@ function renderGoogleAvis() {
       + '<div class="avis-google-tag" style="margin-top:8px">✓ Publié sur Google</div>'
       + '</div>';
   }).join('');
+  container.innerHTML = html;
 }
 
 function setAvisFilter(filter, btn) {
   currentAvisFilter = filter;
-  document.querySelectorAll('.filter-btn').forEach(function(b) { b.classList.remove('active'); });
+  document.querySelectorAll('#avisFilters .filter-btn').forEach(function(b) { b.classList.remove('active'); });
   btn.classList.add('active');
   renderAvis();
 }
@@ -1139,10 +1147,12 @@ async function generateAISummary() {
   var avisText = recentAvis.map(function(a,i){return 'Avis '+(i+1)+': Note '+a.note_globale+'/5, Cuisine '+a.note_cuisine+'/5, Service '+a.note_service+'/5, Prix '+a.note_prix+'/5'+(a.commentaire?', Commentaire: "'+a.commentaire+'"':'');}).join('\n');
   var prompt = 'Tu es un assistant pour aider les restaurateurs a comprendre leurs clients. Voici les '+recentAvis.length+' avis de cette semaine:\n\n'+avisText+'\n\nEcris en francais simple et direct, comme si tu parlais a un ami cuisinier.\n\nFais:\n1. Un bilan de la semaine en 2-3 phrases simples (ce qui va bien, ce qui va moins bien)\n2. 3 conseils pratiques et concrets pour la semaine prochaine (commence chaque conseil par un emoji)\n\nPas de jargon, pas de formules complexes. Du concret.';
   try {
-    var aiUrl = new URL(SCRIPT_URL);
-    aiUrl.searchParams.set('action', 'ai_summary');
-    aiUrl.searchParams.set('prompt', prompt);
-    var response = await fetch(aiUrl.toString());
+    var aiUrl = SCRIPT_URL + '?action=ai_summary';
+    var response = await fetch(aiUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: 'prompt=' + encodeURIComponent(prompt)
+    });
     var data = await response.json();
     if (!data.ok) throw new Error(data.error || 'Erreur IA');
     var text = data.text;
@@ -1295,10 +1305,12 @@ function cancelSubscription() {
 
 function toggleCard(header) {
   header.parentElement.classList.toggle('collapsed');
-  // Re-render progress chart when opened
-  var body = header.parentElement.querySelector('#progressBody');
-  if (body && !header.parentElement.classList.contains('collapsed')) {
-    setTimeout(renderProgressChart, 50);
+  var isOpen = !header.parentElement.classList.contains('collapsed');
+  if (isOpen) {
+    var body = header.parentElement.querySelector('#progressBody');
+    if (body) setTimeout(renderProgressChart, 50);
+    var gList = header.parentElement.querySelector('#googleAvisList');
+    if (gList) setTimeout(renderGoogleAvis, 300);
   }
 }
 
