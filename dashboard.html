@@ -194,8 +194,20 @@ html, body { background: var(--bg); font-family: var(--font); color: var(--text)
 
 /* ===== AI CARD ===== */
 .card.ai-card {
-  background: linear-gradient(135deg, #161616 0%, rgba(88,204,2,0.06) 100%);
-  border: 1.5px solid rgba(88,204,2,0.15);
+  background: linear-gradient(135deg, #161616 0%, rgba(88,204,2,0.08) 100%);
+  border: 1.5px solid rgba(88,204,2,0.3);
+  box-shadow: 0 0 30px rgba(88,204,2,0.08), inset 0 0 60px rgba(88,204,2,0.03);
+  position: relative;
+}
+.card.ai-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(88,204,2,0.6), transparent);
+}
+.card.ai-card::after {
+  content: '';
+  position: absolute; bottom: 0; left: 20%; right: 20%; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(88,204,2,0.3), transparent);
 }
 .ai-generate-btn {
   width: 100%; padding: 16px;
@@ -741,7 +753,7 @@ html, body { background: var(--bg); font-family: var(--font); color: var(--text)
 </div>
 
 <script>
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyU27vBZEP0pVmFCoBkyZYWWxV2hRvPafLykMfOhuewJi2DDAb1bC2Qu30DrQvcU0rM/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwrFXkapJMHAkBtItvzSHTmNprJU5B95uzexeBu104dRkWz1PMefMlx91Bfes32pbUt/exec';
 const BASE_URL = 'https://emcl22a-creator.github.io/frizz-client/';
 const STRIPE_LINK = 'https://buy.stripe.com/test_8x26oIcoO1H07Xn9cZbEA01';
 const TRIAL_DAYS = 14;
