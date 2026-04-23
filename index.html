@@ -30,7 +30,8 @@
 }
 
 html { scroll-behavior: smooth; }
-body { background: var(--bg); color: var(--text); font-family: var(--font); overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+body { background: var(--bg); color: var(--text); font-family: var(--font); overflow-x: hidden; -webkit-font-smoothing: antialiased; width: 100%; }
+html { width: 100%; }
 
 /* ===== ANIMATED BACKGROUND ===== */
 #bg-canvas {
@@ -324,11 +325,7 @@ footer { position: relative; z-index: 1; border-top: 1px solid var(--border); pa
 <!-- NAV -->
 <nav>
   <div class="nav-logo">Frizz <span>✦</span></div>
-  <div class="nav-links">
-    <a href="#features">Fonctionnalités</a>
-    <a href="#pricing">Tarif</a>
-    <a href="inscription.html">Se connecter</a>
-  </div>
+
   <a href="inscription.html" class="nav-cta">Essai gratuit</a>
 </nav>
 
