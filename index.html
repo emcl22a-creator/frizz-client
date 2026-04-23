@@ -82,10 +82,11 @@ body { background: var(--bg); color: var(--text); font-family: var(--font); over
 }
 
 .grid-overlay {
-  position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0.03;
-  background-image: linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px);
-  background-size: 60px 60px;
-  mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 100%);
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image:
+    linear-gradient(rgba(88,204,2,0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(88,204,2,0.07) 1px, transparent 1px);
+  background-size: 48px 48px;
 }
 
 /* ===== NAV ===== */
@@ -188,7 +189,7 @@ nav {
 @keyframes fadeUp { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
 
 /* ===== SECTIONS ===== */
-.section { position: relative; z-index: 1; padding: 120px 24px; max-width: 1000px; margin: 0 auto; }
+.section { position: relative; z-index: 1; padding: 60px 24px; max-width: 1000px; margin: 0 auto; }
 .section-eyebrow { font-size: 13px; font-weight: 500; color: var(--accent); letter-spacing: -0.1px; margin-bottom: 16px; text-align: center; }
 .section-title { font-size: clamp(36px, 5vw, 56px); font-weight: 700; letter-spacing: -2px; line-height: 1.05; text-align: center; margin-bottom: 16px; }
 .section-title em { color: var(--accent); font-style: normal; }
@@ -237,7 +238,7 @@ nav {
 @media(max-width:600px) { .step-card { gap: 20px; padding: 24px 20px; } .step-num { font-size: 36px; width: 36px; } }
 
 /* ===== PROOF ===== */
-.proof-section { position: relative; z-index: 1; padding: 120px 24px; text-align: center; }
+.proof-section { position: relative; z-index: 1; padding: 60px 24px; text-align: center; }
 .proof-number { font-size: clamp(80px, 16vw, 160px); font-weight: 800; line-height: 0.9; letter-spacing: -6px; background: linear-gradient(135deg, var(--accent), rgba(88,204,2,0.5)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 16px; }
 .proof-label { font-size: 17px; color: var(--muted); margin-bottom: 64px; font-weight: 300; letter-spacing: -0.2px; }
 .testimonials { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; max-width: 900px; margin: 0 auto; }
@@ -249,7 +250,7 @@ nav {
 .testimonial-place { font-size: 12px; color: var(--muted2); margin-top: 2px; }
 
 /* ===== PRICING ===== */
-.pricing-section { position: relative; z-index: 1; padding: 120px 24px; max-width: 520px; margin: 0 auto; text-align: center; }
+.pricing-section { position: relative; z-index: 1; padding: 60px 24px; max-width: 520px; margin: 0 auto; text-align: center; }
 .price-card {
   background: var(--surface);
   border: 1px solid var(--border); border-radius: 28px; padding: 48px 40px;
@@ -272,7 +273,7 @@ nav {
 .price-note { font-size: 12px; color: var(--muted2); letter-spacing: -0.1px; }
 
 /* ===== FAQ ===== */
-.faq-section { position: relative; z-index: 1; padding: 80px 24px 120px; max-width: 680px; margin: 0 auto; }
+.faq-section { position: relative; z-index: 1; padding: 40px 24px 60px; max-width: 680px; margin: 0 auto; }
 .faq-item { border-bottom: 1px solid var(--border); }
 .faq-btn { width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 22px 0; background: none; border: none; color: var(--text); font-family: var(--font); font-size: 16px; font-weight: 500; cursor: pointer; text-align: left; gap: 20px; letter-spacing: -0.3px; transition: color 0.2s; }
 .faq-btn:hover { color: var(--accent); }
@@ -284,7 +285,7 @@ nav {
 /* ===== FINAL CTA ===== */
 .cta-section {
   position: relative; z-index: 1;
-  padding: 140px 24px; text-align: center;
+  padding: 60px 24px; text-align: center;
 }
 .cta-title { font-size: clamp(42px, 7vw, 72px); font-weight: 700; letter-spacing: -2.5px; line-height: 1.04; margin-bottom: 20px; }
 .cta-title em { color: var(--accent); font-style: normal; }
