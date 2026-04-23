@@ -3,600 +3,631 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Frizz — Plus d'avis Google, automatiquement</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<title>Frizz — Améliorez votre restaurant. Gagnez plus de clients.</title>
+<meta name="description" content="Frizz collecte les avis de vos clients après chaque repas. Dashboard temps réel, résumé IA hebdomadaire, alertes mauvaises notes. Essai gratuit 14 jours.">
+<meta name="keywords" content="avis restaurant, collecter avis clients, réputation google restaurant, logiciel avis restaurant">
+<meta property="og:title" content="Frizz — Améliorez votre restaurant grâce aux avis clients">
+<meta property="og:description" content="Collectez les avis, comprenez vos clients, générez plus d'avis Google. 14 jours gratuits.">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Frizz","description":"Plateforme de collecte d'avis clients pour restaurants","applicationCategory":"BusinessApplication","offers":{"@type":"Offer","price":"14.99","priceCurrency":"EUR"}}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
 :root {
   --bg: #000000;
-  --surface: #111111;
-  --surface2: #1a1a1a;
-  --border: rgba(255,255,255,0.08);
-  --text: #FFFFFF;
-  --muted: rgba(255,255,255,0.5);
-  --accent: #7CFC00;
-  --accent-dim: rgba(88,204,2,0.12);
-  --accent-glow: rgba(88,204,2,0.3);
+  --text: #F5F5F7;
+  --muted: rgba(245,245,247,0.6);
+  --muted2: rgba(245,245,247,0.3);
+  --accent: #58CC02;
+  --accent-light: #65e002;
+  --accent-glow: rgba(88,204,2,0.4);
+  --surface: rgba(255,255,255,0.05);
+  --surface2: rgba(255,255,255,0.08);
+  --border: rgba(255,255,255,0.1);
+  --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-display: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
+
 html { scroll-behavior: smooth; }
-body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; overflow-x: hidden; }
+body { background: var(--bg); color: var(--text); font-family: var(--font); overflow-x: hidden; -webkit-font-smoothing: antialiased; }
 
+/* ===== ANIMATED BACKGROUND ===== */
+#bg-canvas {
+  position: fixed; inset: 0; z-index: 0;
+  pointer-events: none;
+}
 
-/* BG ANIMATIONS */
-.bg-orbs { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
-.orb { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.12; animation: orbFloat linear infinite; }
-.orb1 { width: 400px; height: 400px; background: #58CC02; top: -100px; left: -100px; animation-duration: 20s; }
-.orb2 { width: 300px; height: 300px; background: #00C8FF; top: 40%; right: -80px; animation-duration: 15s; animation-delay: -5s; }
-.orb3 { width: 250px; height: 250px; background: #58CC02; bottom: 10%; left: 20%; animation-duration: 18s; animation-delay: -10s; }
+.bg-orb {
+  position: fixed; border-radius: 50%; filter: blur(120px);
+  pointer-events: none; z-index: 0; opacity: 0;
+  animation: orbFloat linear infinite;
+}
+.orb1 { width: 600px; height: 600px; background: radial-gradient(circle, rgba(88,204,2,0.15), transparent 70%); top: -200px; left: -200px; animation-duration: 20s; animation-delay: 0s; }
+.orb2 { width: 500px; height: 500px; background: radial-gradient(circle, rgba(88,204,2,0.1), transparent 70%); bottom: -150px; right: -150px; animation-duration: 25s; animation-delay: -8s; }
+.orb3 { width: 400px; height: 400px; background: radial-gradient(circle, rgba(100,200,0,0.08), transparent 70%); top: 40%; left: 50%; transform: translate(-50%,-50%); animation-duration: 18s; animation-delay: -4s; }
+
 @keyframes orbFloat {
-  0% { transform: translate(0, 0) scale(1); }
-  25% { transform: translate(30px, -40px) scale(1.05); }
-  50% { transform: translate(-20px, 30px) scale(0.95); }
-  75% { transform: translate(40px, 20px) scale(1.02); }
-  100% { transform: translate(0, 0) scale(1); }
+  0% { opacity: 0; transform: scale(0.8) translate(0,0); }
+  10% { opacity: 1; }
+  50% { transform: scale(1.1) translate(30px, -20px); }
+  90% { opacity: 1; }
+  100% { opacity: 0; transform: scale(0.8) translate(0,0); }
 }
 
-/* FLOATING PARTICLES */
-.particles { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
-.particle { position: absolute; width: 4px; height: 4px; background: var(--accent); border-radius: 50%; opacity: 0; animation: particleRise linear infinite; }
-@keyframes particleRise {
-  0% { opacity: 0; transform: translateY(0) scale(0); }
-  10% { opacity: 0.6; transform: translateY(-20px) scale(1); }
-  90% { opacity: 0.2; transform: translateY(-300px) scale(0.5); }
-  100% { opacity: 0; transform: translateY(-320px) scale(0); }
+/* Particle grid */
+.aurora {
+  position: fixed; pointer-events: none; z-index: 0;
+  border-radius: 50%; filter: blur(80px); opacity: 0;
+  animation: auroraMove ease infinite;
+}
+.aurora1 {
+  width: 800px; height: 300px;
+  background: linear-gradient(135deg, rgba(88,204,2,0.12), rgba(88,204,2,0.04), transparent);
+  top: 15%; left: -200px;
+  animation-duration: 14s; animation-delay: 0s;
+}
+.aurora2 {
+  width: 700px; height: 250px;
+  background: linear-gradient(135deg, rgba(88,204,2,0.08), rgba(100,220,0,0.04), transparent);
+  bottom: 20%; right: -200px;
+  animation-duration: 18s; animation-delay: -7s;
+}
+@keyframes auroraMove {
+  0%   { opacity:0; transform: translateX(0) rotate(0deg); }
+  15%  { opacity:1; }
+  50%  { transform: translateX(80px) rotate(3deg); opacity:0.8; }
+  85%  { opacity:1; }
+  100% { opacity:0; transform: translateX(0) rotate(0deg); }
 }
 
-/* GRID LINES */
-.grid-lines { position: fixed; inset: 0; pointer-events: none; z-index: 0; background-image: linear-gradient(rgba(88,204,2,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(88,204,2,0.03) 1px, transparent 1px); background-size: 60px 60px; }
+.grid-overlay {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0.03;
+  background-image: linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px);
+  background-size: 60px 60px;
+  mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 100%);
+}
 
-/* Make sure content is above bg */
-nav, .hero, .mockup-section, .steps-section, .pricing-section, .faq-section, .cta-final, footer { position: relative; z-index: 1; }
+/* ===== NAV ===== */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 48px; height: 52px;
+  background: rgba(0,0,0,0.72);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.nav-logo { font-size: 17px; font-weight: 700; color: var(--text); letter-spacing: -0.3px; }
+.nav-logo span { color: var(--accent); }
+.nav-links { display: flex; align-items: center; gap: 32px; }
+.nav-links a { font-size: 13px; font-weight: 400; color: var(--muted); text-decoration: none; transition: color 0.2s; letter-spacing: -0.1px; }
+.nav-links a:hover { color: var(--text); }
+.nav-cta { background: var(--accent); color: #fff; font-size: 13px; font-weight: 600; padding: 8px 18px; border-radius: 980px; text-decoration: none; letter-spacing: -0.1px; transition: all 0.2s; }
+.nav-cta:hover { background: var(--accent-light); color: #fff; }
+@media(max-width:768px) { nav { padding: 0 20px; } .nav-links { display: none; } }
 
-/* NAV */
-nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 0 24px; height: 60px; display: flex; align-items: center; justify-content: space-between; background: rgba(0,0,0,0.8); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); }
-.nav-logo { font-size: 18px; font-weight: 800; color: var(--accent); }
-.nav-cta { background: var(--accent); color: #000; border: none; border-radius: 99px; padding: 8px 20px; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.2s; text-decoration: none; }
-.nav-cta:hover { transform: scale(1.04); box-shadow: 0 0 20px var(--accent-glow); }
+/* ===== HERO ===== */
+.hero {
+  position: relative; z-index: 1;
+  min-height: 100vh;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center; padding: 120px 24px 80px;
+}
 
-/* HERO */
-.hero { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 80px 24px 60px; text-align: center; position: relative; overflow: hidden; }
-.hero-glow { position: absolute; width: 700px; height: 700px; background: radial-gradient(circle, rgba(88,204,2,0.07) 0%, transparent 65%); border-radius: 50%; top: 50%; left: 50%; transform: translate(-50%, -55%); pointer-events: none; }
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 13px; font-weight: 500; color: var(--accent);
+  letter-spacing: -0.1px; margin-bottom: 24px;
+  opacity: 0; animation: fadeUp 0.8s 0.2s ease forwards;
+}
+.hero-eyebrow-dot { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; animation: ping 2s ease infinite; }
+@keyframes ping { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(1.4)} }
 
-.pill { display: inline-flex; align-items: center; gap: 7px; background: var(--accent-dim); border: 1px solid rgba(200,241,53,0.2); border-radius: 99px; padding: 6px 14px; font-size: 12px; font-weight: 700; color: var(--accent); margin-bottom: 32px; animation: fadeUp 0.5s ease both; }
-.pill-dot { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; animation: blink 1.4s ease infinite; }
-@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+.hero-title {
+  font-size: clamp(52px, 8.5vw, 96px);
+  font-weight: 700;
+  line-height: 1.03;
+  letter-spacing: -3px;
+  color: var(--text);
+  max-width: 900px;
+  margin-bottom: 24px;
+  opacity: 0; animation: fadeUp 0.8s 0.35s ease forwards;
+}
+.hero-title .line2 { color: var(--accent); display: block; }
 
-h1 { font-size: clamp(40px, 8vw, 86px); font-weight: 900; line-height: 1.02; letter-spacing: -3px; margin-bottom: 24px; animation: fadeUp 0.5s 0.1s ease both; }
-h1 em { color: var(--accent); font-style: normal; }
+.hero-sub {
+  font-size: clamp(17px, 2.2vw, 21px);
+  font-weight: 300;
+  color: var(--muted);
+  max-width: 560px;
+  line-height: 1.6;
+  letter-spacing: -0.3px;
+  margin-bottom: 44px;
+  opacity: 0; animation: fadeUp 0.8s 0.5s ease forwards;
+}
 
-.hero-sub { font-size: clamp(16px, 2.5vw, 20px); color: var(--muted); max-width: 500px; line-height: 1.6; font-weight: 400; margin-bottom: 40px; animation: fadeUp 0.5s 0.2s ease both; }
+.hero-actions {
+  display: flex; align-items: center; gap: 16px; flex-wrap: wrap; justify-content: center;
+  opacity: 0; animation: fadeUp 0.8s 0.65s ease forwards;
+}
+.btn-primary {
+  background: var(--accent); color: #fff;
+  font-size: 17px; font-weight: 600; letter-spacing: -0.3px;
+  padding: 16px 36px; border-radius: 980px;
+  text-decoration: none; transition: all 0.25s;
+  box-shadow: 0 0 40px var(--accent-glow);
+}
+.btn-primary:hover { background: var(--accent-light); transform: scale(1.02); box-shadow: 0 0 60px var(--accent-glow); }
+.btn-secondary {
+  font-size: 17px; font-weight: 500; color: var(--text);
+  text-decoration: none; display: flex; align-items: center; gap: 6px;
+  transition: gap 0.2s;
+  letter-spacing: -0.3px;
+}
+.btn-secondary:hover { gap: 10px; }
 
-.cta-wrap { display: flex; flex-direction: column; align-items: center; gap: 12px; animation: fadeUp 0.5s 0.3s ease both; }
-.btn-big { background: var(--accent); color: #000; border: none; border-radius: 16px; padding: 18px 48px; font-family: 'Inter', sans-serif; font-size: 17px; font-weight: 800; cursor: pointer; transition: all 0.25s; text-decoration: none; display: inline-block; }
-.btn-big:hover { transform: translateY(-2px) scale(1.02); box-shadow: 0 8px 40px var(--accent-glow); }
-.cta-hint { font-size: 13px; color: var(--muted); font-weight: 500; }
-.cta-hint strong { color: var(--text); }
+.hero-hint {
+  font-size: 13px; color: var(--muted2); margin-top: 16px;
+  opacity: 0; animation: fadeUp 0.8s 0.8s ease forwards;
+  letter-spacing: -0.1px;
+}
 
-@keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+/* HERO STATS */
+.hero-stats {
+  display: flex; align-items: center; gap: 48px; flex-wrap: wrap; justify-content: center;
+  margin-top: 80px; padding-top: 48px;
+  border-top: 1px solid var(--border);
+  width: 100%; max-width: 700px;
+  opacity: 0; animation: fadeUp 0.8s 0.95s ease forwards;
+}
+.hero-stat-num { font-size: 34px; font-weight: 700; letter-spacing: -1.5px; color: var(--text); }
+.hero-stat-num span { color: var(--accent); }
+.hero-stat-label { font-size: 13px; color: var(--muted2); margin-top: 3px; letter-spacing: -0.1px; }
 
-/* SOCIAL PROOF */
-.proof { display: flex; align-items: center; justify-content: center; gap: 16px; margin-top: 56px; animation: fadeUp 0.5s 0.4s ease both; flex-wrap: wrap; }
-.proof-avatars { display: flex; }
-.proof-avatar { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--bg); background: var(--surface2); display: flex; align-items: center; justify-content: center; font-size: 14px; margin-left: -8px; }
-.proof-avatar:first-child { margin-left: 0; }
-.proof-text { font-size: 13px; color: var(--muted); }
-.proof-text strong { color: var(--text); }
-.proof-stars { color: var(--accent); font-size: 13px; letter-spacing: 1px; }
+@keyframes fadeUp { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
 
-/* FEATURES — BENTO GRID */
-.bento { max-width: 900px; margin: 0 auto; padding: 100px 24px; display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: auto; gap: 12px; }
-@media(max-width:700px){ .bento { grid-template-columns: 1fr; } }
+/* ===== SECTIONS ===== */
+.section { position: relative; z-index: 1; padding: 120px 24px; max-width: 1000px; margin: 0 auto; }
+.section-eyebrow { font-size: 13px; font-weight: 500; color: var(--accent); letter-spacing: -0.1px; margin-bottom: 16px; text-align: center; }
+.section-title { font-size: clamp(36px, 5vw, 56px); font-weight: 700; letter-spacing: -2px; line-height: 1.05; text-align: center; margin-bottom: 16px; }
+.section-title em { color: var(--accent); font-style: normal; }
+.section-sub { font-size: 17px; font-weight: 300; color: var(--muted); max-width: 500px; margin: 0 auto 64px; text-align: center; line-height: 1.65; letter-spacing: -0.2px; }
 
-.bento-card { background: var(--surface); border: 1px solid var(--border); border-radius: 24px; padding: 32px 28px; transition: border-color 0.2s, transform 0.2s; }
-.bento-card:hover { border-color: rgba(88,204,2,0.2); transform: translateY(-2px); }
-.bento-card.wide { grid-column: span 2; }
-.bento-card.tall { display: flex; flex-direction: column; justify-content: space-between; }
-@media(max-width:700px){ .bento-card.wide { grid-column: span 1; } }
+/* ===== FEATURES ===== */
+.features-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 2px; background: var(--border); border-radius: 24px; overflow: hidden; }
+.feature-card {
+  background: #000; padding: 36px 28px;
+  transition: background 0.3s;
+}
+.feature-card:hover { background: #0a0a0a; }
+.feature-icon { font-size: 28px; margin-bottom: 18px; display: block; }
+.feature-title { font-size: 19px; font-weight: 600; letter-spacing: -0.5px; margin-bottom: 10px; }
+.feature-desc { font-size: 14px; color: var(--muted); line-height: 1.7; font-weight: 300; letter-spacing: -0.1px; }
+@media(max-width:768px) { .features-grid { grid-template-columns: 1fr; } }
 
-.bento-icon { font-size: 36px; margin-bottom: 16px; }
-.bento-title { font-size: 20px; font-weight: 800; margin-bottom: 8px; letter-spacing: -0.5px; }
-.bento-desc { font-size: 14px; color: var(--muted); line-height: 1.6; }
-.bento-number { font-size: 56px; font-weight: 900; color: var(--accent); letter-spacing: -2px; margin-top: 16px; }
-.bento-number-label { font-size: 13px; color: var(--muted); }
+/* ===== AMÉLIORATION ===== */
+.improve-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; background: var(--border); border-radius: 24px; overflow: hidden; }
+.improve-card { background: #000; padding: 36px 32px; transition: background 0.3s; }
+.improve-card:hover { background: #0a0a0a; }
+.improve-card.featured { background: linear-gradient(135deg, rgba(88,204,2,0.06), #000); }
+.improve-label { font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--muted2); margin-bottom: 12px; }
+.improve-title { font-size: 24px; font-weight: 700; letter-spacing: -1px; margin-bottom: 12px; }
+.improve-desc { font-size: 14px; color: var(--muted); line-height: 1.7; font-weight: 300; margin-bottom: 20px; letter-spacing: -0.1px; }
+.improve-bar-wrap { display: flex; align-items: center; gap: 12px; }
+.improve-bar { flex: 1; height: 3px; background: var(--surface); border-radius: 99px; overflow: hidden; }
+.improve-bar-fill { height: 100%; border-radius: 99px; background: var(--accent); transition: width 1.5s ease; }
+.improve-score { font-size: 13px; font-weight: 600; color: var(--accent); }
+@media(max-width:768px) { .improve-grid { grid-template-columns: 1fr; } }
 
-/* STEPS */
-.steps-section { max-width: 900px; margin: 0 auto; padding: 0 24px 80px; }
-.section-label { font-size: 12px; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 16px; }
-.section-title { font-size: clamp(28px, 4vw, 44px); font-weight: 900; letter-spacing: -1.5px; margin-bottom: 48px; line-height: 1.1; }
+/* ===== STEPS ===== */
+.steps-grid { display: flex; flex-direction: column; gap: 2px; }
+.step-card {
+  background: var(--surface); border-radius: 2px;
+  padding: 36px 40px; display: flex; gap: 40px; align-items: flex-start;
+  transition: background 0.2s;
+}
+.step-card:first-child { border-radius: 20px 20px 2px 2px; }
+.step-card:last-child { border-radius: 2px 2px 20px 20px; }
+.step-card:hover { background: var(--surface2); }
+.step-num { font-size: 52px; font-weight: 800; color: var(--accent); opacity: 0.25; line-height: 1; flex-shrink: 0; letter-spacing: -3px; width: 56px; }
+.step-title { font-size: 20px; font-weight: 600; letter-spacing: -0.5px; margin-bottom: 8px; }
+.step-desc { font-size: 14px; color: var(--muted); line-height: 1.7; font-weight: 300; letter-spacing: -0.1px; }
+.step-tag { display: inline-block; background: var(--surface2); border-radius: 980px; padding: 4px 12px; font-size: 12px; font-weight: 500; color: var(--accent); margin-top: 12px; }
+@media(max-width:600px) { .step-card { gap: 20px; padding: 24px 20px; } .step-num { font-size: 36px; width: 36px; } }
 
-.steps-list { display: flex; flex-direction: column; gap: 2px; }
-.step-row { display: flex; align-items: flex-start; gap: 20px; background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 28px 24px; transition: border-color 0.2s; }
-.step-row:hover { border-color: rgba(88,204,2,0.15); }
-.step-num-wrap { width: 40px; height: 40px; background: var(--accent-dim); border: 1px solid rgba(88,204,2,0.2); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 900; color: var(--accent); flex-shrink: 0; }
-.step-content { flex: 1; }
-.step-title { font-size: 17px; font-weight: 800; margin-bottom: 6px; }
-.step-desc { font-size: 14px; color: var(--muted); line-height: 1.6; }
-.step-emoji { font-size: 32px; flex-shrink: 0; }
+/* ===== PROOF ===== */
+.proof-section { position: relative; z-index: 1; padding: 120px 24px; text-align: center; }
+.proof-number { font-size: clamp(80px, 16vw, 160px); font-weight: 800; line-height: 0.9; letter-spacing: -6px; background: linear-gradient(135deg, var(--accent), rgba(88,204,2,0.5)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 16px; }
+.proof-label { font-size: 17px; color: var(--muted); margin-bottom: 64px; font-weight: 300; letter-spacing: -0.2px; }
+.testimonials { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; max-width: 900px; margin: 0 auto; }
+.testimonial { background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 24px 28px; flex: 1; min-width: 240px; max-width: 280px; text-align: left; transition: border-color 0.2s; }
+.testimonial:hover { border-color: rgba(88,204,2,0.3); }
+.testimonial-stars { color: var(--accent); font-size: 12px; letter-spacing: 2px; margin-bottom: 12px; }
+.testimonial-text { font-size: 14px; color: var(--muted); line-height: 1.7; margin-bottom: 16px; font-weight: 300; font-style: italic; letter-spacing: -0.1px; }
+.testimonial-name { font-size: 13px; font-weight: 600; color: var(--text); }
+.testimonial-place { font-size: 12px; color: var(--muted2); margin-top: 2px; }
 
-/* PRICING */
-.pricing-section { max-width: 480px; margin: 0 auto; padding: 0 24px 100px; text-align: center; }
-.pricing-card { background: var(--surface); border: 1px solid var(--border); border-radius: 28px; overflow: hidden; margin-top: 40px; }
-.pricing-top { padding: 36px 32px 28px; }
-.price-row { display: flex; align-items: flex-end; justify-content: center; gap: 4px; margin: 20px 0 8px; }
-.price-currency { font-size: 22px; font-weight: 700; color: var(--muted); margin-bottom: 6px; }
-.price-amount { font-size: 72px; font-weight: 900; line-height: 1; letter-spacing: -3px; }
-.price-period { font-size: 15px; color: var(--muted); margin-bottom: 6px; }
-.price-trial { display: inline-flex; align-items: center; gap: 6px; background: var(--accent-dim); border: 1px solid rgba(88,204,2,0.2); border-radius: 99px; padding: 7px 16px; font-size: 13px; font-weight: 700; color: var(--accent); }
+/* ===== PRICING ===== */
+.pricing-section { position: relative; z-index: 1; padding: 120px 24px; max-width: 520px; margin: 0 auto; text-align: center; }
+.price-card {
+  background: var(--surface);
+  border: 1px solid var(--border); border-radius: 28px; padding: 48px 40px;
+  position: relative; overflow: hidden;
+  backdrop-filter: blur(20px);
+}
+.price-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(88,204,2,0.5), transparent); }
+.price-badge { display: inline-block; background: rgba(88,204,2,0.15); border: 1px solid rgba(88,204,2,0.25); border-radius: 980px; padding: 6px 16px; font-size: 12px; font-weight: 500; color: var(--accent); margin-bottom: 32px; letter-spacing: -0.1px; }
+.price-amount { display: flex; align-items: flex-start; justify-content: center; gap: 4px; margin-bottom: 8px; }
+.price-curr { font-size: 24px; font-weight: 600; margin-top: 10px; color: var(--text); }
+.price-num { font-size: 88px; font-weight: 700; letter-spacing: -5px; line-height: 1; color: var(--text); }
+.price-dec { font-size: 36px; font-weight: 600; margin-top: 20px; color: var(--text); }
+.price-period { font-size: 15px; color: var(--muted); margin-bottom: 40px; font-weight: 300; letter-spacing: -0.2px; }
+.price-features { list-style: none; text-align: left; margin-bottom: 40px; }
+.price-feature { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 15px; font-weight: 400; letter-spacing: -0.2px; }
+.price-feature:last-child { border-bottom: none; }
+.price-feature::before { content: ''; width: 16px; height: 16px; background: var(--accent); border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background-image: url("data:image/svg+xml,%3Csvg width='10' height='8' viewBox='0 0 10 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 4L3.5 6.5L9 1' stroke='white' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: center; background-size: 10px; background-color: var(--accent); }
+.btn-pricing { display: block; width: 100%; background: var(--accent); color: #fff; font-size: 17px; font-weight: 600; padding: 18px; border-radius: 980px; text-decoration: none; transition: all 0.25s; box-shadow: 0 8px 40px var(--accent-glow); letter-spacing: -0.3px; margin-bottom: 16px; }
+.btn-pricing:hover { background: var(--accent-light); transform: scale(1.02); }
+.price-note { font-size: 12px; color: var(--muted2); letter-spacing: -0.1px; }
 
-.pricing-features { padding: 0 32px; display: flex; flex-direction: column; gap: 14px; text-align: left; }
-.pf { display: flex; align-items: center; gap: 12px; font-size: 14px; color: var(--muted); padding: 10px 0; border-bottom: 1px solid var(--border); }
-.pf:last-child { border-bottom: none; }
-.pf-check { width: 20px; height: 20px; background: var(--accent-dim); border: 1px solid rgba(88,204,2,0.3); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 11px; color: var(--accent); flex-shrink: 0; }
-
-.pricing-cta-wrap { padding: 24px 32px 32px; }
-.btn-full { width: 100%; padding: 18px; background: var(--accent); color: #000; border: none; border-radius: 16px; font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 800; cursor: pointer; transition: all 0.2s; text-decoration: none; display: block; text-align: center; }
-.btn-full:hover { transform: translateY(-1px); box-shadow: 0 6px 30px var(--accent-glow); }
-.no-card { font-size: 12px; color: var(--muted); margin-top: 10px; }
-
-/* FAQ */
-.faq-section { max-width: 640px; margin: 0 auto; padding: 0 24px 100px; }
+/* ===== FAQ ===== */
+.faq-section { position: relative; z-index: 1; padding: 80px 24px 120px; max-width: 680px; margin: 0 auto; }
 .faq-item { border-bottom: 1px solid var(--border); }
-.faq-q { padding: 20px 0; font-size: 15px; font-weight: 600; cursor: pointer; display: flex; justify-content: space-between; align-items: center; user-select: none; }
-.faq-arrow { color: var(--muted); font-size: 11px; transition: transform 0.3s; flex-shrink: 0; }
-.faq-item.open .faq-arrow { transform: rotate(180deg); }
-.faq-a { display: none; padding-bottom: 20px; font-size: 14px; color: var(--muted); line-height: 1.7; }
-.faq-item.open .faq-a { display: block; }
+.faq-btn { width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 22px 0; background: none; border: none; color: var(--text); font-family: var(--font); font-size: 16px; font-weight: 500; cursor: pointer; text-align: left; gap: 20px; letter-spacing: -0.3px; transition: color 0.2s; }
+.faq-btn:hover { color: var(--accent); }
+.faq-icon { font-size: 20px; color: var(--muted2); flex-shrink: 0; transition: transform 0.25s, color 0.2s; }
+.faq-item.open .faq-icon { transform: rotate(45deg); color: var(--accent); }
+.faq-answer { font-size: 15px; color: var(--muted); line-height: 1.75; padding-bottom: 22px; display: none; font-weight: 300; letter-spacing: -0.2px; }
+.faq-item.open .faq-answer { display: block; }
 
-/* CTA FINAL */
-.cta-final { text-align: center; padding: 60px 24px 80px; }
-.cta-final h2 { font-size: clamp(32px, 5vw, 60px); font-weight: 900; letter-spacing: -2px; line-height: 1.05; margin-bottom: 16px; }
-.cta-final h2 em { color: var(--accent); font-style: normal; }
-.cta-final p { font-size: 16px; color: var(--muted); margin-bottom: 36px; }
-
-/* FOOTER */
-footer { border-top: 1px solid var(--border); padding: 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
-.footer-logo { font-size: 16px; font-weight: 800; color: var(--accent); }
-.footer-text { font-size: 12px; color: var(--muted); }
-
-
-/* MOCKUP SECTION */
-.mockup-section { padding: 20px 24px 60px; }
-.mockup-wrap { max-width: 900px; margin: 0 auto; position: relative; display: flex; align-items: flex-end; justify-content: center; gap: 0; }
-
-/* LAPTOP */
-.laptop { position: relative; width: 580px; flex-shrink: 0; z-index: 1; }
-.laptop-screen { background: #1a1a1a; border-radius: 12px 12px 0 0; border: 2px solid #333; overflow: hidden; }
-.laptop-bar { background: #111; padding: 8px 12px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #222; }
-.lb-dots { display: flex; gap: 5px; }
-.lb-dots span { width: 9px; height: 9px; border-radius: 50%; background: #333; }
-.lb-dots span:first-child { background: #FF5F57; }
-.lb-dots span:nth-child(2) { background: #FFBD2E; }
-.lb-dots span:last-child { background: #28C840; }
-.lb-url { flex: 1; background: #222; border-radius: 5px; padding: 3px 10px; font-size: 10px; color: #555; text-align: center; }
-.laptop-content { padding: 14px; }
-.lc-header { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
-.lc-logo { font-size: 12px; font-weight: 900; color: var(--accent); }
-.lc-name { font-size: 11px; font-weight: 700; flex: 1; }
-.lc-live { display: flex; align-items: center; gap: 4px; font-size: 9px; color: var(--accent); font-weight: 700; background: var(--accent-dim); border-radius: 99px; padding: 2px 8px; }
-.lc-live span { width: 5px; height: 5px; background: var(--accent); border-radius: 50%; animation: blink 1.4s ease infinite; }
-.lc-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 12px; }
-.lc-stat { background: #222; border-radius: 8px; padding: 8px 6px; text-align: center; }
-.lc-stat-val { font-size: 18px; font-weight: 900; }
-.lc-stat-val.green { color: var(--accent); }
-.lc-stat-val.red { color: #FF4B4B; }
-.lc-stat-label { font-size: 8px; color: #555; margin-top: 2px; font-weight: 600; }
-.lc-avis-title { font-size: 10px; font-weight: 800; color: #666; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
-.lc-avis { display: flex; flex-direction: column; gap: 4px; }
-.lc-avis-row { display: flex; align-items: center; gap: 6px; background: #222; border-radius: 8px; padding: 7px 8px; }
-.lc-stars { font-size: 9px; color: var(--accent); flex-shrink: 0; }
-.lc-avis-text { font-size: 9px; color: #888; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.lc-tag { font-size: 8px; font-weight: 700; border-radius: 4px; padding: 2px 5px; flex-shrink: 0; }
-.lc-tag.green { background: var(--accent-dim); color: var(--accent); }
-.lc-tag.orange { background: rgba(255,200,0,0.1); color: #FFC800; }
-.laptop-base { background: linear-gradient(#2a2a2a, #222); height: 12px; border-radius: 0 0 4px 4px; border: 2px solid #333; border-top: none; }
-.laptop-foot { width: 200px; height: 6px; background: #222; border-radius: 0 0 8px 8px; margin: 0 auto; border: 1px solid #333; border-top: none; }
-
-/* PHONE */
-.phone { width: 180px; background: #111; border-radius: 28px; border: 2px solid #333; overflow: hidden; margin-left: -40px; margin-bottom: 18px; position: relative; z-index: 2; box-shadow: -20px 20px 60px rgba(0,0,0,0.8); }
-.phone-notch { width: 60px; height: 18px; background: #000; border-radius: 0 0 12px 12px; margin: 0 auto; }
-.phone-screen { padding: 8px 10px 14px; }
-.ph-avatar { text-align: center; font-size: 22px; margin: 4px 0 4px; }
-.ph-name { text-align: center; font-size: 10px; font-weight: 800; margin-bottom: 8px; }
-.ph-progress { margin-bottom: 8px; }
-.ph-prog-label { display: flex; justify-content: space-between; font-size: 7px; color: #555; font-weight: 700; margin-bottom: 3px; }
-.ph-prog-bar { height: 3px; background: #222; border-radius: 99px; }
-.ph-prog-fill { height: 100%; width: 50%; background: var(--accent); border-radius: 99px; }
-.ph-card { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 10px; padding: 10px 8px; margin-bottom: 8px; }
-.ph-card-title { font-size: 10px; font-weight: 900; text-align: center; margin-bottom: 2px; }
-.ph-card-sub { font-size: 8px; color: #666; text-align: center; margin-bottom: 8px; }
-.ph-stars { display: flex; gap: 3px; justify-content: center; }
-.ph-star { width: 22px; height: 22px; background: #222; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 11px; border: 1px solid #333; }
-.ph-star.active { background: rgba(88,204,2,0.15); border-color: var(--accent); }
-.ph-btn { background: var(--accent); border-radius: 8px; padding: 8px; text-align: center; font-size: 10px; font-weight: 800; color: #000; }
-
-@media(max-width:700px){
-  .mockup-wrap { flex-direction: column; align-items: center; gap: 24px; }
-  .laptop { width: 100%; max-width: 400px; }
-  .phone { display: none !important; }
-  .mockup-section { display: none; }
+/* ===== FINAL CTA ===== */
+.cta-section {
+  position: relative; z-index: 1;
+  padding: 140px 24px; text-align: center;
 }
+.cta-title { font-size: clamp(42px, 7vw, 72px); font-weight: 700; letter-spacing: -2.5px; line-height: 1.04; margin-bottom: 20px; }
+.cta-title em { color: var(--accent); font-style: normal; }
+.cta-sub { font-size: 19px; color: var(--muted); max-width: 460px; margin: 0 auto 44px; line-height: 1.6; font-weight: 300; letter-spacing: -0.3px; }
 
-/* DESKTOP SPACING */
-@media(min-width: 768px) {
-  .hero { padding-bottom: 20px; }
-  .mockup-section { padding: 0px 24px 80px; }
-  .steps-section { padding: 60px 24px 100px; }
-  .pricing-section { padding: 60px 24px 100px; }
-  .faq-section { padding: 60px 24px 100px; }
-  .cta-final { padding: 80px 24px 100px; }
-  .bento { padding: 80px 24px; }
-}
+/* ===== FOOTER ===== */
+footer { position: relative; z-index: 1; border-top: 1px solid var(--border); padding: 32px 48px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+.footer-logo { font-size: 15px; font-weight: 600; color: var(--muted); }
+.footer-logo span { color: var(--accent); }
+.footer-links { display: flex; gap: 24px; }
+.footer-links a { font-size: 13px; color: var(--muted2); text-decoration: none; transition: color 0.2s; }
+.footer-links a:hover { color: var(--text); }
+.footer-copy { font-size: 12px; color: var(--muted2); }
+@media(max-width:600px) { footer { padding: 24px 20px; flex-direction: column; text-align: center; } }
 
-@media(max-width:640px) {
-  .amelio-grid { grid-template-columns: 1fr !important; }
-}
-/* REVEAL */
-.reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.6s ease, transform 0.6s ease; }
+/* ===== REVEAL ===== */
+.reveal { opacity: 0; transform: translateY(40px); transition: opacity 0.9s cubic-bezier(0.16,1,0.3,1), transform 0.9s cubic-bezier(0.16,1,0.3,1); }
 .reveal.visible { opacity: 1; transform: translateY(0); }
 </style>
 </head>
 <body>
 
-<div class="bg-orbs">
-  <div class="orb orb1"></div>
-  <div class="orb orb2"></div>
-  <div class="orb orb3"></div>
-</div>
-<div class="grid-lines"></div>
-<div class="particles" id="particles"></div>
+<!-- ANIMATED BACKGROUND -->
+<div class="bg-orb orb1"></div>
+<div class="bg-orb orb2"></div>
+<div class="bg-orb orb3"></div>
+<div class="grid-overlay"></div>
+<canvas id="bg-canvas"></canvas>
+<!-- Aurora -->
+<div class="aurora aurora1"></div>
+<div class="aurora aurora2"></div>
 
 <!-- NAV -->
 <nav>
-  <div class="nav-logo">Frizz ✦</div>
-  <a href="inscription.html" class="nav-cta">Essai gratuit →</a>
+  <div class="nav-logo">Frizz <span>✦</span></div>
+  <div class="nav-links">
+    <a href="#features">Fonctionnalités</a>
+    <a href="#pricing">Tarif</a>
+    <a href="inscription.html">Se connecter</a>
+  </div>
+  <a href="inscription.html" class="nav-cta">Essai gratuit</a>
 </nav>
 
 <!-- HERO -->
 <section class="hero">
-  <div class="hero-glow"></div>
+  <h1 class="hero-title">
+    Améliorez votre restaurant.
+    <span class="line2">Gagnez plus de clients.</span>
+  </h1>
 
-  <div class="pill">
-    <div class="pill-dot"></div>
-    Essai gratuit 7 jours — sans carte bancaire
+  <p class="hero-sub">
+    Frizz collecte les avis de vos clients après chaque repas. Comprenez ce qui doit changer, agissez — et boostez votre réputation sur Google.
+  </p>
+
+  <div class="hero-actions">
+    <a href="inscription.html" class="btn-primary">Commencer gratuitement</a>
+    <a href="#features" class="btn-secondary">En savoir plus →</a>
   </div>
 
-  <h1>Améliorez votre<br>restaurant grâce<br>à vos clients.</h1>
-
-  <p class="hero-sub">Collectez les avis après chaque repas. Comprenez ce qui doit changer. Générez plus d'avis Google automatiquement.</p>
-
-  <div class="cta-wrap">
-    <a href="inscription.html" class="btn-big">Commencer gratuitement →</a>
-    <div class="cta-hint">Gratuit 7 jours · puis <strong>19€/mois</strong> · Annulation en 1 clic</div>
-  </div>
-
+  <p class="hero-hint">Gratuit 14 jours · puis 14,99 €/mois · Annulation en 1 clic</p>
 
 
 </section>
 
-<!-- MOCKUP SECTION -->
-<div class="mockup-section reveal">
-  <div class="mockup-wrap">
+<!-- FEATURES -->
+<section class="section reveal" id="features">
+  <div class="section-eyebrow">Fonctionnalités</div>
+  <h2 class="section-title">Tout ce dont vous avez<br><em>besoin, rien de plus.</em></h2>
+  <p class="section-sub">Un outil simple, pensé pour les restaurateurs — pas pour les développeurs.</p>
 
-    <!-- LAPTOP -->
-    <div class="laptop">
-      <div class="laptop-screen">
-        <div class="laptop-bar">
-          <div class="lb-dots"><span></span><span></span><span></span></div>
-          <div class="lb-url">frizz.app/dashboard</div>
-        </div>
-        <div class="laptop-content">
-          <div class="lc-header">
-            <div class="lc-logo">Frizz ✦</div>
-            <div class="lc-name">Restaurant Le Gourmet</div>
-            <div class="lc-live"><span></span> En direct</div>
-          </div>
-          <div class="lc-stats">
-            <div class="lc-stat">
-              <div class="lc-stat-val green">4.8</div>
-              <div class="lc-stat-label">Note moyenne</div>
-            </div>
-            <div class="lc-stat">
-              <div class="lc-stat-val">47</div>
-              <div class="lc-stat-label">Total avis</div>
-            </div>
-            <div class="lc-stat">
-              <div class="lc-stat-val green">38</div>
-              <div class="lc-stat-label">Bons avis</div>
-            </div>
-            <div class="lc-stat">
-              <div class="lc-stat-val red">3</div>
-              <div class="lc-stat-label">À surveiller</div>
-            </div>
-          </div>
-          <div class="lc-avis-title">Derniers avis</div>
-          <div class="lc-avis">
-            <div class="lc-avis-row">
-              <span class="lc-stars">★★★★★</span>
-              <span class="lc-avis-text">"Excellent repas, service impeccable !"</span>
-              <span class="lc-tag green">Google ✓</span>
-            </div>
-            <div class="lc-avis-row">
-              <span class="lc-stars">★★★★★</span>
-              <span class="lc-avis-text">"Je recommande, ambiance parfaite."</span>
-              <span class="lc-tag green">Google ✓</span>
-            </div>
-            <div class="lc-avis-row">
-              <span class="lc-stars" style="color:#FFC800">★★★☆☆</span>
-              <span class="lc-avis-text">"Service un peu lent ce soir."</span>
-              <span class="lc-tag orange">Privé</span>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="laptop-base"></div>
-      <div class="laptop-foot"></div>
+  <div class="features-grid">
+    <div class="feature-card">
+      <span class="feature-icon">📱</span>
+      <div class="feature-title">QR code en 2 minutes</div>
+      <div class="feature-desc">Inscrivez-vous, obtenez votre QR code, affichez-le sur vos tables. Vos clients laissent un avis en 20 secondes.</div>
     </div>
-
-    <!-- PHONE -->
-    <div class="phone">
-      <div class="phone-notch"></div>
-      <div class="phone-screen">
-        <div class="ph-avatar">🍽️</div>
-        <div class="ph-name">Restaurant Le Gourmet</div>
-        <div class="ph-progress">
-          <div class="ph-prog-label"><span>VOTRE AVIS</span><span>1 / 2</span></div>
-          <div class="ph-prog-bar"><div class="ph-prog-fill"></div></div>
-        </div>
-        <div class="ph-card">
-          <div class="ph-card-title">Votre avis compte 🙌</div>
-          <div class="ph-card-sub">Ça prend 20 secondes ⏱️</div>
-          <div class="ph-stars">
-            <div class="ph-star active">⭐</div>
-            <div class="ph-star active">⭐</div>
-            <div class="ph-star active">⭐</div>
-            <div class="ph-star active">⭐</div>
-            <div class="ph-star active">⭐</div>
-          </div>
-        </div>
-        <div class="ph-btn">Continuer →</div>
-      </div>
+    <div class="feature-card">
+      <span class="feature-icon">📊</span>
+      <div class="feature-title">Dashboard temps réel</div>
+      <div class="feature-desc">Notes, tendances, répartition. Tout vos avis organisés en un seul endroit, accessible depuis n'importe quel appareil.</div>
     </div>
-
+    <div class="feature-card">
+      <span class="feature-icon">✨</span>
+      <div class="feature-title">Résumé IA hebdomadaire</div>
+      <div class="feature-desc">Chaque semaine, l'IA analyse vos avis et vous donne un bilan clair avec 3 conseils concrets pour progresser.</div>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">🔔</span>
+      <div class="feature-title">Alertes instantanées</div>
+      <div class="feature-desc">Notification immédiate dès qu'un client laisse une mauvaise note. Réagissez avant qu'il reparte insatisfait.</div>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">⭐</span>
+      <div class="feature-title">Avis Google intégrés</div>
+      <div class="feature-desc">Chaque client est invité à publier son avis sur Google. Le texte est généré automatiquement — il n'a qu'à coller.</div>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">📈</span>
+      <div class="feature-title">Suivi de progression</div>
+      <div class="feature-desc">Graphiques d'évolution semaine par semaine. Voyez vos progrès sur la cuisine, le service et le rapport qualité/prix.</div>
+    </div>
   </div>
-</div>
+</section>
 
-<!-- AMÉLIORATION SECTION -->
-<div style="max-width:900px;margin:0 auto;padding:0 24px 80px;" class="reveal">
+<!-- AMÉLIORATION -->
+<section class="section reveal">
+  <div class="section-eyebrow">Amélioration continue</div>
+  <h2 class="section-title">Sachez exactement<br><em>ce qui doit changer.</em></h2>
+  <p class="section-sub">Vos clients évaluent chaque aspect de leur expérience. Vous voyez tout, en temps réel.</p>
 
-  <div class="section-label" style="text-align:center;margin:0 auto 20px;display:inline-flex;left:50%;position:relative;transform:translateX(-50%)">✦ Pourquoi Frizz</div>
-
-  <h2 class="section-title" style="text-align:center;font-size:clamp(28px,4vw,44px);margin-bottom:12px">Améliorez votre restaurant.<br><em style="color:var(--accent);font-style:normal">Gagnez plus de clients.</em></h2>
-  <p style="text-align:center;font-size:16px;color:var(--muted);max-width:520px;margin:0 auto 48px;line-height:1.7">Frizz vous donne les données concrètes pour progresser — et transforme vos clients satisfaits en ambassadeurs sur Google.</p>
-
-  <!-- CARDS AMÉLIORATION -->
-  <div class="amelio-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
-
-    <!-- Critères combinés -->
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:28px;transition:border-color 0.2s" onmouseover="this.style.borderColor='rgba(200,241,53,0.3)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.08)'">
-      <div style="font-size:36px;margin-bottom:14px">📊</div>
-      <div style="font-size:18px;font-weight:800;margin-bottom:8px;letter-spacing:-0.5px">Cuisine · Service · Prix</div>
-      <div style="font-size:14px;color:var(--muted);line-height:1.7;margin-bottom:16px">Vos clients évaluent chaque aspect de leur expérience. <strong style="color:var(--text)">Identifiez précisément ce qui plaît et ce qui doit s'améliorer.</strong></div>
-      <div style="display:flex;flex-direction:column;gap:10px">
-        <div style="display:flex;align-items:center;gap:10px">
-          <span style="font-size:14px;width:20px">🍽️</span>
-          <div style="height:4px;flex:1;background:var(--surface2);border-radius:99px;overflow:hidden"><div style="height:100%;width:82%;background:var(--accent);border-radius:99px"></div></div>
-          <span style="font-size:11px;font-weight:800;color:var(--accent);width:32px">4.1</span>
-        </div>
-        <div style="display:flex;align-items:center;gap:10px">
-          <span style="font-size:14px;width:20px">😊</span>
-          <div style="height:4px;flex:1;background:var(--surface2);border-radius:99px;overflow:hidden"><div style="height:100%;width:74%;background:var(--accent);border-radius:99px"></div></div>
-          <span style="font-size:11px;font-weight:800;color:var(--accent);width:32px">3.7</span>
-        </div>
-        <div style="display:flex;align-items:center;gap:10px">
-          <span style="font-size:14px;width:20px">💰</span>
-          <div style="height:4px;flex:1;background:var(--surface2);border-radius:99px;overflow:hidden"><div style="height:100%;width:90%;background:var(--accent);border-radius:99px"></div></div>
-          <span style="font-size:11px;font-weight:800;color:var(--accent);width:32px">4.5</span>
-        </div>
+  <div class="improve-grid">
+    <div class="improve-card">
+      <div class="improve-label">Critère évalué</div>
+      <div class="improve-title">🍽️ Cuisine</div>
+      <div class="improve-desc">Qualité, fraîcheur, présentation. Détectez si un plat déçoit avant de perdre des habitués.</div>
+      <div class="improve-bar-wrap">
+        <div class="improve-bar"><div class="improve-bar-fill" style="width:82%"></div></div>
+        <div class="improve-score">4.1/5</div>
       </div>
-      <div style="font-size:11px;color:var(--muted);margin-top:10px">Notes moyennes — exemple</div>
     </div>
-
-    <!-- Google -->
-    <div style="background:var(--surface);border:1px solid rgba(200,241,53,0.2);border-radius:20px;padding:28px;position:relative;overflow:hidden">
-      <div style="position:absolute;top:0;right:0;width:120px;height:120px;background:radial-gradient(circle,rgba(200,241,53,0.08),transparent);border-radius:50%;transform:translate(30%,-30%)"></div>
-      <div style="font-size:36px;margin-bottom:14px">⭐</div>
-      <div style="font-size:18px;font-weight:800;margin-bottom:8px;letter-spacing:-0.5px">Boostez votre réputation</div>
-      <div style="font-size:14px;color:var(--muted);line-height:1.7">Chaque client est invité à partager son avis sur Google. Frizz génère le texte automatiquement — il n'a qu'à coller. <strong style="color:var(--text)">Plus d'avis Google = plus de visibilité = plus de nouveaux clients.</strong></div>
-      <div style="margin-top:16px;background:rgba(200,241,53,0.08);border:1px solid rgba(200,241,53,0.15);border-radius:12px;padding:10px 14px;display:flex;align-items:center;gap:10px">
+    <div class="improve-card">
+      <div class="improve-label">Critère évalué</div>
+      <div class="improve-title">😊 Service</div>
+      <div class="improve-desc">Accueil, rapidité, amabilité. Identifiez les moments où le service pêche.</div>
+      <div class="improve-bar-wrap">
+        <div class="improve-bar"><div class="improve-bar-fill" style="width:74%"></div></div>
+        <div class="improve-score">3.7/5</div>
+      </div>
+    </div>
+    <div class="improve-card">
+      <div class="improve-label">Critère évalué</div>
+      <div class="improve-title">💰 Qualité / Prix</div>
+      <div class="improve-desc">Sachez si vos clients trouvent votre offre justifiée. Un signal fort à ne pas ignorer.</div>
+      <div class="improve-bar-wrap">
+        <div class="improve-bar"><div class="improve-bar-fill" style="width:90%"></div></div>
+        <div class="improve-score">4.5/5</div>
+      </div>
+    </div>
+    <div class="improve-card featured">
+      <div class="improve-label">Résultat</div>
+      <div class="improve-title">⭐ Plus d'avis Google</div>
+      <div class="improve-desc">Chaque client est invité à partager sur Google. Plus d'avis = meilleure visibilité = plus de nouveaux clients.</div>
+      <div style="margin-top:16px;background:rgba(88,204,2,0.08);border:1px solid rgba(88,204,2,0.2);border-radius:10px;padding:10px 14px;display:flex;align-items:center;gap:10px">
         <svg width="16" height="16" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
-        <div style="font-size:12px;font-weight:700;color:var(--accent)">Bouton "Laisser un avis Google" intégré</div>
+        <span style="font-size:12px;font-weight:500;color:var(--accent)">Bouton Google Avis intégré dans la page client</span>
       </div>
     </div>
   </div>
+</section>
 
-  <!-- BOTTOM STAT BAR -->
-  <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:24px 28px;display:flex;gap:0;flex-wrap:wrap">
-    <div style="flex:1;min-width:140px;text-align:center;padding:12px">
-      <div style="font-size:32px;font-weight:900;color:var(--accent);letter-spacing:-1px">20s</div>
-      <div style="font-size:12px;color:var(--muted);margin-top:4px">Pour laisser un avis</div>
+<!-- STEPS -->
+<section class="section reveal">
+  <div class="section-eyebrow">Comment ça marche</div>
+  <h2 class="section-title" style="margin-bottom:48px">Prêt en <em>3 étapes.</em></h2>
+  <div class="steps-grid">
+    <div class="step-card">
+      <div class="step-num">01</div>
+      <div>
+        <div class="step-title">Inscrivez-vous, obtenez votre QR code</div>
+        <div class="step-desc">Remplissez le formulaire en 2 minutes. Vous recevez instantanément votre QR code personnalisé et l'accès à votre dashboard.</div>
+        <span class="step-tag">⚡ 2 minutes</span>
+      </div>
     </div>
-    <div style="width:1px;background:var(--border);margin:8px 0"></div>
-    <div style="flex:1;min-width:140px;text-align:center;padding:12px">
-      <div style="font-size:32px;font-weight:900;color:var(--accent);letter-spacing:-1px">3</div>
-      <div style="font-size:12px;color:var(--muted);margin-top:4px">Critères évalués</div>
+    <div class="step-card">
+      <div class="step-num">02</div>
+      <div>
+        <div class="step-title">Affichez le QR code sur vos tables</div>
+        <div class="step-desc">Imprimez et collez sur les tables, le menu ou le ticket de caisse. Vos clients scannent après le repas et laissent leur avis en 20 secondes.</div>
+        <span class="step-tag">📱 20 secondes par client</span>
+      </div>
     </div>
-    <div style="width:1px;background:var(--border);margin:8px 0"></div>
-    <div style="flex:1;min-width:140px;text-align:center;padding:12px">
-      <div style="font-size:32px;font-weight:900;color:var(--accent);letter-spacing:-1px">∞</div>
-      <div style="font-size:12px;color:var(--muted);margin-top:4px">Avis illimités</div>
-    </div>
-    <div style="width:1px;background:var(--border);margin:8px 0"></div>
-    <div style="flex:1;min-width:140px;text-align:center;padding:12px">
-      <div style="font-size:32px;font-weight:900;color:var(--accent);letter-spacing:-1px">2min</div>
-      <div style="font-size:12px;color:var(--muted);margin-top:4px">Pour démarrer</div>
+    <div class="step-card">
+      <div class="step-num">03</div>
+      <div>
+        <div class="step-title">Analysez, améliorez, progressez</div>
+        <div class="step-desc">Consultez votre dashboard chaque matin. L'IA vous fait un bilan hebdomadaire avec des conseils concrets. Suivez votre progression semaine après semaine.</div>
+        <span class="step-tag">✨ Résumé IA chaque semaine</span>
+      </div>
     </div>
   </div>
-
-</div>
-
-<!-- CERCLE VERTUEUX -->
-<div style="max-width:900px;margin:0 auto;padding:0 24px 80px;" class="reveal">
-
-  <div style="text-align:center;margin-bottom:48px">
-    <div class="section-label" style="display:inline-flex;margin-bottom:16px">✦ Le cercle vertueux</div>
-    <h2 class="section-title" style="font-size:clamp(28px,4vw,44px)">Comment Frizz vous apporte<br><em style="color:var(--accent);font-style:normal">plus de clients.</em></h2>
-    <p style="font-size:16px;color:var(--muted);max-width:500px;margin:12px auto 0;line-height:1.7">Le feedback de vos clients crée un cycle d'amélioration continue qui attire naturellement de nouveaux clients.</p>
-  </div>
-
-  <!-- CYCLE CARDS -->
-  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:2px;background:var(--border);border-radius:20px;overflow:hidden" class="amelio-grid">
-
-    <div style="background:var(--surface);padding:28px 20px;text-align:center">
-      <div style="width:44px;height:44px;background:var(--accent-dim);border:1px solid rgba(200,241,53,0.2);border-radius:12px;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-size:20px">📱</div>
-      <div style="font-size:15px;font-weight:800;margin-bottom:8px">Client scanne</div>
-      <div style="font-size:13px;color:var(--muted);line-height:1.6">Votre client laisse son avis en 20 secondes après son repas</div>
-    </div>
-
-    <div style="background:var(--surface);padding:28px 20px;text-align:center">
-      <div style="width:44px;height:44px;background:var(--accent-dim);border:1px solid rgba(200,241,53,0.2);border-radius:12px;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-size:20px">📊</div>
-      <div style="font-size:15px;font-weight:800;margin-bottom:8px">Vous analysez</div>
-      <div style="font-size:13px;color:var(--muted);line-height:1.6">Vous voyez exactement ce qui plaît et ce qui doit s'améliorer</div>
-    </div>
-
-    <div style="background:var(--surface);padding:28px 20px;text-align:center">
-      <div style="width:44px;height:44px;background:var(--accent-dim);border:1px solid rgba(200,241,53,0.2);border-radius:12px;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-size:20px">🔧</div>
-      <div style="font-size:15px;font-weight:800;margin-bottom:8px">Vous améliorez</div>
-      <div style="font-size:13px;color:var(--muted);line-height:1.6">Vous agissez sur les points faibles. La qualité monte, les clients le sentent</div>
-    </div>
-
-    <div style="background:var(--surface);padding:28px 20px;text-align:center;position:relative">
-      <div style="position:absolute;top:0;right:0;width:80px;height:80px;background:radial-gradient(circle,rgba(200,241,53,0.1),transparent);border-radius:50%;transform:translate(20%,-20%)"></div>
-      <div style="width:44px;height:44px;background:var(--accent-dim);border:1px solid rgba(200,241,53,0.3);border-radius:12px;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-size:20px">🚀</div>
-      <div style="font-size:15px;font-weight:800;margin-bottom:8px;color:var(--accent)">Plus de clients</div>
-      <div style="font-size:13px;color:var(--muted);line-height:1.6">Meilleure expérience + plus d'avis Google = plus de visibilité = plus de clients</div>
-    </div>
-
-  </div>
-
-  <!-- TESTIMONIAL STYLE BLOCK -->
-  <div style="margin-top:16px;background:var(--surface);border:1px solid rgba(200,241,53,0.15);border-radius:20px;padding:32px;display:flex;gap:24px;align-items:center;flex-wrap:wrap">
-    <div style="font-size:48px;flex-shrink:0">💡</div>
-    <div style="flex:1;min-width:200px">
-      <div style="font-size:17px;font-weight:800;margin-bottom:8px;line-height:1.4">"Un restaurant qui écoute ses clients et s'améliore constamment attire naturellement plus de monde."</div>
-      <div style="font-size:13px;color:var(--muted)">C'est exactement ce que Frizz vous permet de faire — simplement, en 2 minutes par jour.</div>
-    </div>
-    <a href="inscription.html" class="btn-big" style="flex-shrink:0;font-size:14px;padding:14px 28px">Essayer gratuitement →</a>
-  </div>
-
-</div>
+</section>
 
 <!-- PRICING -->
-<div class="pricing-section reveal">
-  <div class="section-label" style="text-align:center">Tarif</div>
-  <div class="section-title" style="text-align:center">Simple.<br>Tout inclus.</div>
-  <div class="pricing-card">
-    <div class="pricing-top">
-      <div style="font-size:13px;font-weight:700;color:var(--muted)">Plan Restaurant</div>
-      <div class="price-row">
-        <div class="price-currency">€</div>
-        <div class="price-amount">19</div>
-      </div>
-      <div class="price-period">par mois · sans engagement</div>
-      <div style="margin-top:16px">
-        <div class="price-trial">🎁 7 jours gratuits — sans carte</div>
-      </div>
+<section class="pricing-section reveal" id="pricing">
+  <div class="section-eyebrow">Tarif</div>
+  <h2 class="section-title" style="margin-bottom:40px">Simple.<br><em>Tout inclus.</em></h2>
+  <div class="price-card">
+    <div class="price-badge">🎁 14 jours gratuits — sans carte bancaire</div>
+    <div class="price-amount">
+      <span class="price-curr">€</span>
+      <span class="price-num">14</span>
+      <span class="price-dec">,99</span>
     </div>
-    <div class="pricing-features">
-      <div class="pf"><div class="pf-check">✓</div> Dashboard temps réel</div>
-      <div class="pf"><div class="pf-check">✓</div> Alertes mauvaises notes instantanées</div>
-      <div class="pf"><div class="pf-check">✓</div> Résumé généré automatiquement pour Google</div>
-      <div class="pf"><div class="pf-check">✓</div> Alerte immédiate pour chaque mauvaise note</div>
-      <div class="pf"><div class="pf-check">✓</div> Statistiques & répartition des notes</div>
-      <div class="pf"><div class="pf-check">✓</div> Avis illimités</div>
-    </div>
-    <div class="pricing-cta-wrap">
-      <a href="inscription.html" class="btn-full">Commencer l'essai gratuit →</a>
-      <div class="no-card">Aucune carte bancaire requise · Annulation en 1 clic</div>
-    </div>
+    <p class="price-period">par mois · sans engagement</p>
+    <ul class="price-features">
+      <li class="price-feature">Dashboard temps réel</li>
+      <li class="price-feature">Avis illimités</li>
+      <li class="price-feature">Alertes mauvaises notes</li>
+      <li class="price-feature">Résumé IA hebdomadaire</li>
+      <li class="price-feature">Graphiques de progression</li>
+      <li class="price-feature">QR code haute résolution</li>
+      <li class="price-feature">Bouton Google Avis intégré</li>
+    </ul>
+    <a href="inscription.html" class="btn-pricing">Commencer l'essai gratuit</a>
+    <p class="price-note">Aucune carte requise · Annulation en 1 clic</p>
   </div>
-</div>
+</section>
 
 <!-- FAQ -->
-<div class="faq-section reveal">
-  <div class="section-label">FAQ</div>
-  <div class="section-title" style="font-size:clamp(24px,3vw,36px)">Questions fréquentes</div>
+<section class="faq-section reveal">
+  <div class="section-eyebrow" style="text-align:center">Questions fréquentes</div>
+  <h2 class="section-title" style="margin-bottom:48px">Vos <em>questions.</em></h2>
   <div class="faq-item">
-    <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
-      Comment fonctionne l'essai gratuit ?
-      <span class="faq-arrow">▼</span>
-    </div>
-    <div class="faq-a">7 jours d'accès complet à toutes les fonctionnalités, sans carte bancaire. À la fin de l'essai, le prélèvement de 19€/mois démarre automatiquement. Vous pouvez annuler à tout moment.</div>
+    <button class="faq-btn" onclick="toggleFaq(this)">Mes clients doivent-ils créer un compte ? <span class="faq-icon">+</span></button>
+    <p class="faq-answer">Non. Votre client scanne le QR code, note son expérience en 20 secondes. Zéro friction, zéro inscription.</p>
   </div>
   <div class="faq-item">
-    <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
-      Faut-il des compétences techniques ?
-      <span class="faq-arrow">▼</span>
-    </div>
-    <div class="faq-a">Aucune. Vous remplissez un formulaire en 2 minutes, vous obtenez votre QR code, vous l'affichez. C'est tout.</div>
+    <button class="faq-btn" onclick="toggleFaq(this)">Que se passe-t-il après les 14 jours ? <span class="faq-icon">+</span></button>
+    <p class="faq-answer">Vous recevez une notification avant la fin de l'essai. Si vous continuez, l'abonnement démarre à 14,99€/mois. Annulation possible à tout moment.</p>
   </div>
   <div class="faq-item">
-    <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
-      Que se passe-t-il avec les mauvaises notes ?
-      <span class="faq-arrow">▼</span>
-    </div>
-    <div class="faq-a">Vous recevez une alerte immédiate. L'avis reste dans votre dashboard privé et vous pouvez agir rapidement. Le client peut toujours choisir de publier sur Google s'il le souhaite.</div>
+    <button class="faq-btn" onclick="toggleFaq(this)">Est-ce que tous les avis vont sur Google ? <span class="faq-icon">+</span></button>
+    <p class="faq-answer">Oui. Chaque client, satisfait ou non, est invité à partager sur Google. Frizz ne filtre pas les avis — nous vous aidons à en collecter davantage.</p>
   </div>
   <div class="faq-item">
-    <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
-      Puis-je annuler à tout moment ?
-      <span class="faq-arrow">▼</span>
-    </div>
-    <div class="faq-a">Oui, sans condition et sans frais. Depuis votre dashboard ou en nous contactant sur Frizz.avis@gmail.com.</div>
+    <button class="faq-btn" onclick="toggleFaq(this)">Ça fonctionne pour quel type de restaurant ? <span class="faq-icon">+</span></button>
+    <p class="faq-answer">Tous. Brasserie, fast-food, gastronomique, café, pizzeria, take-away. Si vous avez des clients, Frizz fonctionne.</p>
   </div>
   <div class="faq-item">
-    <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
-      Ça marche pour quel type de restaurant ?
-      <span class="faq-arrow">▼</span>
-    </div>
-    <div class="faq-a">Oui — restaurant, café, brasserie, bar, take-away. Si vous avez des clients, Frizz peut collecter leurs avis.</div>
+    <button class="faq-btn" onclick="toggleFaq(this)">C'est compliqué à mettre en place ? <span class="faq-icon">+</span></button>
+    <p class="faq-answer">Non. Formulaire en 2 minutes, QR code immédiat, affichez-le sur vos tables. Premiers avis dès le premier service.</p>
   </div>
-</div>
+</section>
 
-
-
-<!-- CTA FINAL -->
-<div class="cta-final reveal">
-  <h2>Améliorez votre restaurant<br><em>grâce à vos clients.</em></h2>
-  <p>Collectez les avis après chaque repas, identifiez ce qui doit changer et suivez votre progression en temps réel.</p>
-  <a href="inscription.html" class="btn-big">Commencer gratuitement →</a>
-  <div style="margin-top:14px;font-size:13px;color:var(--muted)">7 jours gratuits · Pas de carte · Annulation en 1 clic</div>
-</div>
+<!-- FINAL CTA -->
+<section class="cta-section reveal">
+  <h2 class="cta-title">Votre restaurant mérite<br>de <em>s'améliorer.</em></h2>
+  <p class="cta-sub">Rejoignez les restaurants qui écoutent leurs clients et progressent chaque semaine.</p>
+  <a href="inscription.html" class="btn-primary" style="font-size:19px;padding:18px 48px">Essayer gratuitement 14 jours</a>
+  <p style="margin-top:16px;font-size:13px;color:var(--muted2);letter-spacing:-0.1px">Aucune carte bancaire · Annulation en 1 clic</p>
+</section>
 
 <!-- FOOTER -->
 <footer>
-  <div class="footer-logo">Frizz ✦</div>
-  <div class="footer-text">© 2026 Frizz · Suisse · Frizz.avis@gmail.com</div>
+  <div class="footer-logo">Frizz <span>✦</span></div>
+  <div class="footer-links">
+    <a href="inscription.html">Inscription</a>
+    <a href="mailto:Frizz.avis@gmail.com">Contact</a>
+  </div>
+  <p class="footer-copy">© 2026 Frizz</p>
 </footer>
 
 <script>
-// PARTICLES
-const particlesEl = document.getElementById('particles');
-for (let i = 0; i < 20; i++) {
-  const p = document.createElement('div');
-  p.className = 'particle';
-  p.style.left = Math.random() * 100 + '%';
-  p.style.bottom = Math.random() * 20 + '%';
-  p.style.animationDuration = (8 + Math.random() * 12) + 's';
-  p.style.animationDelay = (Math.random() * 10) + 's';
-  p.style.width = p.style.height = (2 + Math.random() * 4) + 'px';
-  p.style.opacity = 0;
-  particlesEl.appendChild(p);
+// ===== PARTICLE CANVAS =====
+(function() {
+  var canvas = document.getElementById('bg-canvas');
+  var ctx = canvas.getContext('2d');
+  var particles = [];
+  var W, H;
+
+  function resize() {
+    W = canvas.width = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  for (var i = 0; i < 80; i++) {
+    particles.push({
+      x: Math.random() * window.innerWidth,
+      y: Math.random() * window.innerHeight,
+      r: Math.random() * 1.5 + 0.3,
+      vx: (Math.random() - 0.5) * 0.3,
+      vy: (Math.random() - 0.5) * 0.3,
+      a: Math.random() * 0.4 + 0.1
+    });
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    particles.forEach(function(p) {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(88,204,2,' + p.a + ')';
+      ctx.fill();
+      p.x += p.vx; p.y += p.vy;
+      if (p.x < 0) p.x = W; if (p.x > W) p.x = 0;
+      if (p.y < 0) p.y = H; if (p.y > H) p.y = 0;
+    });
+
+    // Draw connections
+    for (var i = 0; i < particles.length; i++) {
+      for (var j = i+1; j < particles.length; j++) {
+        var dx = particles[i].x - particles[j].x;
+        var dy = particles[i].y - particles[j].y;
+        var dist = Math.sqrt(dx*dx+dy*dy);
+        if (dist < 120) {
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.strokeStyle = 'rgba(88,204,2,' + (0.06*(1-dist/120)) + ')';
+          ctx.lineWidth = 0.5;
+          ctx.stroke();
+        }
+      }
+    }
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// ===== COUNTER =====
+function animateCount(el, target, duration) {
+  var start = 0, step = target/(duration/16);
+  var t = setInterval(function() {
+    start += step; if(start>=target){start=target;clearInterval(t);}
+    el.textContent = Math.floor(start).toLocaleString('fr-FR');
+  }, 16);
 }
 
-const observer = new IntersectionObserver((entries) => {
-  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
-}, { threshold: 0.08 });
-document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+// ===== REVEAL =====
+var observer = new IntersectionObserver(function(entries) {
+  entries.forEach(function(e) {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+      if (e.target.classList.contains('proof-section')) {
+        animateCount(document.getElementById('proofNum'), 3241, 1800);
+      }
+    }
+  });
+}, { threshold: 0.12 });
+
+document.querySelectorAll('.reveal').forEach(function(el) { observer.observe(el); });
+
+
+
+// ===== FAQ =====
+function toggleFaq(btn) {
+  var item = btn.parentElement;
+  var open = item.classList.contains('open');
+  document.querySelectorAll('.faq-item').forEach(function(i){i.classList.remove('open');});
+  if (!open) item.classList.add('open');
+}
 </script>
 </body>
 </html>
