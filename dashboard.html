@@ -755,7 +755,7 @@ html, body { background: var(--bg); font-family: var(--font); color: var(--text)
 </div>
 
 <script>
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwfbPiZJ3tLj_0IeB0uvgdlVD0V3m0Fnu0jTD-ssvuvCN2PDiOCm9Z5ZcWyRd8XSS4G/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwmtKJ1hiCf-wVZ-Wj9GtTaf_HCdEb4AFt5qxaTUdxaEfUtPUNowafqWTDnQZ4qKQn8/exec';
 const BASE_URL = 'https://emcl22a-creator.github.io/frizz-client/';
 const STRIPE_LINK = 'https://buy.stripe.com/test_8x26oIcoO1H07Xn9cZbEA01';
 const TRIAL_DAYS = 14;
@@ -811,6 +811,14 @@ function editName(el) {
     div.style.cursor = 'pointer';
     input.replaceWith(div);
     localStorage.setItem('commerce_name_' + commerceId, newName);
+    generateQR();
+    try {
+      var url = new URL(SCRIPT_URL);
+      url.searchParams.set('action', 'save_nom');
+      url.searchParams.set('commerce_id', commerceId);
+      url.searchParams.set('nom', newName);
+      fetch(url.toString(), {method:'GET', mode:'no-cors'});
+    } catch(e) {}
   }
   input.addEventListener('blur', save);
   input.addEventListener('keydown', function(e) { if (e.key === 'Enter') input.blur(); if (e.key === 'Escape') { input.value = current; input.blur(); } });
@@ -1223,8 +1231,9 @@ function setChartPeriod(period) {
 }
 
 function generateQR() {
-  var clientUrl = BASE_URL + 'landing.html?id=' + commerceId;
-  document.getElementById('qrUrl').textContent = clientUrl;
+  var savedName = localStorage.getItem('commerce_name_' + commerceId) || commerceName;
+  var clientUrl = BASE_URL + 'landing.html?id=' + commerceId + '&name=' + encodeURIComponent(savedName);
+  document.getElementById('qrUrl').textContent = BASE_URL + 'landing.html?id=' + commerceId;
   var qrEl = document.getElementById('qrcode');
   qrEl.innerHTML='';
   new QRCode(qrEl,{text:clientUrl,width:200,height:200,colorDark:'#000000',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});
@@ -1406,6 +1415,14 @@ function editName(el) {
     div.style.cursor = 'pointer';
     input.replaceWith(div);
     localStorage.setItem('commerce_name_' + commerceId, newName);
+    generateQR();
+    try {
+      var url = new URL(SCRIPT_URL);
+      url.searchParams.set('action', 'save_nom');
+      url.searchParams.set('commerce_id', commerceId);
+      url.searchParams.set('nom', newName);
+      fetch(url.toString(), {method:'GET', mode:'no-cors'});
+    } catch(e) {}
   }
   input.addEventListener('blur', save);
   input.addEventListener('keydown', function(e) { if (e.key === 'Enter') input.blur(); if (e.key === 'Escape') { input.value = current; input.blur(); } });
