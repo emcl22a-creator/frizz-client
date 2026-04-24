@@ -289,7 +289,7 @@ html, body { background: #0A0A0A; margin: 0; padding: 0; font-family: 'Figtree',
   let googleUrl = params.get('google') || '#';
   let commerceName = params.get('name') || '';
   if (commerceName) {
-    document.getElementById('commerceName').textContent = commerceName;
+    document.getElementById('commerceName').textContent = decodeURIComponent(commerceName);
   }
 
   // Load logo from Sheet only
