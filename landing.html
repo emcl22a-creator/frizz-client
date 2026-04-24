@@ -287,10 +287,8 @@ html, body { background: #0A0A0A; margin: 0; padding: 0; font-family: 'Figtree',
   const params = new URLSearchParams(window.location.search);
   const commerceId = params.get('id') || 'demo';
   let googleUrl = params.get('google') || '#';
-  let commerceName = params.get('name') || '';
-  if (commerceName) {
-    document.getElementById('commerceName').textContent = decodeURIComponent(commerceName);
-  }
+  let commerceName = '';
+  // Name always loaded from Sheet via get_commerce_info below
 
   // Load logo from Sheet only
   (async () => {
