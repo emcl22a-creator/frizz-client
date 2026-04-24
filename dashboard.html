@@ -665,6 +665,14 @@ html, body { background: var(--bg); font-family: var(--font); color: var(--text)
       <div class="card-chevron">&#9660;</div>
     </div>
     <div class="card-body">
+      <div style="margin-bottom:16px">
+        <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px">Nom de votre commerce</div>
+        <div class="input-group">
+          <input class="input-field" id="nomCommerceInput" type="text" placeholder="Nom de votre commerce">
+          <button class="btn-save" onclick="saveNomCommerce()">Sauvegarder</button>
+        </div>
+        <div id="nomSavedOk" class="saved-ok">✓ Nom sauvegardé !</div>
+      </div>
       <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:12px">Logo affiché sur la page avis</div>
       <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px">
         <div class="logo-preview" id="logoPreview">🏪</div>
@@ -789,6 +797,8 @@ window.addEventListener('DOMContentLoaded', function() {
   checkCGU();
   initSubscription();
   updateAICounter();
+  var nomInput = document.getElementById('nomCommerceInput');
+  if (nomInput) nomInput.value = localStorage.getItem('commerce_name_' + commerceId) || commerceName;
   generateQR();
   loadData();
   setTimeout(loadSavedLogo, 500);
@@ -1328,6 +1338,24 @@ async function handleLogoUpload(input) {
     if(saving){saving.style.display='none';}
     alert('Erreur upload logo: ' + err.message);
   }
+}
+
+function saveNomCommerce() {
+  var val = document.getElementById('nomCommerceInput').value.trim();
+  if (!val) return;
+  localStorage.setItem('commerce_name_' + commerceId, val);
+  var headerName = document.getElementById('headerName');
+  if (headerName) headerName.textContent = val;
+  var ok = document.getElementById('nomSavedOk');
+  if (ok) { ok.style.display='block'; setTimeout(function(){ok.style.display='none';},2500); }
+  generateQR();
+  try {
+    var url = new URL(SCRIPT_URL);
+    url.searchParams.set('action','save_nom');
+    url.searchParams.set('commerce_id', commerceId);
+    url.searchParams.set('nom', val);
+    fetch(url.toString(), {method:'GET', mode:'no-cors'});
+  } catch(e) {}
 }
 
 function removeLogo() {
