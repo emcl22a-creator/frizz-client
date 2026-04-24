@@ -1288,32 +1288,46 @@ function showAlert(msg) {
   setTimeout(function(){el.style.display='none';},4000);
 }
 
-function handleLogoUpload(input) {
+async function handleLogoUpload(input) {
   var file=input.files[0]; if(!file)return;
-  var saving=document.getElementById('logoSaving'); if(saving)saving.style.display='block';
-  var reader=new FileReader();
-  reader.onload=function(e){
-    var img=new Image();
-    img.onload=function(){
-      var canvas=document.createElement('canvas'); var max=200;
-      var w=img.width,h=img.height;
-      if(w>h){if(w>max){h=Math.round(h*max/w);w=max;}}else{if(h>max){w=Math.round(w*max/h);h=max;}}
-      canvas.width=w;canvas.height=h;
-      canvas.getContext('2d').drawImage(img,0,0,w,h);
-      var compressed=canvas.toDataURL('image/jpeg',0.6);
-      var preview=document.getElementById('logoPreview');
-      if(preview)preview.innerHTML='<img src="'+compressed+'" style="width:100%;height:100%;object-fit:cover;border-radius:16px">';
-      document.getElementById('removeLogo').style.display='block';
-      localStorage.setItem('logo_'+commerceId,compressed);
-      localStorage.removeItem('cache_logo_'+commerceId);
-      if(saving)saving.style.display='none';
-      var ok=document.getElementById('logoSavedOk');
-      if(ok){ok.style.display='block';setTimeout(function(){ok.style.display='none';},2500);}
-      try{var logoUrl=new URL(SCRIPT_URL);logoUrl.searchParams.set('action','save_logo');logoUrl.searchParams.set('commerce_id',commerceId);logoUrl.searchParams.set('logo_url',compressed);fetch(logoUrl.toString(),{method:'GET',mode:'no-cors'});}catch(err){}
-    };
-    img.src=e.target.result;
-  };
-  reader.readAsDataURL(file);
+  var saving=document.getElementById('logoSaving');
+  if(saving){saving.style.display='block';saving.textContent='Upload en cours...';}
+
+  try {
+    // Upload to Imgur (free anonymous hosting)
+    var formData = new FormData();
+    formData.append('image', file);
+    var imgurResp = await fetch('https://api.imgur.com/3/image', {
+      method: 'POST',
+      headers: { 'Authorization': 'Client-ID 546c25a59c58ad7' },
+      body: formData
+    });
+    var imgurData = await imgurResp.json();
+    if (!imgurData.success) throw new Error('Imgur error');
+    var imageUrl = imgurData.data.link;
+
+    // Show preview
+    var preview=document.getElementById('logoPreview');
+    if(preview)preview.innerHTML='<img src="'+imageUrl+'" style="width:100%;height:100%;object-fit:cover;border-radius:16px">';
+    document.getElementById('removeLogo').style.display='block';
+    localStorage.setItem('logo_'+commerceId, imageUrl);
+    localStorage.removeItem('cache_logo_'+commerceId);
+
+    // Save URL to Sheet
+    var logoUrl=new URL(SCRIPT_URL);
+    logoUrl.searchParams.set('action','save_logo');
+    logoUrl.searchParams.set('commerce_id',commerceId);
+    logoUrl.searchParams.set('logo_url',imageUrl);
+    await fetch(logoUrl.toString(),{method:'GET',mode:'no-cors'});
+
+    if(saving){saving.style.display='none';}
+    var ok=document.getElementById('logoSavedOk');
+    if(ok){ok.style.display='block';setTimeout(function(){ok.style.display='none';},2500);}
+
+  } catch(err) {
+    if(saving){saving.style.display='none';}
+    alert('Erreur upload logo: ' + err.message);
+  }
 }
 
 function removeLogo() {
