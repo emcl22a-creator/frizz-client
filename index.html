@@ -432,6 +432,86 @@
   /* Reveal on scroll */
   .reveal{opacity:0;transform:translateY(20px);transition:opacity .8s ease, transform .8s ease;}
   .reveal.in{opacity:1;transform:translateY(0);}
+
+  /* ========== APPLE-STYLE ANIMATED BACKGROUND (MOBILE ONLY) ========== */
+  .hero-bg{
+    display:none; /* hidden by default (desktop) */
+    position:absolute;inset:0;
+    overflow:hidden;
+    pointer-events:none;
+    z-index:0;
+  }
+
+  @media(max-width:900px){
+    .hero-bg{display:block;}
+    /* Make hero content sit above the bg */
+    .hero-inner{position:relative;z-index:2;}
+    /* Disable the static radial in ::before on mobile, let orbs do the work */
+    .hero::before{opacity:0.3;}
+  }
+
+  /* Floating colored orbs */
+  .orb{
+    position:absolute;
+    border-radius:50%;
+    filter:blur(60px);
+    opacity:0.55;
+    will-change:transform, opacity;
+  }
+  .orb-1{
+    width:320px;height:320px;
+    background:radial-gradient(circle, rgba(88,204,2,0.6), transparent 70%);
+    top:-80px;left:-80px;
+    animation:orbFloat1 14s ease-in-out infinite;
+  }
+  .orb-2{
+    width:280px;height:280px;
+    background:radial-gradient(circle, rgba(74,184,2,0.5), transparent 70%);
+    top:30%;right:-100px;
+    animation:orbFloat2 18s ease-in-out infinite;
+  }
+  .orb-3{
+    width:360px;height:360px;
+    background:radial-gradient(circle, rgba(120,230,50,0.35), transparent 70%);
+    bottom:-120px;left:20%;
+    animation:orbFloat3 16s ease-in-out infinite;
+  }
+
+  @keyframes orbFloat1{
+    0%,100%{transform:translate(0,0) scale(1);opacity:0.55;}
+    33%{transform:translate(60px,80px) scale(1.15);opacity:0.7;}
+    66%{transform:translate(-40px,120px) scale(0.9);opacity:0.45;}
+  }
+  @keyframes orbFloat2{
+    0%,100%{transform:translate(0,0) scale(1);opacity:0.5;}
+    50%{transform:translate(-120px,-60px) scale(1.2);opacity:0.65;}
+  }
+  @keyframes orbFloat3{
+    0%,100%{transform:translate(0,0) scale(1);opacity:0.4;}
+    40%{transform:translate(-80px,-100px) scale(1.1);opacity:0.55;}
+    70%{transform:translate(100px,-40px) scale(0.95);opacity:0.5;}
+  }
+
+  /* Subtle animated grid lines (like Apple product pages) */
+  .grid-lines{
+    position:absolute;inset:0;
+    background-image:
+      linear-gradient(rgba(88,204,2,0.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(88,204,2,0.035) 1px, transparent 1px);
+    background-size:60px 60px;
+    mask-image:radial-gradient(ellipse at 50% 40%, black 30%, transparent 80%);
+    -webkit-mask-image:radial-gradient(ellipse at 50% 40%, black 30%, transparent 80%);
+    animation:gridDrift 20s linear infinite;
+  }
+  @keyframes gridDrift{
+    0%{background-position:0 0, 0 0;}
+    100%{background-position:60px 60px, 60px 60px;}
+  }
+
+  /* Respect reduced motion */
+  @media (prefers-reduced-motion: reduce){
+    .orb,.grid-lines{animation:none;}
+  }
 </style>
 </head>
 <body>
@@ -446,6 +526,13 @@
 
 <!-- HERO -->
 <section class="hero">
+  <!-- Mobile-only animated background -->
+  <div class="hero-bg" aria-hidden="true">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    <div class="grid-lines"></div>
+  </div>
   <div class="hero-inner">
     <div class="reveal in">
       <div class="hero-pill">
