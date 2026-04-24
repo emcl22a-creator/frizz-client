@@ -282,13 +282,15 @@ html, body { background: #0A0A0A; margin: 0; padding: 0; font-family: 'Figtree',
 <div class="toast" id="toast">📋 Résumé copié — collez-le sur Google !</div>
 
 <script>
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwfbPiZJ3tLj_0IeB0uvgdlVD0V3m0Fnu0jTD-ssvuvCN2PDiOCm9Z5ZcWyRd8XSS4G/exec';
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwmtKJ1hiCf-wVZ-Wj9GtTaf_HCdEb4AFt5qxaTUdxaEfUtPUNowafqWTDnQZ4qKQn8/exec';
 
   const params = new URLSearchParams(window.location.search);
   const commerceId = params.get('id') || 'demo';
   let googleUrl = params.get('google') || '#';
-  let commerceName = params.get('name') || 'Mon Commerce';
-  document.getElementById('commerceName').textContent = commerceName;
+  let commerceName = params.get('name') || '';
+  if (commerceName) {
+    document.getElementById('commerceName').textContent = commerceName;
+  }
 
   // Load logo from Sheet only
   (async () => {
