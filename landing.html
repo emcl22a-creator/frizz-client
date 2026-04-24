@@ -288,9 +288,24 @@ html, body { background: #0A0A0A; margin: 0; padding: 0; font-family: 'Figtree',
   const commerceId = params.get('id') || 'demo';
   let googleUrl = params.get('google') || '#';
   let commerceName = '';
-  // Name always loaded from Sheet via get_commerce_info below
 
-  // Load logo from Sheet only
+  // Show cached data instantly
+  const cachedName = localStorage.getItem('cache_nom_' + commerceId);
+  const cachedLogo = localStorage.getItem('cache_logo_' + commerceId);
+  const cachedGoogle = localStorage.getItem('cache_google_' + commerceId);
+  if (cachedName) {
+    commerceName = cachedName;
+    const nameEl = document.getElementById('commerceName');
+    if (nameEl) nameEl.textContent = cachedName;
+    document.title = cachedName + ' — Avis';
+  }
+  if (cachedLogo) {
+    const avatarEl = document.getElementById('avatarEl');
+    if (avatarEl) avatarEl.innerHTML = '<img src="' + cachedLogo + '" style="width:100%;height:100%;object-fit:cover;border-radius:18px">';
+  }
+  if (cachedGoogle) googleUrl = cachedGoogle;
+
+  // Fetch from Sheet in background and update cache
   (async () => {
     try {
       const url = new URL(SCRIPT_URL);
@@ -303,13 +318,16 @@ html, body { background: #0A0A0A; margin: 0; padding: 0; font-family: 'Figtree',
         const nameEl = document.getElementById('commerceName');
         if (nameEl) nameEl.textContent = commerceName;
         document.title = commerceName + ' — Avis';
+        localStorage.setItem('cache_nom_' + commerceId, commerceName);
       }
       if (json && json.logo_url) {
         const avatarEl = document.getElementById('avatarEl');
         if (avatarEl) avatarEl.innerHTML = '<img src="' + json.logo_url + '" style="width:100%;height:100%;object-fit:cover;border-radius:18px">';
+        localStorage.setItem('cache_logo_' + commerceId, json.logo_url);
       }
       if (json && json.google) {
         googleUrl = json.google;
+        localStorage.setItem('cache_google_' + commerceId, json.google);
       }
     } catch(e) {}
   })();
